@@ -37,6 +37,16 @@ The Goal of this Exercise is to have a functioning Movie Database for the FH Mov
   .) Beware of method/function names and variables - state that it is clear what the variable does or the function/method</br>
   .) methodNames start with small letters and class names start with big letters</br>
   .) Write JavaDoc commentary for methods to ensure clear aspect
+
+## How to commit/push a code to the branch:
+  > .) checkout the branch you need to work on</br>
+> .) work on the branch, and change code</br>
+  > .) go to the commit window, and mark the changes you want to commit (after testing and if there are NO bugs/errors)</br>
+  > .) Commit message template:  Exercise and number of Exercise [name] commit message</br>
+  > for example:  Exercise1 [Julia] this is a commit message</br></br>
+  > FIRST: update the branch by right click & update</br></br>
+  > THEN: push the committed code if no merge conflicts come up</br></br>
+  > IF there are merge conflicts -> first merge them, test and bugfix again and afterwards commit & push anew
       
 
 ## Start the application
