@@ -22,5 +22,6 @@ public class FHMDbApplication extends Application {
     public static void main(String[] args) {
         launch();
         //comment for contributor initialization
+        //comment for contributor initialization
     }
 }
