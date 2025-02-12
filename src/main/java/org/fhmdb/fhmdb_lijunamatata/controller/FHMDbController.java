@@ -7,29 +7,24 @@ import javafx.scene.control.Label;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class FHMDbController implements Initializable {
-    @FXML
-    private Label welcomeText;
+public class FHMDbController {
+   /*   @FXML
+        private Label welcomeText;
+        --> annotation for a element on the GUI
+    */
 
-    public FHMDbController(Label welcomeText) {
-        this.welcomeText = welcomeText;
-    }
 
     public FHMDbController() {
         //No args constructor for initialization
     }
 
-    @FXML
-    public void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
-    }
+    //TODO: Sort Button!
 
-    public Label getWelcomeText() {
-        return welcomeText;
-    }
+    //TODO: Filtering with query
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        //Do Stuff
-    }
+    //TODO: Filtering with genres
+
+    //TODO: Updating Logic
+    //Working with elements from the view has to have the annotation @FXML, please look up JavaFX if you are uncertain
+
 }

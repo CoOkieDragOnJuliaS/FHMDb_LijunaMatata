@@ -16,7 +16,7 @@ public class FHMDbControllerTest {
     - Sorting Ascending
     - Sorting Descending
 
-    //Don't forget Documentation JavaDoc
+    //Don't forget Documentation JavaDoc!!!
      */
 
 
@@ -25,8 +25,11 @@ public class FHMDbControllerTest {
         //BeforSetup
     }
 
+    /*
+    --> this is an example test
     @Test
     public void test() {
         assertTrue(true);
     }
+    */
 }

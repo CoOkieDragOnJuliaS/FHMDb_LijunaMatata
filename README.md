@@ -35,6 +35,7 @@ The Goal of this Exercise is to have a functioning Movie Database for the FH Mov
 ## Coding Conventions:
   .) Naming Conventions are in English, camelCase is mandatory</br>
   .) Beware of method/function names and variables - state that it is clear what the variable does or the function/method</br>
+  .) methodNames start with small letters and class names start with big letters</br>
   .) Write JavaDoc commentary for methods to ensure clear aspect
       
 
