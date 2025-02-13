@@ -1,4 +1,4 @@
-package org.fhmdb.fhmdb_lijunamatata;
+package org.fhmdb.fhmdb_lijunamatata.models;
 
 public enum Genre {
     ACTION,
