@@ -11,4 +11,6 @@ module org.fhmdb.fhmdb_lijunamatata {
     exports org.fhmdb.fhmdb_lijunamatata;
     exports org.fhmdb.fhmdb_lijunamatata.controller;
     opens org.fhmdb.fhmdb_lijunamatata.controller to javafx.fxml;
+    exports org.fhmdb.fhmdb_lijunamatata.models;
+    opens org.fhmdb.fhmdb_lijunamatata.models to javafx.fxml;
 }

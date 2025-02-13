@@ -1,9 +1,6 @@
 package org.fhmdb.fhmdb_lijunamatata.controller;
 
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import org.fhmdb.fhmdb_lijunamatata.Movie;
+import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 
 import java.net.URL;
 import java.util.List;
