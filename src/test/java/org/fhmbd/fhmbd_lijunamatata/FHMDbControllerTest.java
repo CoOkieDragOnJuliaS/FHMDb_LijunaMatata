@@ -66,12 +66,10 @@ public class FHMDbControllerTest{
         assertEquals(expectedGenres, this.movies.get(0).getGenres());
     }
 
-    //TODO: Test rewriting - the information below does not test the code in the Controller
-    //unfortunately the testing does not work from this point on without mocking the elements
     @Test
     @DisplayName("Test sorting in ascending order")
     public void testSortAscending() {
-        movieController.sortMovies();
+        movieController.sortMovieAlgorithm(movies, true);
         assertEquals("Avatar", movieController.getMovies().get(0).getTitle());
         assertEquals("The Wolf of Wall Street", movieController.getMovies().get(movieController.getMovies().size() - 1).getTitle());
     }
@@ -79,8 +77,7 @@ public class FHMDbControllerTest{
     @Test
     @DisplayName("Test sorting in descending order")
     public void testSortDescending() {
-        movieController.sortMovies();   //first ascending sort
-        movieController.sortMovies();   //then descending sort
+        movieController.sortMovieAlgorithm(movies, false);
         assertEquals("The Wolf of Wall Street", movieController.getMovies().get(0).getTitle());
         assertEquals("Avatar", movieController.getMovies().get(movieController.getMovies().size() - 1).getTitle());
     }
@@ -91,3 +88,5 @@ public class FHMDbControllerTest{
         assertDoesNotThrow(() -> movieController.updateMovieListView());
     }
 }
+
+

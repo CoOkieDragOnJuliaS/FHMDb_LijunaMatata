@@ -35,43 +35,62 @@ public class FHMDbController implements Initializable {
     }
 
     /**
-     * JavaDoc which tells what the method has to do - in this case sortMovies or sortListOfMovies
+     * Handles the sorting button click event.
+     * Calls the sortMovies() method to toggle the sorting order.
      */
     @FXML
     private void onSortButtonClick() {
         sortMovies();
     }
 
-    //TODO: separate sortingLogic from FXML button elements for better testing?!
-    //maybe update of sortButtonText in another method?
     /**
-     * JavaDoc which tells what the method has to do - in this case sortMovies or sortListOfMovies
+     * Sorts the list of movies based on the current sorting order.
+     * Updates the button text and refreshes the movie list view.
      */
     public void sortMovies() {
         if (movies == null || movies.isEmpty())
-            return; //return and check is necessary to avoid NullPointerException when checking
+            return;
 
-        //other way of testing is to ask if it is not null and notEmpty and therefore work the logic below
-        if (isAscending) {
-            movies.sort(Comparator.comparing(Movie::getTitle));
-            sortBtn.setText("Sort (desc)");
-        } else {
-            movies.sort(Comparator.comparing(Movie::getTitle).reversed());
-            sortBtn.setText("Sort (asc)");
-        }
+        sortMovieAlgorithm(movies, isAscending);
+
+        updateSortButtonText();
 
         isAscending = !isAscending;
         updateMovieListView();
     }
 
+    /**
+     * Sorts the given list of movies either in ascending or descending order by title.
+     *
+     * @param movies The list of movies to be sorted.
+     * @param isAscending Determines the sorting order:
+     *                    true for ascending, false for descending.
+     */
+    public void sortMovieAlgorithm(List<Movie> movies, boolean isAscending) {
+        if (isAscending) {
+            movies.sort(Comparator.comparing(Movie::getTitle));
+        } else {
+            movies.sort(Comparator.comparing(Movie::getTitle).reversed());
+        }
+    }
 
+    /**
+     * Updates the sort button text based on the current sorting order.
+     * This method ensures that the UI element is updated only when available.
+     */
+    private void updateSortButtonText() {
+        if (sortBtn != null) {
+            sortBtn.setText(isAscending ? "Sort (desc)" : "Sort (asc)");
+        }
+    }
 
     //TODO: Filtering with query
 
     //TODO: Filtering with genres
 
     /**
-     * What does this method do, short explanation and what happens, BUT: was not part of the issue
+     * Updates the movie list view by clearing and repopulating it with sorted movie titles.
+     * Ensures the UI list correctly reflects the current order of movies.
      */
     public void updateMovieListView() {
         if (movieListView == null) return;
