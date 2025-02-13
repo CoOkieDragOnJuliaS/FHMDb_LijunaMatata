@@ -29,7 +29,8 @@
     </HBox>
     <HBox spacing="5.0" styleClass="background-black" stylesheets="@styles.css">
         <children>
-            <Button fx:id="sortBtn" styleClass="background-yellow" stylesheets="@styles.css" text="Sort (asc)"/>
+            <Button fx:id="sortBtn" styleClass="background-yellow" stylesheets="@styles.css"
+                    text="Sort (asc)" onAction="#onSortButtonClick"/>
             <TextField fx:id="searchField" prefHeight="25.0" prefWidth="170.0" promptText="Search FHMDb"/>
             <ComboBox fx:id="genreComboBox" styleClass="filter-combo-box" stylesheets="@styles.css"/>
             <Button fx:id="searchBtn" styleClass="background-yellow" stylesheets="@styles.css" text="Filter"/>
