@@ -1,22 +1,20 @@
 package org.fhmbd.fhmbd_lijunamatata;
 
+import org.fhmdb.fhmdb_lijunamatata.controller.FHMDbController;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
-import org.fhmdb.fhmdb_lijunamatata.controller.FHMDbController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Comparator;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FHMDbControllerTest {
+public class FHMDbControllerTest{
 
     //TODO: Testing (TDD Principle)
     /*
-    - Testing of Initializing movies
     - Testing of Filtering by Genre
     - Testing of Filtering by Query (positive Entry)
     - Testing Filtering by Query (Empty String)
@@ -24,37 +22,32 @@ public class FHMDbControllerTest {
     - Sorting Ascending
     - Sorting Descending
 
-    //Don't forget Documentation JavaDoc!!!
      */
-    private FHMDbController controller;
+    private FHMDbController movieController;
     private List<Movie> movies;
 
     @BeforeEach
     public void setUp() {
-        //BeforSetup
-        controller = new FHMDbController();
-        movies = Movie.initializeMovies();
+        //BeforeSetup
+        this.movieController = new FHMDbController();
+        this.movies = Movie.initializeMovies();
+        movieController.setMovies(this.movies);
+        //Update: Mocking the Buttons e.g. does not work because Mockito is not able to mock JavaFX private elements or final classes
+        //Avoiding the UI elements and focusing on the testing of logic in the method is necessary
+        //Another solution (maybe later purposes) is using WrapperClasses to wrap around the JavaFX elements needed to mock
     }
-
-    /*
-    --> this is an example test
-    @Test
-    public void test() {
-        assertTrue(true);
-    }
-    */
 
     @Test
     @DisplayName("Test initialize Movies: Movies not empty")
-    public void testInitializeMovies_notEmpty() {
-        assertFalse(movies.isEmpty());
+    public void testInitializeMsovies_notEmpty() {
+        assertFalse(this.movies.isEmpty());
     }
 
     @Test
     @DisplayName("Test initialize Movies: First Movie has expected title")
     public void testInitializeMovies_firstMovieTitle_equals_expected() {
         String expectedTitle = "Life Is Beautiful";
-        assertEquals(expectedTitle, movies.get(0).getTitle());
+        assertEquals(expectedTitle, this.movies.get(0).getTitle());
     }
 
     @Test
@@ -63,35 +56,38 @@ public class FHMDbControllerTest {
         String expectedDescription = "When an open-minded Jewish librarian and his son become victims of" +
                 " the Holocaust, he uses a perfect mixture of will, humor, and imagination to protect his son from " +
                 "the dangers around their camp.";
-        assertEquals(expectedDescription, movies.get(0).getDescription());
+        assertEquals(expectedDescription, this.movies.get(0).getDescription());
     }
 
     @Test
     @DisplayName("Test initialize Movies: First Movie has expected genres")
     public void testInitializeMovies_firstMovieGenres_equals_expected() {
         List<Genre> expectedGenres = List.of(Genre.DRAMA, Genre.ROMANCE);
-        assertEquals(expectedGenres, movies.get(0).getGenres());
+        assertEquals(expectedGenres, this.movies.get(0).getGenres());
     }
 
+    //TODO: Test rewriting - the information below does not test the code in the Controller
+    //unfortunately the testing does not work from this point on without mocking the elements
     @Test
     @DisplayName("Test sorting in ascending order")
     public void testSortAscending() {
-        movies.sort(Comparator.comparing(Movie::getTitle));
-        assertEquals("Avatar", movies.get(0).getTitle());
-        assertEquals("The Wolf of Wall Street", movies.get(movies.size() - 1).getTitle());
+        movieController.sortMovies();
+        assertEquals("Avatar", movieController.getMovies().get(0).getTitle());
+        assertEquals("The Wolf of Wall Street", movieController.getMovies().get(movieController.getMovies().size() - 1).getTitle());
     }
 
     @Test
     @DisplayName("Test sorting in descending order")
     public void testSortDescending() {
-        movies.sort(Comparator.comparing(Movie::getTitle).reversed());
-        assertEquals("The Wolf of Wall Street", movies.get(0).getTitle());
-        assertEquals("Avatar", movies.get(movies.size() - 1).getTitle());
+        movieController.sortMovies();   //first ascending sort
+        movieController.sortMovies();   //then descending sort
+        assertEquals("The Wolf of Wall Street", movieController.getMovies().get(0).getTitle());
+        assertEquals("Avatar", movieController.getMovies().get(movieController.getMovies().size() - 1).getTitle());
     }
 
     @Test
     @DisplayName("Test updateMovieListView does not throw exceptions")
     public void testUpdateMovieListView() {
-        assertDoesNotThrow(() -> controller.updateMovieListView());
+        assertDoesNotThrow(() -> movieController.updateMovieListView());
     }
 }
