@@ -146,7 +146,7 @@ public class FHMDbController {
 
 
     //TODO: Updating Logic
-    // Working with elements from the view has to have the annotation @FXML, please look up JavaFX if you are uncertain
+    //Working with elements from the view has to have the annotation @FXML, please look up JavaFX if you are uncertain
     public void filterBtn(ActionEvent actionEvent) {
         getSearchText();
         getSelectedGenre();
