@@ -20,7 +20,7 @@ public class FHMDbController {
 
     private List<Movie> movies;
     private boolean sort = true;
-    private String searchText;
+    private String searchText = "";
     private Genre genre;
     private MovieService movieService;
 
@@ -42,14 +42,30 @@ public class FHMDbController {
     /**
      * Initializes the ComboBox with a "no genre" option followed by all genres from the {@link Genre} enum.
      * The first item, representing "no genre", is selected by default.
+     * Additionally, sets up listeners to automatically update the search text and selected genre.
+
+     * - The `searchText` is automatically updated whenever the user types in the `searchField`.
+     * - The `genre` is automatically updated whenever a new genre is selected from the `genreComboBox`.
      */
     @FXML
     public void initialize() {
+        // Create an ObservableList to store genre options, including a "no genre" option.
         ObservableList<Genre> genreOptions = FXCollections.observableArrayList();
         genreOptions.add(null);
         genreOptions.addAll(Genre.values());
         genreComboBox.setItems(genreOptions);
+        /* Alternative
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            searchText = newValue;
+        });
+        genreComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            genre = (Genre) newValue;
+        });
+         */
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> searchText = newValue);
+        genreComboBox.valueProperty().addListener((observable, oldValue, newValue) -> genre = (Genre) newValue);
     }
+
 
     /**
      * Toggles the sorting order between ascending and descending when the button is clicked.
@@ -68,27 +84,9 @@ public class FHMDbController {
         }
     }
 
-    /**
-     * Retrieves the text entered in the search field and stores it in the {@code searchText} variable.
-     */
-    public void getSearchText() {
-        searchText = searchField.getText(); // Получаем текст из TextField
-    }
-
-    /**
-     * Retrieves the selected genre from the ComboBox and stores it in the {@code genre} variable.
-     * The selected genre is cast to the {@link Genre} type and can be {@code null} if no genre is selected.
-     */
-    public void getSelectedGenre() {
-        genre = (Genre) genreComboBox.getValue(); // Получаем выбранный жанр из ComboBox
-    }
-
-
     //TODO: Updating Logic
     //Working with elements from the view has to have the annotation @FXML, please look up JavaFX if you are uncertain
-    public void filterBtn(ActionEvent actionEvent) {
-        getSearchText();
-        getSelectedGenre();
+    public void filterBtn() {
         // Filter movies
         List<Movie> filteredMovies = movieService.filterMovies(movies, searchText, genre);
         // Sort movies
