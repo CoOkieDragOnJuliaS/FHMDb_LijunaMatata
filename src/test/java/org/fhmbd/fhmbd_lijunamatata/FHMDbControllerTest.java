@@ -1,5 +1,7 @@
 package org.fhmbd.fhmbd_lijunamatata;
 
+import javafx.scene.control.ComboBox;
+import org.fhmdb.fhmdb_lijunamatata.controller.FHMDbController;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,10 +27,11 @@ public class FHMDbControllerTest {
     //Don't forget Documentation JavaDoc!!!
      */
     private List<Movie> movies;
+    private FHMDbController controller;
 
     @BeforeEach
     public void setUp() {
-        //BeforSetup
+        //BeforeSetup
         movies = Movie.initializeMovies();
     }
 
@@ -68,4 +71,5 @@ public class FHMDbControllerTest {
         List<Genre> expectedGenres = List.of(Genre.DRAMA, Genre.ROMANCE);
         assertEquals(expectedGenres, movies.get(0).getGenres());
     }
+
 }
