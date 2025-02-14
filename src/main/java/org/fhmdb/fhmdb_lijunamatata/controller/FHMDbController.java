@@ -3,6 +3,7 @@ package org.fhmdb.fhmdb_lijunamatata.controller;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
+import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
 
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
@@ -12,7 +13,6 @@ import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -22,6 +22,7 @@ public class FHMDbController {
     private boolean sort = true;
     private String searchText;
     private Genre genre;
+    private MovieService movieService;
 
     @FXML
     public TextField searchField;
@@ -35,6 +36,7 @@ public class FHMDbController {
     public FHMDbController() {
         //No args constructor for initialization
         movies = Movie.initializeMovies();
+        movieService = new MovieService();
     }
 
     /**
@@ -67,51 +69,10 @@ public class FHMDbController {
     }
 
     /**
-     * Sorts a list of movies based on their titles in either ascending or descending order,
-     * depending on the value of the {@code sort} variable.
-     *
-     * @param sortedMovies The list of movies to be sorted.
-     * @return The sorted list of movies.
-     */
-    private List<Movie> sortMovies(List<Movie> sortedMovies) {
-        for (int i = 0; i < sortedMovies.size() - 1; i++) {
-            if(sort) {
-                // sort asc
-                sortedMovies.sort((movie1, movie2) -> movie1.getTitle().compareTo(movie2.getTitle()));
-            } else {
-                // sort desc
-                sortedMovies.sort((movie1, movie2) -> movie2.getTitle().compareTo(movie1.getTitle()));
-            }
-        }
-        return sortedMovies;
-    }
-
-    /**
-     * Checks if the movie title contains the search text, ignoring case sensitivity.
-     *
-     * @param movie The movie to be checked.
-     * @return {@code true} if the movie title contains the search text; {@code false} otherwise.
-     */
-    private boolean isMatchesSearchText(Movie movie) {
-        return movie.getTitle().toLowerCase().contains(searchText.toLowerCase());
-    }
-
-    /**
      * Retrieves the text entered in the search field and stores it in the {@code searchText} variable.
      */
     public void getSearchText() {
         searchText = searchField.getText(); // Получаем текст из TextField
-    }
-
-    /**
-     * Checks if the movie's genres contain the selected genre.
-     * If no genre is selected (i.e., {@code genre} is {@code null}), it returns {@code true} for any movie.
-     *
-     * @param movie The movie to be checked.
-     * @return {@code true} if the movie's genres contain the selected genre, or if no genre is selected; {@code false} otherwise.
-     */
-    private boolean isMatchesGenre(Movie movie) {
-        return (genre == null || movie.getGenres().contains(genre));
     }
 
     /**
@@ -122,39 +83,18 @@ public class FHMDbController {
         genre = (Genre) genreComboBox.getValue(); // Получаем выбранный жанр из ComboBox
     }
 
-    /**
-     * Filters the list of movies based on the current search text and selected genre.
-     * The method checks each movie's title against the search text and its genres against the selected genre.
-     * Only movies that match both criteria are included in the returned list.
-     *
-     * @return A list of movies that match the search text and selected genre.
-     */
-    private List<Movie> filterMovies() {
-        List<Movie> filteredMovies = new ArrayList<>();
-        for (Movie movie : movies) {
-            // by text in title
-            boolean matchesSearchText = isMatchesSearchText(movie);
-            // by gerne
-            boolean matchesGenre = isMatchesGenre(movie);
-            // add to Array
-            if (matchesSearchText && matchesGenre) {
-                filteredMovies.add(movie);
-            }
-        }
-        return filteredMovies;
-    }
-
 
     //TODO: Updating Logic
     //Working with elements from the view has to have the annotation @FXML, please look up JavaFX if you are uncertain
     public void filterBtn(ActionEvent actionEvent) {
         getSearchText();
         getSelectedGenre();
-        // filter
-        List<Movie> filteredMovies = filterMovies();
-        // sort
-        List<Movie> sortedMovies = sortMovies(filteredMovies);
+        // Filter movies
+        List<Movie> filteredMovies = movieService.filterMovies(movies, searchText, genre);
+        // Sort movies
+        List<Movie> sortedMovies = movieService.sortMovies(filteredMovies, sort);
 
+        // Display sorted movie titles
         for (Movie movie : sortedMovies) {
             System.out.println(movie.getTitle());
         }
