@@ -1,6 +1,7 @@
 package org.fhmdb.fhmdb_lijunamatata.controller;
 
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -10,21 +11,18 @@ import javafx.scene.control.TextField;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
+import org.fhmdb.fhmdb_lijunamatata.ui.MovieCell;
 
 import java.util.List;
 
 
 public class FHMDbController {
-    @FXML
-    private Button sortBtn;
 
-    @FXML
-    private ListView<String> movieListView;
-
+    //private List<Movie> filteredMovies;
     private Genre genre;
     private boolean isAscending = true;
-    private List<Movie> movies;
-    private List<Movie> filteredMovies;
+    private ObservableList<Movie> movies;
+    private ObservableList<Movie> filteredMovies;
     private MovieService movieService;
     private String searchText = "";
 
@@ -33,6 +31,12 @@ public class FHMDbController {
 
     @FXML
     public ComboBox<Genre> genreComboBox;
+
+    @FXML
+    private ListView<Movie> movieListView;
+
+    @FXML
+    private Button sortBtn;
 
     @FXML
     public TextField searchField;
@@ -50,12 +54,14 @@ public class FHMDbController {
      */
     @FXML
     public void initialize() {
-        this.movies = Movie.initializeMovies();
+        this.movies = FXCollections.observableList(Movie.initializeMovies());
         this.filteredMovies = this.movies;
         this.movieService = new MovieService();
 
         //Initial update of the movie list on the UI
+        movieListView.setCellFactory(movieListView -> new MovieCell()); // use custom cell factory to display data
         updateMovieListView();
+
         //Initialization of genreComboBox
         initializeGenreComboBox();
 
@@ -65,6 +71,9 @@ public class FHMDbController {
         });
         genreComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             genre = newValue;
+        });
+        this.filteredMovies.addListener((ListChangeListener<? super Movie>) c -> {
+            updateMovieListView();
         });
     }
 
@@ -97,11 +106,10 @@ public class FHMDbController {
         if (this.filteredMovies == null || this.filteredMovies.isEmpty())
             return;
 
-        this.movieService.sortMovies(this.filteredMovies, this.isAscending);
+        this.filteredMovies = FXCollections.observableList(this.movieService.sortMovies(this.filteredMovies, this.isAscending));
         updateSortButtonText();
 
         this.isAscending = !this.isAscending;
-        updateMovieListView();
     }
 
     /**
@@ -129,27 +137,25 @@ public class FHMDbController {
      */
     private void filterMovies(){
         // Filter movies
-        this.filteredMovies = this.movies;
-        this.filteredMovies = this.movieService.filterMovies(this.filteredMovies, this.searchText, this.genre);
-        updateMovieListView();
+        //TODO: Bugfix Filtering movies with new MovieCell method of UI change
+        this.filteredMovies.removeAll();
+        this.filteredMovies.addAll(this.movies);
+        this.filteredMovies = FXCollections.observableList(this.movieService.filterMovies(this.filteredMovies, this.searchText, this.genre));
     }
-
 
     /**
      * Updates the movie list view by clearing and repopulating it with sorted movie titles.
      * Ensures the UI list correctly reflects the current order of movies.
      */
     public void updateMovieListView() {
+        //TODO: Bugfix updating the listview according to the changes
         if (this.movieListView == null) return;
         this.movieListView.getItems().clear();
-        for (Movie movie : this.filteredMovies) {
-            this.movieListView.getItems().add(movie.getTitle());
-        }
+        this.movieListView.getItems().addAll(this.filteredMovies);
     }
-
 
     //Getter, Setter
     public void setMovies(List<Movie> movies) {
-        this.movies = movies;
+        this.movies = FXCollections.observableList(movies);
     }
 }
