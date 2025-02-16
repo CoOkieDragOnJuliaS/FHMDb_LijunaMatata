@@ -3,39 +3,153 @@ package org.fhmdb.fhmdb_lijunamatata.controller;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
-import org.fhmdb.fhmdb_lijunamatata.ui.MovieCell;
+import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
 
-import java.net.URL;
 import java.util.List;
-import java.util.ResourceBundle;
 
-public class FHMDbController implements Initializable {
 
-    private List<Movie> movies;
+public class FHMDbController {
     @FXML
-    ListView<Movie> movieListView;
+    private Button sortBtn;
+
+    @FXML
+    private ListView<String> movieListView;
+
+    private Genre genre;
+    private boolean isAscending = true;
+    private List<Movie> movies;
+    private List<Movie> filteredMovies;
+    private MovieService movieService;
+    private String searchText = "";
+
+    @FXML
+    public Button filterBtn;
+
+    @FXML
+    public ComboBox<Genre> genreComboBox;
+
+    @FXML
+    public TextField searchField;
 
     public FHMDbController() {
         //No args constructor for initialization
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        movies = Movie.initializeMovies();
-        movieListView.setItems(FXCollections.observableArrayList(movies));
-        movieListView.setCellFactory(movieListView -> new MovieCell());
+    /**
+     * Initializes the movie database and initializes the listview, combobox and movies
+     * Additionally, sets up listeners to automatically update the search text and selected genre.
+     * <p>
+     * - The `searchText` is automatically updated whenever the user types in the `searchField`.
+     * - The `genre` is automatically updated whenever a new genre is selected from the `genreComboBox`.
+     */
+    @FXML
+    public void initialize() {
+        this.movies = Movie.initializeMovies();
+        this.filteredMovies = this.movies;
+        this.movieService = new MovieService();
+
+        //Initial update of the movie list on the UI
+        updateMovieListView();
+        //Initialization of genreComboBox
+        initializeGenreComboBox();
+
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            searchText = newValue;
+            filterMovies();
+        });
+        genreComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            genre = newValue;
+        });
     }
 
-    //TODO: Sort Button!
+    /**
+     * Initializes the ComboBox with a "no genre" option followed by all genres from the {@link Genre} enum.
+     * The first item, representing "no genre", is selected by default.
+     */
+    private void initializeGenreComboBox() {
+        // Create an ObservableList to store genre options, including a "no genre" option.
+        ObservableList<Genre> genreOptions = FXCollections.observableArrayList();
+        genreOptions.add(null);
+        genreOptions.addAll(Genre.values());
+        this.genreComboBox.setItems(genreOptions);
+    }
 
-    //TODO: Filtering with query
+    /**
+     * Handles the sorting button click event.
+     * Calls the sortMovies() method to toggle the sorting order.
+     */
+    @FXML
+    private void onSortButtonClick() {
+        sortMovies();
+    }
 
-    //TODO: Filtering with genres
+    /**
+     * Sorts the list of movies based on the current sorting order.
+     * Updates the button text and refreshes the movie list view.
+     */
+    public void sortMovies() {
+        if (this.filteredMovies == null || this.filteredMovies.isEmpty())
+            return;
 
-    //TODO: Updating Logic
-    //Working with elements from the view has to have the annotation @FXML, please look up JavaFX if you are uncertain
+        this.movieService.sortMovies(this.filteredMovies, this.isAscending);
+        updateSortButtonText();
 
+        this.isAscending = !this.isAscending;
+        updateMovieListView();
+    }
+
+    /**
+     * Updates the sort button text based on the current sorting order.
+     * This method ensures that the UI element is updated only when available.
+     */
+    private void updateSortButtonText() {
+        if (this.sortBtn != null) {
+            this.sortBtn.setText(this.isAscending ? "Sort (desc)" : "Sort (asc)");
+        }
+    }
+
+    /**
+     * Handles the filter button click event.
+     * Calls the filterMovies() method to trigger filtering
+     */
+    @FXML
+    public void onFilterButtonClick() {
+        //Calling the filterMovies() method to separate FXMl of logic
+        filterMovies();
+    }
+
+    /**
+     * Calls the filterMovies method inside the movieService class and updates the movieListView
+     */
+    private void filterMovies(){
+        // Filter movies
+        this.filteredMovies = this.movies;
+        this.filteredMovies = this.movieService.filterMovies(this.filteredMovies, this.searchText, this.genre);
+        updateMovieListView();
+    }
+
+
+    /**
+     * Updates the movie list view by clearing and repopulating it with sorted movie titles.
+     * Ensures the UI list correctly reflects the current order of movies.
+     */
+    public void updateMovieListView() {
+        if (this.movieListView == null) return;
+        this.movieListView.getItems().clear();
+        for (Movie movie : this.filteredMovies) {
+            this.movieListView.getItems().add(movie.getTitle());
+        }
+    }
+
+
+    //Getter, Setter
+    public void setMovies(List<Movie> movies) {
+        this.movies = movies;
+    }
 }
