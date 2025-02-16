@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MovieServiceTest {
+public class MovieServiceTest {
 
     private MovieService movieService;
     private List<Movie> movies;
@@ -23,19 +23,19 @@ class MovieServiceTest {
     }
 
     @Test
-    @DisplayName("Test Sorting in Ascending Order")
-    void testSortMoviesAscending() {
+    @DisplayName("Test sorting in ascending order")
+    public void testSortMoviesAscending() {
         List<Movie> sortedMovies = movieService.sortMovies(movies, true);
-        assertEquals("Avatar", sortedMovies.get(0).getTitle(),
-                "The first movie in ascending order should be 'Avatar'.");
+        assertEquals("Avatar", sortedMovies.get(0).getTitle());
+        assertEquals("The Wolf of Wall Street", sortedMovies.get(sortedMovies.size() - 1).getTitle());
     }
 
     @Test
-    @DisplayName("Test Sorting in Descending Order")
-    void testSortMoviesDescending() {
+    @DisplayName("Test sorting in descending order")
+    public void testSortMoviesDescending() {
         List<Movie> sortedMovies = movieService.sortMovies(movies, false);
-        assertEquals("The Wolf of Wall Street", sortedMovies.get(0).getTitle(),
-                "The first movie in descending order should be 'The Wolf of Wall Street'.");
+        assertEquals("The Wolf of Wall Street", sortedMovies.get(0).getTitle());
+        assertEquals("Avatar", sortedMovies.get(sortedMovies.size() - 1).getTitle());
     }
 
     @Test
@@ -58,8 +58,8 @@ class MovieServiceTest {
     @DisplayName("Test Filtering Movies by Search Text and Genre")
     void testFilterMoviesBySearchTextAndGenre() {
         List<Movie> filteredMovies = movieService.filterMovies(movies, "life", Genre.DRAMA);
-        assertEquals(1, filteredMovies.size(),
-                "Only 'Life Is Beautiful' should match the search text 'life' and DRAMA genre.");
+        assertEquals(2, filteredMovies.size(),
+                "Only 'Life Is Beautiful' and 'The Wolf of Wall Steet' should match the search text 'life' and DRAMA genre.");
     }
 
     @Test
@@ -69,8 +69,6 @@ class MovieServiceTest {
         assertEquals(5, filteredMovies.size(),
                 "All movies should be included when search text is empty.");
     }
-
-    // New tests
 
     @Test
     @DisplayName("Test Filtering Movies with Empty Genre")

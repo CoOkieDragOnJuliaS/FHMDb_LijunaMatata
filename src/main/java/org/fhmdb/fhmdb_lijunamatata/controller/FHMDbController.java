@@ -1,89 +1,83 @@
 package org.fhmdb.fhmdb_lijunamatata.controller;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.ListView;
-import org.fhmdb.fhmdb_lijunamatata.models.Genre;
-import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
-
-import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.fxml.FXML;
-import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-import java.net.URL;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
-
+import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
+import org.fhmdb.fhmdb_lijunamatata.models.Genre;
+import org.fhmdb.fhmdb_lijunamatata.models.Movie;
+import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
 
-import java.util.Comparator;
+import java.util.List;
 
 
-public class FHMDbController implements Initializable {
+public class FHMDbController {
     @FXML
     private Button sortBtn;
 
     @FXML
     private ListView<String> movieListView;
 
-    private List<Movie> movies;
-    private boolean sort = true;
-    private String searchText = "";
     private Genre genre;
+    private boolean isAscending = true;
+    private List<Movie> movies;
+    private List<Movie> filteredMovies;
     private MovieService movieService;
+    private String searchText = "";
+
+    @FXML
+    public Button filterBtn;
+
+    @FXML
+    public ComboBox<Genre> genreComboBox;
 
     @FXML
     public TextField searchField;
-    @FXML
-    public Button filterBtn;
-    @FXML
-    public ComboBox genreComboBox;
-    @FXML
-    public ListView movieListView;
-
-    private boolean isAscending = true;
-
 
     public FHMDbController() {
         //No args constructor for initialization
     }
 
     /**
-     * Initializes the ComboBox with a "no genre" option followed by all genres from the {@link Genre} enum.
-     * The first item, representing "no genre", is selected by default.
+     * Initializes the movie database and initializes the listview, combobox and movies
      * Additionally, sets up listeners to automatically update the search text and selected genre.
-
+     * <p>
      * - The `searchText` is automatically updated whenever the user types in the `searchField`.
      * - The `genre` is automatically updated whenever a new genre is selected from the `genreComboBox`.
      */
     @FXML
     public void initialize() {
-        movies = Movie.initializeMovies();
-        movieService = new MovieService();
+        this.movies = Movie.initializeMovies();
+        this.filteredMovies = this.movies;
+        this.movieService = new MovieService();
+
+        //Initial update of the movie list on the UI
         updateMovieListView();
+        //Initialization of genreComboBox
+        initializeGenreComboBox();
+
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            searchText = newValue;
+            filterMovies();
+        });
+        genreComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            genre = newValue;
+        });
+    }
+
+    /**
+     * Initializes the ComboBox with a "no genre" option followed by all genres from the {@link Genre} enum.
+     * The first item, representing "no genre", is selected by default.
+     */
+    private void initializeGenreComboBox() {
         // Create an ObservableList to store genre options, including a "no genre" option.
         ObservableList<Genre> genreOptions = FXCollections.observableArrayList();
         genreOptions.add(null);
         genreOptions.addAll(Genre.values());
-        genreComboBox.setItems(genreOptions);
-        /* Alternative
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
-            searchText = newValue;
-        });
-        genreComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            genre = (Genre) newValue;
-        });
-         */
-        searchField.textProperty().addListener((observable, oldValue, newValue) -> searchText = newValue);
-        genreComboBox.valueProperty().addListener((observable, oldValue, newValue) -> genre = (Genre) newValue);
+        this.genreComboBox.setItems(genreOptions);
     }
 
     /**
@@ -100,14 +94,13 @@ public class FHMDbController implements Initializable {
      * Updates the button text and refreshes the movie list view.
      */
     public void sortMovies() {
-        if (movies == null || movies.isEmpty())
+        if (this.filteredMovies == null || this.filteredMovies.isEmpty())
             return;
 
-        sortMovieAlgorithm(movies, isAscending);
-
+        this.movieService.sortMovies(this.filteredMovies, this.isAscending);
         updateSortButtonText();
 
-        isAscending = !isAscending;
+        this.isAscending = !this.isAscending;
         updateMovieListView();
     }
 
@@ -116,63 +109,47 @@ public class FHMDbController implements Initializable {
      * This method ensures that the UI element is updated only when available.
      */
     private void updateSortButtonText() {
-        if (sortBtn != null) {
-            sortBtn.setText(isAscending ? "Sort (desc)" : "Sort (asc)");
+        if (this.sortBtn != null) {
+            this.sortBtn.setText(this.isAscending ? "Sort (desc)" : "Sort (asc)");
         }
     }
 
     /**
-     * Sorts the given list of movies either in ascending or descending order by title.
-     *
-     * @param movies The list of movies to be sorted.
-     * @param isAscending Determines the sorting order:
-     *                    true for ascending, false for descending.
+     * Handles the filter button click event.
+     * Calls the filterMovies() method to trigger filtering
      */
-    public void sortMovieAlgorithm(List<Movie> movies, boolean isAscending) {
-        if (isAscending) {
-            movies.sort(Comparator.comparing(Movie::getTitle));
-        } else {
-            movies.sort(Comparator.comparing(Movie::getTitle).reversed());
-        }
+    @FXML
+    public void onFilterButtonClick() {
+        //Calling the filterMovies() method to separate FXMl of logic
+        filterMovies();
     }
+
+    /**
+     * Calls the filterMovies method inside the movieService class and updates the movieListView
+     */
+    private void filterMovies(){
+        // Filter movies
+        this.filteredMovies = this.movies;
+        this.filteredMovies = this.movieService.filterMovies(this.filteredMovies, this.searchText, this.genre);
+        updateMovieListView();
+    }
+
+
     /**
      * Updates the movie list view by clearing and repopulating it with sorted movie titles.
      * Ensures the UI list correctly reflects the current order of movies.
      */
     public void updateMovieListView() {
-        if (movieListView == null) return;
-        movieListView.getItems().clear();
-        for (Movie movie : movies) {
-            movieListView.getItems().add(movie.getTitle());
-        }
-    }
-    //Working with elements from the view has to have the annotation @FXML, please look up JavaFX if you are uncertain
-    public void filterBtn() {
-        // Filter movies
-        List<Movie> filteredMovies = movieService.filterMovies(movies, searchText, genre);
-        // Sort movies
-        List<Movie> sortedMovies = movieService.sortMovies(filteredMovies, sort);
-        // Display sorted movie titles
-        for (Movie movie : sortedMovies) {
-            System.out.println(movie.getTitle());
+        if (this.movieListView == null) return;
+        this.movieListView.getItems().clear();
+        for (Movie movie : this.filteredMovies) {
+            this.movieListView.getItems().add(movie.getTitle());
         }
     }
 
 
     //Getter, Setter
-    public List<Movie> getMovies() {
-        return movies;
-    }
-
     public void setMovies(List<Movie> movies) {
         this.movies = movies;
-    }
-
-    public boolean isAscending() {
-        return isAscending;
-    }
-
-    public void setAscending(boolean ascending) {
-        isAscending = ascending;
     }
 }

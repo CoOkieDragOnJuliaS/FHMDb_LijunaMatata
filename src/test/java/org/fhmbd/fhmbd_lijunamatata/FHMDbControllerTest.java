@@ -1,8 +1,6 @@
 package org.fhmbd.fhmbd_lijunamatata;
 
 import org.fhmdb.fhmdb_lijunamatata.controller.FHMDbController;
-import javafx.scene.control.ComboBox;
-import org.fhmdb.fhmdb_lijunamatata.controller.FHMDbController;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,17 +13,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class FHMDbControllerTest {
 
-    //TODO: Testing (TDD Principle)
-    /*
-    - Testing of Initializing movies
-    - Testing of Filtering by Genre
-    - Testing of Filtering by Query (positive Entry)
-    - Testing Filtering by Query (Empty String)
-    - Testing if List is correct with Filtering and without Filtering Genre
-    - Sorting Ascending
-    - Sorting Descending
-
-     */
     private FHMDbController movieController;
     private List<Movie> movies;
 
@@ -42,7 +29,7 @@ public class FHMDbControllerTest {
 
     @Test
     @DisplayName("Test initialize Movies: Movies not empty")
-    public void testInitializeMsovies_notEmpty() {
+    public void testInitializeMovies_notEmpty() {
         assertFalse(this.movies.isEmpty());
     }
 
@@ -67,22 +54,6 @@ public class FHMDbControllerTest {
     public void testInitializeMovies_firstMovieGenres_equals_expected() {
         List<Genre> expectedGenres = List.of(Genre.DRAMA, Genre.ROMANCE);
         assertEquals(expectedGenres, this.movies.get(0).getGenres());
-    }
-
-    @Test
-    @DisplayName("Test sorting in ascending order")
-    public void testSortAscending() {
-        movieController.sortMovieAlgorithm(movies, true);
-        assertEquals("Avatar", movieController.getMovies().get(0).getTitle());
-        assertEquals("The Wolf of Wall Street", movieController.getMovies().get(movieController.getMovies().size() - 1).getTitle());
-    }
-
-    @Test
-    @DisplayName("Test sorting in descending order")
-    public void testSortDescending() {
-        movieController.sortMovieAlgorithm(movies, false);
-        assertEquals("The Wolf of Wall Street", movieController.getMovies().get(0).getTitle());
-        assertEquals("Avatar", movieController.getMovies().get(movieController.getMovies().size() - 1).getTitle());
     }
 
     @Test

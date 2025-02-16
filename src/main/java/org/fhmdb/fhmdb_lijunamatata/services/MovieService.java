@@ -17,23 +17,20 @@ import java.util.List;
 public class MovieService {
 
     /**
-     * Sorts a list of movies based on their titles in either ascending or descending order.
-     * The sorting order is determined by the {@code sort} flag.
+     * Sorts the given list of movies either in ascending or descending order by title
      *
-     * @param sortedMovies The list of movies to be sorted.
-     * @param sort A boolean flag that determines the sorting order.
-     *             {@code true} for ascending order, {@code false} for descending order.
-     * @return The sorted list of movies.
+     * @param movies      The list of movies to be sorted.
+     * @param isAscending Determines the sorting order:
+     *                    true for ascending, false for descending.
+     * @return A list of movies sorted in ascending or descending order
      */
-    public List<Movie> sortMovies(List<Movie> sortedMovies, boolean sort) {
-        if (sort) {
-            // Sort in ascending order by title
-            sortedMovies.sort(Comparator.comparing(Movie::getTitle));
+    public List<Movie> sortMovies(List<Movie> movies, boolean isAscending) {
+        if (isAscending) {
+            movies.sort(Comparator.comparing(Movie::getTitle));
         } else {
-            // Sort in descending order by title
-            sortedMovies.sort((movie1, movie2) -> movie2.getTitle().compareTo(movie1.getTitle()));
+            movies.sort(Comparator.comparing(Movie::getTitle).reversed());
         }
-        return sortedMovies;
+        return movies;
     }
 
     /**
@@ -41,9 +38,9 @@ public class MovieService {
      * The method checks if the movie's title contains the search text (ignoring case)
      * and if the movie's genre matches the selected genre.
      *
-     * @param movies The list of movies to be filtered.
+     * @param movies     The list of movies to be filtered.
      * @param searchText The text to search for in movie titles.
-     * @param genre The genre to filter movies by. If {@code null}, no genre filtering is applied.
+     * @param genre      The genre to filter movies by. If {@code null}, no genre filtering is applied.
      * @return A list of movies that match both the search text and selected genre.
      */
     public List<Movie> filterMovies(List<Movie> movies, String searchText, Genre genre) {
@@ -71,13 +68,15 @@ public class MovieService {
     }
 
     /**
-     * Checks if the movie's title contains the search text, ignoring case.
+     * Checks if the movie's title and description contains the search text, ignoring case.
      *
      * @param searchText The text to search for in the movie's title.
-     * @param movie The movie whose title is to be checked.
-     * @return {@code true} if the movie's title contains the search text; {@code false} otherwise.
+     * @param movie      The movie whose title is to be checked.
+     * @return {@code true} if the movie's title and the movie's description contains the search text; {@code false} otherwise.
      */
     private static boolean isMatchesSearchText(String searchText, Movie movie) {
-        return movie.getTitle().toLowerCase().contains(searchText.toLowerCase());
+
+        return movie.getTitle().toLowerCase().contains(searchText.toLowerCase()) ||
+                movie.getDescription().toLowerCase().contains(searchText.toLowerCase());
     }
 }
