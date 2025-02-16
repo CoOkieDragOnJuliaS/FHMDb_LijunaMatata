@@ -55,7 +55,7 @@ public class FHMDbController {
     @FXML
     public void initialize() {
         this.movies = FXCollections.observableList(Movie.initializeMovies());
-        this.filteredMovies = this.movies;
+        this.filteredMovies = FXCollections.observableList(this.movies);
         this.movieService = new MovieService();
 
         //Initial update of the movie list on the UI
@@ -69,11 +69,9 @@ public class FHMDbController {
             searchText = newValue;
             filterMovies();
         });
+
         genreComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             genre = newValue;
-        });
-        this.filteredMovies.addListener((ListChangeListener<? super Movie>) c -> {
-            updateMovieListView();
         });
     }
 
@@ -138,10 +136,12 @@ public class FHMDbController {
     private void filterMovies(){
         // Filter movies
         //TODO: Bugfix Filtering movies with new MovieCell method of UI change
-        this.filteredMovies.removeAll();
-        this.filteredMovies.addAll(this.movies);
-        this.filteredMovies = FXCollections.observableList(this.movieService.filterMovies(this.filteredMovies, this.searchText, this.genre));
-    }
+        this.filteredMovies.clear();
+        // Get the filtered results from the movieService
+        List<Movie> filteredResults = this.movieService.filterMovies(this.movies, this.searchText, this.genre);
+
+        // Add the filtered results to the filteredMovies list
+        this.filteredMovies.addAll(filteredResults);}
 
     /**
      * Updates the movie list view by clearing and repopulating it with sorted movie titles.
