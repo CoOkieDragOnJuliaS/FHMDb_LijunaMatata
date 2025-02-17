@@ -43,7 +43,18 @@ The Goal of this Exercise is to have a functioning Movie Database for the FH Mov
 > .) work on the branch, and change code</br>
   > .) go to the commit window, and mark the changes you want to commit (after testing and if there are NO bugs/errors)</br>
   > .) Commit message template:  Exercise and number of Exercise [name] commit message</br>
-  > for example:  Exercise1 [Julia] this is a commit message</br></br>
+  > Example: </br>
+  > [ Exercise$nr$ [$name$] tag: $commit-message$ ] --> Exercise$1$ [$Julia$]  $bugfix$: had problems, i had to fix ]</br>
+  >> Tags: </br>
+  > .) $feature$: Commits, that add or remove a new feature to the API or UI</br>
+    .) $bugfix$: Commits, that fix a API or UI bug of a preceded feat commit</br>
+    .) $refactor$: Commits, that rewrite/restructure your code, however do not change any API or UI behaviour</br>
+    .) $style$: Commits, that do not affect the meaning (white-space, formatting, missing semi-colons, etc)</br>
+    .) $test$: Commits, that add missing tests or correcting existing tests</br>
+    .) $docs$: Commits, that affect documentation only</br>
+    .) $build$: Commits, that affect build components like build tool, ci pipeline, dependencies, project version, ...</br>
+    .) $chore$: Miscellaneous commits e.g. modifying .gitignore</br>
+> 
   > FIRST: update the branch by right click & update</br></br>
   > THEN: push the committed code if no merge conflicts come up</br></br>
   > IF there are merge conflicts -> first merge them, test and bugfix again and afterwards commit & push anew
@@ -51,3 +62,4 @@ The Goal of this Exercise is to have a functioning Movie Database for the FH Mov
 
 ## Start the application
 Start the application by either running the `main` method in the `FHMDbApplication` class.
+//TODO: How to start mvn clean install in command line
