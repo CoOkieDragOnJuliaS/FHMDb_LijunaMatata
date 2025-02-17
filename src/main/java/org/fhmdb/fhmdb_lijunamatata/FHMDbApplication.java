@@ -12,7 +12,9 @@ public class FHMDbApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(FHMDbApplication.class.getResource("fhmdb-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 890, 620);
+        //Sets the scene by loading the .fxml element, setting the size and adding
+        //elements like stylesheet (for css) and "setting the stage" for the scene
+        Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
         scene.getStylesheets().add(Objects.requireNonNull(FHMDbApplication.class.getResource("styles.css")).toExternalForm());
         stage.setTitle("FHMDb");
         stage.setScene(scene);
