@@ -24,9 +24,14 @@ public class MovieCell extends ListCell<Movie> {
     protected void updateItem(Movie movie, boolean empty) {
         super.updateItem(movie, empty);
 
+        // Clear previous styles and graphic
+        this.getStyleClass().removeAll("movie-cell");
+        setGraphic(null); // Clear the graphic when empty to avoid double entries on MovieCell
+
         if (empty || movie == null) {
             setText(null);  //sets the text of all labels inside the item null
         } else {
+            //Adds the movie-cell element, setting the title, description and genre
             this.getStyleClass().add("movie-cell");
             title.setText(movie.getTitle());
             description.setText(
@@ -40,16 +45,14 @@ public class MovieCell extends ListCell<Movie> {
 
 
             // color scheme
-            title.getStyleClass().add("text-yellow");
-            title.getStyleClass().add("start-title");
-            description.getStyleClass().add("text-white");
-            description.getStyleClass().add("start-description");
-            genre.getStyleClass().add("text-white");
-            genre.getStyleClass().add("start-genre");
+            title.getStyleClass().setAll("text-yellow", "start-title");
+            description.getStyleClass().setAll("text-white", "start-description");
+            genre.getStyleClass().setAll("text-white", "start-genre");
             layout.setBackground(new Background(new BackgroundFill(Color.web("#454545"), null, null)));
 
-            // layout
-            description.setMaxWidth(this.getScene().getWidth() - 30);
+            // layout by a template
+            double maxWidth = (getScene() != null) ? getScene().getWidth() - 30 : 300; // Fallback width
+            description.setMaxWidth(maxWidth);
             description.setWrapText(true);
 
             layout.setPadding(new Insets(10));
