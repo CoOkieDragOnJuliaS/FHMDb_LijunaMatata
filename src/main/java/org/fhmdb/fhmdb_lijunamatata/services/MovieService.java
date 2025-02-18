@@ -25,12 +25,15 @@ public class MovieService {
      * @return A list of movies sorted in ascending or descending order
      */
     public List<Movie> sortMovies(List<Movie> movies, boolean isAscending) {
+        // Create a new list to avoid modifying the original list
+        List<Movie> sortedMovies = new ArrayList<>(movies);
         if (isAscending) {
-            movies.sort(Comparator.comparing(Movie::getTitle));
+            sortedMovies.sort(Comparator.comparing(Movie::getTitle));
         } else {
-            movies.sort(Comparator.comparing(Movie::getTitle).reversed());
+            sortedMovies.sort(Comparator.comparing(Movie::getTitle).reversed());
         }
-        return movies;
+
+        return sortedMovies; // Return the new sorted list
     }
 
     /**
