@@ -1,7 +1,8 @@
-package org.fhmdb.fhmdb_lijunamatata.services;
+package org.fhmbd.fhmbd_lijunamatata.services;
 
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
+import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
