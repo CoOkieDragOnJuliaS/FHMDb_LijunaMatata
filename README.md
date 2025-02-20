@@ -62,4 +62,14 @@ The Goal of this Exercise is to have a functioning Movie Database for the FH Mov
 
 ## Start the application
 Start the application by either running the `main` method in the `FHMDbApplication` class.
-//TODO: How to start mvn clean install in command line
+
+## Documentation
+
+For detailed setup and troubleshooting, refer to the following documentation:
+
+- [Maven Setup Guide](docs/MavenSetup.md) – Instructions for installing and configuring Maven.
+- [Maven POM.xml Documentation](docs/MavenPomExplanation.md) – Explanation of the `pom.xml` file and dependencies.
+- [Maven Testing Guide](docs/MavenTesting.md) – How to implement and run tests with Maven and JUnit.
+- [Maven Windows Guide](docs/MavenWindowsGuide.md) – Steps for running Maven on Windows and troubleshooting issues.
+
+
