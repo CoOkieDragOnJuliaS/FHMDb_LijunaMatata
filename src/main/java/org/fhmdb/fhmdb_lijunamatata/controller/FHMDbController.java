@@ -40,8 +40,12 @@ public class FHMDbController {
     @FXML
     public TextField searchField;
 
+    /**
+     * sets up the logic by initializing movieService
+     * */
     public FHMDbController() {
         //No args constructor for initialization
+        this.movieService = new MovieService();
     }
 
     /**
@@ -87,12 +91,10 @@ public class FHMDbController {
 
     /**
      * Initializes the ObservableArrayList() of movies and filteredMovies
-     * and sets up the logic by initializing movieService
      */
     private void initializeMovies() {
         this.movies = FXCollections.observableArrayList(Movie.initializeMovies());
         this.filteredMovies = FXCollections.observableArrayList(this.movies);
-        this.movieService = new MovieService();
     }
 
     /**
