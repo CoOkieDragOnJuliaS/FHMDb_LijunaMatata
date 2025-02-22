@@ -1,4 +1,4 @@
-package org.fhmbd.fhmbd_lijunamatata.models;
+package org.fhmdb.fhmdb_lijunamatata.models;
 
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;

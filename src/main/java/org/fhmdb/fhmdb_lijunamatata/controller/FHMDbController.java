@@ -158,7 +158,7 @@ public class FHMDbController {
     /**
      * Calls the filterMovies method inside the movieService class and updates the movieListView
      */
-    private void filterMovies() {
+    public void filterMovies() {
         // Filter movies
         this.filteredMovies = FXCollections.observableArrayList();
         this.filteredMovies.addAll(this.movies);
