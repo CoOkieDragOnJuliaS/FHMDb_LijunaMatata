@@ -22,7 +22,7 @@ public class FHMDbController {
     private boolean isAscending = true;
     private ObservableList<Movie> movies;
     private ObservableList<Movie> filteredMovies;
-    private MovieService movieService;
+    private MovieService movieService; //do not make final or can't mock
     private String searchText = "";
 
     @FXML
@@ -114,7 +114,7 @@ public class FHMDbController {
      * Calls the sortMovies() method to toggle the sorting order.
      */
     @FXML
-    private void onSortButtonClick() {
+    public void onSortButtonClick() {
         sortMovies();
     }
 
@@ -122,7 +122,7 @@ public class FHMDbController {
      * Sorts the list of movies based on the current sorting order.
      * Updates the button text and refreshes the movie list view.
      */
-    public void sortMovies() {
+    void sortMovies() {
         if (this.filteredMovies == null || this.filteredMovies.isEmpty()) {
             return;
         }
@@ -139,7 +139,7 @@ public class FHMDbController {
      * Updates the sort button text based on the current sorting order.
      * This method ensures that the UI element is updated only when available.
      */
-    private void updateSortButtonText() {
+    void updateSortButtonText() {
         if (this.sortBtn != null) {
             this.sortBtn.setText(this.isAscending ? "Sort (desc)" : "Sort (asc)");
         }
@@ -158,7 +158,7 @@ public class FHMDbController {
     /**
      * Calls the filterMovies method inside the movieService class and updates the movieListView
      */
-    public void filterMovies() {
+    void filterMovies() {
         // Filter movies
         this.filteredMovies = FXCollections.observableArrayList();
         this.filteredMovies.addAll(this.movies);
