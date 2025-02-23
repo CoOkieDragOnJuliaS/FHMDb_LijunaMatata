@@ -182,4 +182,10 @@ public class FHMDbController {
     public void setMovies(List<Movie> movies) {
         this.movies = FXCollections.observableList(movies);
     }
+
+    void setFilteredMovies(List<Movie> movies) {
+        if (movies != null) {
+            this.filteredMovies = FXCollections.observableList(movies);
+        }
+    }
 }

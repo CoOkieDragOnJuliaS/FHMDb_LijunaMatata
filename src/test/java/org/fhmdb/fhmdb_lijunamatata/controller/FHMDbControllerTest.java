@@ -35,6 +35,7 @@ public class FHMDbControllerTest {
     @InjectMocks
     private FHMDbController movieController;
 
+    ObservableList<Movie> initialMovies;
 
     @BeforeEach
     public void setUp() {
@@ -44,7 +45,7 @@ public class FHMDbControllerTest {
          */
         MockitoAnnotations.openMocks(this);
 
-        ObservableList<Movie> initialMovies = FXCollections.observableArrayList(Movie.initializeMovies());
+        initialMovies = FXCollections.observableArrayList(Movie.initializeMovies());
         movieController.setMovies(initialMovies);
 
         //Update: Mocking the Buttons e.g. does not work because Mockito is not able to mock JavaFX private elements or final classes
@@ -65,8 +66,22 @@ public class FHMDbControllerTest {
     }
 
     @Test
-    @DisplayName("Test sortMovies with no filtered Movies does not call movieService's sortMovies method")
+    @DisplayName("Test sortMovies with value filtered Movies calls movieService's sortMovies method")
+    public void testSortMovies_givenFilteredMovies_calls_moviesServiceSortMovies() {
+        movieController.setFilteredMovies(initialMovies);
+        movieController.sortMovies();
+
+        /*The verify() method in Mockito is used to confirm that a specific method was called on a mock object during
+        the execution of your test. */
+        verify(movieService).sortMovies(anyList(), anyBoolean());
+
+    }
+
+
+    @Test
+    @DisplayName("Test sortMovies with no value for filtered Movies does not call movieService's sortMovies method")
     public void testSortMovies_givenNoFilteredMovies_doesNotCall_moviesServiceSortMovies() {
+        movieController.setFilteredMovies(null);
         movieController.sortMovies();
 
         /*The verify() method in Mockito is used to confirm that a specific method was called on a mock object during
