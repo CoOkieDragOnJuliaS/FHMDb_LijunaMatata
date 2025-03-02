@@ -59,7 +59,44 @@ The Goal of this Exercise is to have a functioning Movie Database for the FH Mov
   > THEN: push the committed code if no merge conflicts come up</br></br>
   > IF there are merge conflicts -> first merge them, test and bugfix again and afterwards commit & push anew
       
+## Start the Application
 
-## Start the application
-Start the application by either running the `main` method in the `FHMDbApplication` class.
-//TODO: How to start mvn clean install in command line
+You can start the application using one of the following methods:
+
+### 1. Running from IntelliJ IDEA  
+1. Open **IntelliJ IDEA** and load the project.
+2. Navigate to `src/main/java/org/fhmdb/fhmdb_lijunamatata/FHMDbApplication.java`.
+3. Right-click the `FHMDbApplication` class and select **Run 'FHMDbApplication'**.
+
+### 2. Running from the Command Line with Maven  
+Ensure that **Maven** is installed and properly configured.  
+Run the following command from the project root directory:
+
+```sh
+mvn clean javafx:run
+```
+This will clean previous builds and launch the JavaFX application.
+
+### 3. Running from a Packaged JAR (After Building)  
+If you have already built the project using Maven (`mvn clean install`), you can run the generated `.jar` file:
+
+```sh
+java -jar target/FHMDb_LijunaMatata-1.0-SNAPSHOT.jar
+```
+Replace the JAR name with the actual generated filename if different.
+
+### Troubleshooting  
+- If the application does not start, ensure you have the correct **JavaFX** dependencies.  
+- Check that **Java 16+** is installed and properly set in `JAVA_HOME`.  
+- Refer to the [Maven Windows Guide](docs/MavenWindowsGuide.md) if you're facing issues on Windows.  
+
+## Documentation
+
+For detailed setup and troubleshooting, refer to the following documentation:
+
+- [Maven Setup Guide](docs/MavenSetup.md) – Instructions for installing and configuring Maven.
+- [Maven POM.xml Documentation](docs/MavenPomExplanation.md) – Explanation of the `pom.xml` file and dependencies.
+- [Maven Testing Guide](docs/MavenTesting.md) – How to implement and run tests with Maven and JUnit.
+- [Maven Windows Guide](docs/MavenWindowsGuide.md) – Steps for running Maven on Windows and troubleshooting issues.
+
+
