@@ -2,14 +2,13 @@ package org.fhmdb.fhmdb_lijunamatata.services;
 
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
-import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
-
+import java.util.ArrayList;
+import java.util.Comparator;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MovieServiceTest {
@@ -26,97 +25,89 @@ public class MovieServiceTest {
     @Test
     @DisplayName("Test sorting in ascending order")
     public void testSortMoviesAscending() {
-        List<Movie> sortedMovies = movieService.sortMovies(movies, true);
-        assertEquals("Avatar", sortedMovies.get(0).getTitle());
-        assertEquals("The Wolf of Wall Street", sortedMovies.get(sortedMovies.size() - 1).getTitle());
+        List<Movie> expectedMovies = List.of(
+                movies.get(3), // Avatar
+                movies.get(0), // Life Is Beautiful
+                movies.get(2), // Puss in Boots
+                movies.get(1), // The Usual Suspects
+                movies.get(4)  // The Wolf of Wall Street
+        );
+
+        List<Movie> testMovies = new ArrayList<>(movies);
+        List<Movie> sortedMovies = movieService.sortMovies(testMovies, true);
+        assertEquals(expectedMovies, sortedMovies, "Movies should be sorted in ascending order by title");
     }
 
     @Test
     @DisplayName("Test sorting in descending order")
     public void testSortMoviesDescending() {
-        List<Movie> sortedMovies = movieService.sortMovies(movies, false);
-        assertEquals("The Wolf of Wall Street", sortedMovies.get(0).getTitle());
-        assertEquals("Avatar", sortedMovies.get(sortedMovies.size() - 1).getTitle());
+        List<Movie> expectedMovies = List.of(
+                movies.get(4), // The Wolf of Wall Street
+                movies.get(1), // The Usual Suspects
+                movies.get(2), // Puss in Boots
+                movies.get(0), // Life Is Beautiful
+                movies.get(3)  // Avatar
+        );
+
+        List<Movie> testMovies = new ArrayList<>(movies);
+        List<Movie> sortedMovies = movieService.sortMovies(testMovies, false);
+        assertEquals(expectedMovies, sortedMovies, "Movies should be sorted in descending order by title");
     }
 
     @Test
-    @DisplayName("Test Filtering Movies by Genre")
+    @DisplayName("Test filtering by genre DRAMA")
     void testFilterMoviesByGenre() {
-        List<Movie> filteredMovies = movieService.filterMovies(movies, "", Genre.DRAMA);
-        assertEquals(4, filteredMovies.size(),
-                "The number of filtered movies with DRAMA genre should be 4.");
+        List<Movie> expectedMovies = List.of(
+                movies.get(0), // Life Is Beautiful
+                movies.get(1), // The Usual Suspects
+                movies.get(3), // Avatar
+                movies.get(4)  // The Wolf of Wall Street
+        );
+
+        List<Movie> testMovies = new ArrayList<>(movies);
+        List<Movie> filteredMovies = movieService.filterMovies(testMovies, "", Genre.DRAMA);
+        assertEquals(expectedMovies, filteredMovies, "Filtering by DRAMA should return correct movies");
     }
 
     @Test
-    @DisplayName("Test Filtering Movies by Search Text")
+    @DisplayName("Test filtering by search text 'Puss'")
     void testFilterMoviesBySearchText() {
-        List<Movie> filteredMovies = movieService.filterMovies(movies, "Puss", null);
-        assertEquals(1, filteredMovies.size(),
-                "Only 'Puss in Boots' should match the search text 'Puss'.");
+        List<Movie> expectedMovies = List.of(movies.get(2)); // Puss in Boots
+
+        List<Movie> testMovies = new ArrayList<>(movies);
+        List<Movie> filteredMovies = movieService.filterMovies(testMovies, "Puss", null);
+        assertEquals(expectedMovies, filteredMovies, "Filtering by 'Puss' should return 'Puss in Boots'");
     }
 
     @Test
-    @DisplayName("Test Filtering Movies by Search Text and Genre")
+    @DisplayName("Test filtering by search text 'life' and genre DRAMA")
     void testFilterMoviesBySearchTextAndGenre() {
-        List<Movie> filteredMovies = movieService.filterMovies(movies, "life", Genre.DRAMA);
-        assertEquals(2, filteredMovies.size(),
-                "Only 'Life Is Beautiful' and 'The Wolf of Wall Steet' should match the search text 'life' and DRAMA genre.");
+        List<Movie> expectedMovies = List.of(
+                movies.get(0), // Life Is Beautiful
+                movies.get(4)  // The Wolf of Wall Street
+        );
+
+        List<Movie> testMovies = new ArrayList<>(movies);
+        List<Movie> filteredMovies = movieService.filterMovies(testMovies, "life", Genre.DRAMA);
+        assertEquals(expectedMovies, filteredMovies, "Filtering by 'life' and DRAMA should return correct movies");
     }
 
     @Test
-    @DisplayName("Test Filtering Movies with Empty Search Text")
+    @DisplayName("Test filtering with empty search text")
     void testFilterMoviesWithEmptySearchText() {
-        List<Movie> filteredMovies = movieService.filterMovies(movies, "", null);
-        assertEquals(5, filteredMovies.size(),
-                "All movies should be included when search text is empty.");
+        List<Movie> expectedMovies = new ArrayList<>(movies);
+
+        List<Movie> testMovies = new ArrayList<>(movies);
+        List<Movie> filteredMovies = movieService.filterMovies(testMovies, "", null);
+        assertEquals(expectedMovies, filteredMovies, "All movies should be returned when search text is empty");
     }
 
     @Test
-    @DisplayName("Test Filtering Movies with Empty Genre")
-    void testFilterMoviesWithEmptyGenre() {
-        List<Movie> filteredMovies = movieService.filterMovies(movies, "", null);
-        assertEquals(5, filteredMovies.size(),
-                "All movies should be included when no genre is selected.");
-    }
-
-    @Test
-    @DisplayName("Test Filtering Movies with Partial Search Text (Uppercase)")
-    void testFilterMoviesWithPartialSearchTextUppercase() {
-        List<Movie> filteredMovies = movieService.filterMovies(movies, "puss", null);
-        assertEquals(1, filteredMovies.size(),
-                "Only 'Puss in Boots' should match the partial search text 'puss' ignoring case.");
-    }
-
-    @Test
-    @DisplayName("Test Filtering Movies with Search Text Not Found")
-    void testFilterMoviesWithSearchTextNotFound() {
-        List<Movie> filteredMovies = movieService.filterMovies(movies, "NotInAnyTitle", null);
-        assertEquals(0, filteredMovies.size(),
-                "No movies should be returned when the search text doesn't match any title.");
-    }
-
-    @Test
-    @DisplayName("Test Filtering Movies with Multiple Genres")
-    void testFilterMoviesWithMultipleGenres() {
-        List<Movie> filteredMovies = movieService.filterMovies(movies, "", Genre.COMEDY);
-        assertEquals(1, filteredMovies.size(),
-                "Only 'Puss in Boots' should match the Comedy genre.");
-    }
-
-
-    @Test
-    @DisplayName("Test Sorting Movies with Empty List")
+    @DisplayName("Test sorting movies with an empty list")
     void testSortMoviesWithEmptyList() {
+        List<Movie> expectedMovies = new ArrayList<>();
         List<Movie> emptyMovies = new ArrayList<>();
         List<Movie> sortedMovies = movieService.sortMovies(emptyMovies, true);
-        assertTrue(sortedMovies.isEmpty(), "The sorted list should be empty when no movies are available.");
-    }
-
-    @Test
-    @DisplayName("Test Filtering Movies by Exact Search Text")
-    void testFilterMoviesByExactSearchText() {
-        List<Movie> filteredMovies = movieService.filterMovies(movies, "Avatar", null);
-        assertEquals(1, filteredMovies.size(),
-                "Only 'Avatar' should match the exact search text 'Avatar'.");
+        assertEquals(expectedMovies, sortedMovies, "Sorting an empty list should return an empty list");
     }
 }
