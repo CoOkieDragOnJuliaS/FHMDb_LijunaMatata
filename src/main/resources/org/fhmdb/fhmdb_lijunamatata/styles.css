@@ -7,8 +7,17 @@
     -fx-background-color: #000000;
 }
 
-.background-light-black {
-    -fx-background-color: #454545;
+.title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.description {
+    -fx-font-size: 12px;
+}
+
+.genre {
+    -fx-font-weight: bold;
 }
 
 .text-yellow {
@@ -36,5 +45,14 @@
 
 .filter-combo-box {
     -fx-background-color: white;
-    -fx-text-fill: #ffffff;
+    -fx-text-fill: #000000;
+}
+
+.filter-combo-box .list-view .list-cell {
+    -fx-background-color: white;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+    -fx-border-style: none none solid none; /* No border on top, left, and right; solid on bottom */
+    -fx-border-width: 0 0 1 0; /* No width on top, left, and right; 1px on bottom */
+    -fx-border-color: black; /* Change 'black' to your desired color */
 }

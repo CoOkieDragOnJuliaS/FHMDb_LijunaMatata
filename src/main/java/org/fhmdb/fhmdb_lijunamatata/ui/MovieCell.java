@@ -9,6 +9,8 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
+import java.util.List;
+
 /**
  * @author Julia Sass
  * @date 13.02.2025
@@ -45,9 +47,9 @@ public class MovieCell extends ListCell<Movie> {
 
 
             // color scheme
-            title.getStyleClass().setAll("text-yellow", "start-title");
-            description.getStyleClass().setAll("text-white", "start-description");
-            genre.getStyleClass().setAll("text-white", "start-genre");
+            title.getStyleClass().setAll(List.of("text-yellow", "title"));
+            description.getStyleClass().setAll(List.of("text-white", "description"));
+            genre.getStyleClass().setAll(List.of("text-white", "genre"));
             layout.setBackground(new Background(new BackgroundFill(Color.web("#454545"), null, null)));
 
             // layout by a template

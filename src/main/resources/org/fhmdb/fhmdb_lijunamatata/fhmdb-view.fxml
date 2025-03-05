@@ -43,5 +43,5 @@
             <Insets bottom="20.0" left="10.0" top="20.0" />
         </padding>
     </HBox>
-    <ListView fx:id="movieListView" style="-fx-background-color: black;" styleClass="background-black" stylesheets="@styles.css" VBox.vgrow="ALWAYS" />
+    <ListView fx:id="movieListView" styleClass="background-black" stylesheets="@styles.css" VBox.vgrow="ALWAYS" />
 </VBox>
