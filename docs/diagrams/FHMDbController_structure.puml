@@ -1,0 +1,221 @@
+@startuml
+
+/' diagram meta data start
+config=StructureConfiguration;
+{
+  "projectClassification": {
+    "searchMode": "OpenProject", // OpenProject, AllProjects
+    "includedProjects": "",
+    "pathEndKeywords": "*.impl",
+    "isClientPath": "",
+    "isClientName": "",
+    "isTestPath": "",
+    "isTestName": "",
+    "isMappingPath": "",
+    "isMappingName": "",
+    "isDataAccessPath": "",
+    "isDataAccessName": "",
+    "isDataStructurePath": "",
+    "isDataStructureName": "",
+    "isInterfaceStructuresPath": "",
+    "isInterfaceStructuresName": "",
+    "isEntryPointPath": "",
+    "isEntryPointName": "",
+    "treatFinalFieldsAsMandatory": false
+  },
+  "graphRestriction": {
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "removeByInheritance": "", // inheritance/annotation based filtering is done in a second step
+    "removeByAnnotation": "",
+    "removeByClassPackage": "", // cleanup the graph after inheritance/annotation based filtering is done
+    "removeByClassName": "",
+    "cutMappings": false,
+    "cutEnum": false,
+    "cutTests": true,
+    "cutClient": true,
+    "cutDataAccess": false,
+    "cutInterfaceStructures": false,
+    "cutDataStructures": false,
+    "cutGetterAndSetter": false,
+    "cutConstructors": false
+  },
+  "graphTraversal": {
+    "forwardDepth": 3,
+    "backwardDepth": 3,
+    "classPackageExcludeFilter": "",
+    "classPackageIncludeFilter": "",
+    "classNameExcludeFilter": "",
+    "classNameIncludeFilter": "",
+    "methodNameExcludeFilter": "",
+    "methodNameIncludeFilter": "",
+    "hideMappings": false,
+    "hideDataStructures": false,
+    "hidePrivateMethods": true,
+    "hideInterfaceCalls": true, // indirection: implementation -> interface (is hidden) -> implementation
+    "onlyShowApplicationEntryPoints": false, // root node is included
+    "useMethodCallsForStructureDiagram": "ForwardOnly" // ForwardOnly, BothDirections, No
+  },
+  "details": {
+    "aggregation": "GroupByClass", // ByClass, GroupByClass, None
+    "showClassGenericTypes": true,
+    "showMethods": true,
+    "showMethodParameterNames": true,
+    "showMethodParameterTypes": true,
+    "showMethodReturnType": true,
+    "showPackageLevels": 2,
+    "showDetailedClassStructure": true
+  },
+  "rootClass": "org.fhmdb.fhmdb_lijunamatata.controller.FHMDbController",
+  "extensionCallbackMethod": "" // qualified.class.name#methodName - signature: public static String method(String)
+}
+diagram meta data end '/
+
+
+
+digraph g {
+    rankdir="TB"
+    splines=polyline
+    
+
+'nodes 
+subgraph cluster_97405353 { 
+   	label=fhmdb
+	labeljust=l
+	fillcolor="#ececec"
+	style=filled
+   
+   subgraph cluster_1031455588 { 
+   	label=fhmdb_lijunamatata
+	labeljust=l
+	fillcolor="#d8d8d8"
+	style=filled
+   
+   FHMDbController170940836[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)FHMDbController</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+   filterBtn: Button [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   filteredMovies: ObservableList&lt;Movie&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   genre: Genre [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   genreComboBox: ComboBox&lt;Genre&gt; [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   isAscending: boolean [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   movieListView: ListView&lt;Movie&gt; [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   movieService: MovieService [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   movies: ObservableList&lt;Movie&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   searchField: TextField [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   searchText: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   sortBtn: Button [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ FHMDbController()</TD></TR>
+<TR><TD ALIGN="LEFT" ># filterMovies()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ initialize()</TD></TR>
+<TR><TD ALIGN="LEFT" >- initializeGenreComboBox()</TD></TR>
+<TR><TD ALIGN="LEFT" >- initializeListeners()</TD></TR>
+<TR><TD ALIGN="LEFT" >- initializeMovieListView()</TD></TR>
+<TR><TD ALIGN="LEFT" >- initializeMovies()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onFilterButtonClick()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ onSortButtonClick()</TD></TR>
+<TR><TD ALIGN="LEFT" ># setFilteredMovies(movies: List&lt;Movie&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ setMovies(movies: List&lt;Movie&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" ># sortMovies()</TD></TR>
+<TR><TD ALIGN="LEFT" >+ updateMovieListView()</TD></TR>
+<TR><TD ALIGN="LEFT" ># updateSortButtonText()</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+Genre894694102[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(E)Genre</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+   ACTION: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   ADVENTURE: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   ANIMATION: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   BIOGRAPHY: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   COMEDY: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   CRIME: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   DOCUMENTARY: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   DRAMA: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   FAMILY: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   FANTASY: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   HISTORY: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   HORROR: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   MUSICAL: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   MYSTERY: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   ROMANCE: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   SCIENCE_FICTION: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   SPORT: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   THRILLER: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   WAR: Genre [1]</TD></TR>
+<TR><TD ALIGN="LEFT" >+   WESTERN: Genre [1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ valueOf(name: String): Genre</TD></TR>
+<TR><TD ALIGN="LEFT" >+ values(): Genre[]</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#DCFBD5"
+];
+
+Movie894694102[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)Movie</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >-   description: String [0..1]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   genres: List&lt;Genre&gt; [0..*]</TD></TR>
+<TR><TD ALIGN="LEFT" >-   title: String [0..1]</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" ># Movie(title: String, description: String, genres: List&lt;Genre&gt;)</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getDescription(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getGenres(): List&lt;Genre&gt;</TD></TR>
+<TR><TD ALIGN="LEFT" >+ getTitle(): String</TD></TR>
+<TR><TD ALIGN="LEFT" >+ initializeMovies(): List&lt;Movie&gt;</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+
+MovieService1190658846[
+	label=<<TABLE BORDER="1" CELLBORDER="0" CELLPADDING="4" CELLSPACING="0">
+<TR><TD ALIGN="LEFT" >(C)MovieService</TD></TR>
+<HR/>
+<TR><TD ALIGN="LEFT" >+ filterMovies(movies: List&lt;Movie&gt;, searchText: String, genre: Genre): List&lt;Movie&gt;</TD></TR>
+<TR><TD ALIGN="LEFT" >- isMatchesGenre(genre: Genre, movie: Movie): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >- isMatchesSearchText(searchText: String, movie: Movie): boolean</TD></TR>
+<TR><TD ALIGN="LEFT" >+ sortMovies(movies: List&lt;Movie&gt;, isAscending: boolean): List&lt;Movie&gt;</TD></TR>
+</TABLE>>
+	style=filled
+	margin=0
+	shape=plaintext
+	fillcolor="#FFFFFF"
+];
+} 
+} 
+
+'edges    
+FHMDbController170940836 -> Genre894694102[label="genre
+[0..1]"];
+FHMDbController170940836 -> Genre894694102[label="genreComboBox
+[0..1]"];
+FHMDbController170940836 -> Movie894694102[label="filteredMovies
+[0..*]"];
+FHMDbController170940836 -> Movie894694102[label="movieListView
+[0..1]"];
+FHMDbController170940836 -> Movie894694102[label="movies
+[0..*]"];
+FHMDbController170940836 -> MovieService1190658846[label="movieService
+[0..1]"];
+    
+}
+@enduml
