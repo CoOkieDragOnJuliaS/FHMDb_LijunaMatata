@@ -30,7 +30,9 @@ public class FHMDbControllerTest {
     private MovieService movieService;
 
     /*For fields annotated with @InjectMocks, Mockito creates an instance of the class and then tries to inject the
-    mock objects (created in the previous step) into the constructor, fields, or setter methods of that instance. The injection is based on type matching: if a field or constructor parameter has a type that matches the type of a mock object, Mockito will inject the mock into that field or parameter.
+    mock objects (created in the previous step) into the constructor, fields, or setter methods of that instance.
+    The injection is based on type matching: if a field or constructor parameter has a type that matches the type of
+     a mock object, Mockito will inject the mock into that field or parameter.
      */
     @InjectMocks
     private FHMDbController movieController;
@@ -54,20 +56,20 @@ public class FHMDbControllerTest {
     }
 
     @Test
-    @DisplayName("Test updateMovieListView does not throw exceptions")
-    public void testUpdateMovieListView() {
+    @DisplayName("updateMovieListView should not throw exception")
+    public void updateMovieListView_doesnt_throw_exception() {
         assertDoesNotThrow(() -> movieController.updateMovieListView());
     }
 
     @Test
-    @DisplayName("Test updateSortButtonText does not throw exceptions")
-    public void testUpdateSortButtonText() {
+    @DisplayName("updateSortButtonText should not throw exception")
+    public void updateSortButtonText_doesnt_throw_exception() {
         assertDoesNotThrow(() -> movieController.updateSortButtonText());
     }
 
     @Test
-    @DisplayName("Test sortMovies with value filtered Movies calls movieService's sortMovies method")
-    public void testSortMovies_givenFilteredMovies_calls_moviesServiceSortMovies() {
+    @DisplayName("sortMovies with value in filtered Movies should call movieService's sortMovies method")
+    public void sortMovies_with_filteredMovies_calls_moviesServiceSortMovies() {
         movieController.setFilteredMovies(initialMovies);
         movieController.sortMovies();
 
@@ -79,8 +81,8 @@ public class FHMDbControllerTest {
 
 
     @Test
-    @DisplayName("Test sortMovies with no value for filtered Movies does not call movieService's sortMovies method")
-    public void testSortMovies_givenNoFilteredMovies_doesNotCall_moviesServiceSortMovies() {
+    @DisplayName("sortMovies with null for filtered Movies should not call movieService's sortMovies method")
+    public void sortMovies_with_null_filteredMovies_doesnt_call_moviesServiceSortMethod() {
         movieController.setFilteredMovies(null);
         movieController.sortMovies();
 
@@ -90,10 +92,20 @@ public class FHMDbControllerTest {
 
     }
 
+    @Test
+    @DisplayName("filterMovies should call movieService's filterMovies method")
+    public void filterMovies_calls_movieServiceFilterMovies() {
+        movieController.filterMovies();
+
+        /*The verify() method in Mockito is used to confirm that a specific method was called on a mock object during
+        the execution of your test. */
+        verify(movieService).filterMovies(any(), any(), any());
+
+    }
 
     @Test
-    @DisplayName("Test filterMovies calls movieService's filterMovies method with correct parameter types")
-    public void testFilterMovies_calls_movieServiceFilterMovies_withCorrectParameterTypes() {
+    @DisplayName("Test filterMovies should call movieService's filterMovies method with correct parameter types")
+    public void filterMovies_calls_movieServiceFilterMovies_withCorrectParameterTypes() {
         movieController.filterMovies();
 
         /*The verify() method in Mockito is used to confirm that a specific method was called on a mock object during
