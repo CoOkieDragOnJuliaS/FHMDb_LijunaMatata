@@ -42,7 +42,7 @@ public class FHMDbController {
 
     /**
      * sets up the logic by initializing movieService
-     * */
+     */
     public FHMDbController() {
         //No args constructor for initialization
         this.movieService = new MovieService();
