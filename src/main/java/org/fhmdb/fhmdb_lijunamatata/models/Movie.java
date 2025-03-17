@@ -3,17 +3,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Movie {
-    private String id;
-    private String title;
-    private List<Genre> genres;
-    private int releaseYear;
-    private String description;
-    private String imgUrl;
-    private int lengthInMinutes;
-    private  List<String> directors;
-    private List<String> writers;
-    private List<String> mainCast;
-    private double rating;
+    private final String id;
+    private final String title;
+    private final List<Genre> genres;
+    private final int releaseYear;
+    private final String description;
+    private final String imgUrl;
+    private final int lengthInMinutes;
+    private final List<String> directors;
+    private final List<String> writers;
+    private final List<String> mainCast;
+    private final double rating;
 
     public Movie(String id, String title, List<Genre> genres, int releaseYear, String description,
                  String imgUrl, int lengthInMinutes, List<String> directors, List<String> writers,
