@@ -1,6 +1,8 @@
 module org.fhmdb.fhmdb_lijunamatata {
     requires javafx.controls;
     requires javafx.fxml;
+    requires com.google.gson;
+    requires okhttp3;
 
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
@@ -8,9 +10,11 @@ module org.fhmdb.fhmdb_lijunamatata {
     requires org.kordamp.ikonli.javafx;
 
     opens org.fhmdb.fhmdb_lijunamatata to javafx.fxml;
+    opens org.fhmdb.fhmdb_lijunamatata.controller to javafx.fxml;
+    opens org.fhmdb.fhmdb_lijunamatata.models to javafx.fxml, com.google.gson;
+
     exports org.fhmdb.fhmdb_lijunamatata;
     exports org.fhmdb.fhmdb_lijunamatata.controller;
-    opens org.fhmdb.fhmdb_lijunamatata.controller to javafx.fxml;
     exports org.fhmdb.fhmdb_lijunamatata.models;
-    opens org.fhmdb.fhmdb_lijunamatata.models to javafx.fxml;
+    exports org.fhmdb.fhmdb_lijunamatata.api;
 }
