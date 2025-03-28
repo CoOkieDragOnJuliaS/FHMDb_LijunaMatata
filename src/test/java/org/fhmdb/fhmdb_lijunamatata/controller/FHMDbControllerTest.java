@@ -1,9 +1,6 @@
 package org.fhmdb.fhmdb_lijunamatata.controller;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import org.fhmdb.fhmdb_lijunamatata.controller.FHMDbController;
-import org.fhmdb.fhmdb_lijunamatata.models.Genre;
+import org.fhmdb.fhmdb_lijunamatata.api.MovieAPI;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,7 +34,9 @@ public class FHMDbControllerTest {
     @InjectMocks
     private FHMDbController movieController;
 
-    ObservableList<Movie> initialMovies;
+    // changed from  ObservableList to List
+    // ObservableList<Movie> initialMovies;
+    List<Movie> initialMovies;
 
     @BeforeEach
     public void setUp() {
@@ -47,7 +46,16 @@ public class FHMDbControllerTest {
          */
         MockitoAnnotations.openMocks(this);
 
-        initialMovies = FXCollections.observableArrayList(Movie.initializeMovies());
+        // todo
+        // changed from observableArrayList to List
+        // initialMovies = FXCollections.observableArrayList(Movie.initializeMovies());
+        MovieAPI movieAPI = new MovieAPI();
+        try {
+            initialMovies = movieAPI.fetchAllMovies();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         movieController.setMovies(initialMovies);
 
         //Update: Mocking the Buttons e.g. does not work because Mockito is not able to mock JavaFX private elements or final classes

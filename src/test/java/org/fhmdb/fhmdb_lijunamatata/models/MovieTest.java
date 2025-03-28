@@ -1,5 +1,6 @@
 package org.fhmdb.fhmdb_lijunamatata.models;
 
+import org.fhmdb.fhmdb_lijunamatata.api.MovieAPI;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +21,14 @@ public class MovieTest {
     @BeforeEach
     public void setUp() {
         //BeforeSetup
-        this.movies = Movie.initializeMovies();
+        // todo
+        MovieAPI movieAPI = new MovieAPI();
+        try {
+            this.movies = movieAPI.fetchAllMovies();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        // this.movies = Movie.initializeMovies();
     }
 
     @Test

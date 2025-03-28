@@ -93,7 +93,7 @@ public class FHMDbController {
      * Initializes the ObservableArrayList() of movies and filteredMovies
      */
     private void initializeMovies() {
-        this.movies = FXCollections.observableArrayList(Movie.initializeMovies());
+        // this.movies = FXCollections.observableArrayList(Movie.initializeMovies());
         this.filteredMovies = FXCollections.observableArrayList(this.movies);
     }
 

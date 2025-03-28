@@ -23,20 +23,24 @@ public class MovieAPI {
     private static final String BASE_URL = "https://prog2.fh-campuswien.ac.at/movies";
     private final OkHttpClient client;
     private final Gson gson;
-    private final Label statusLabel;
-    private final boolean isTesting; // Test mode flag
+    // todo Labal from javaFX bibliotek
+    //private final Label statusLabel;
+    // todo nicht verwendete variable?
+    // private final boolean isTesting; // Test mode flag
 
     /**
      * Constructor to initialize the API client, JSON parser, and status label.
      *
-     * @param statusLabel Label component for displaying loading messages.
-     * @param isTesting   If true, disables UI updates to avoid JavaFX issues in tests.
+     * // @param statusLabel Label component for displaying loading messages.
+     * // @param isTesting   If true, disables UI updates to avoid JavaFX issues in tests.
      */
-    public MovieAPI(Label statusLabel, boolean isTesting) {
+    //public MovieAPI(Label statusLabel, boolean isTesting) {
+    public MovieAPI() {
         this.client = new OkHttpClient();
         this.gson = new Gson();
-        this.statusLabel = statusLabel;
-        this.isTesting = isTesting;
+        // todo
+        // this.statusLabel = statusLabel;
+        // this.isTesting = isTesting;
     }
 
     /**
@@ -61,8 +65,8 @@ public class MovieAPI {
      * @throws IOException If the API request fails.
      */
     public List<Movie> fetchMovies(String query, String genre, Integer releaseYear, Double ratingFrom) throws IOException {
-
-        updateStatusLabel("Loading movies...", true);
+        // todo
+        //updateStatusLabel("Loading movies...", true);
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse(getBaseUrl()).newBuilder();
 
@@ -82,7 +86,8 @@ public class MovieAPI {
 
         try (Response response = getClient().newCall(request).execute()) {
             if (!response.isSuccessful() || response.body() == null) {
-                updateStatusLabel("Error loading movies. Try again.", false);
+                // todo
+                //updateStatusLabel("Error loading movies. Try again.", false);
                 throw new IOException("Unexpected response: " + response);
             }
 
@@ -91,14 +96,16 @@ public class MovieAPI {
             List<Movie> movies = gson.fromJson(jsonResponse, movieListType);
 
             if (movies == null || movies.isEmpty()) {
-                updateStatusLabel("No movies found.", false);
+                // todo
+                //updateStatusLabel("No movies found.", false);
                 return List.of();
             }
-
-            updateStatusLabel("", false);
+            // todo
+            //updateStatusLabel("", false);
             return movies;
         } catch (IOException e) {
-            updateStatusLabel("Error loading movies. Check your internet connection.", false);
+            // todo
+            //updateStatusLabel("Error loading movies. Check your internet connection.", false);
             throw e;
         }
     }
@@ -122,6 +129,7 @@ public class MovieAPI {
         return client;
     }
 
+
     /**
      * Updates the status label with a given message.
      * Ensures the update runs on the JavaFX UI thread.
@@ -129,6 +137,8 @@ public class MovieAPI {
      * @param message  The message to display.
      * @param isLoading If true, the label is made visible; otherwise, it's hidden when empty.
      */
+    /*
+    // todo
     private void updateStatusLabel(String message, boolean isLoading) {
         if (isTesting) return; // Turn off UI updates in test mode
 
@@ -139,4 +149,6 @@ public class MovieAPI {
             }
         });
     }
+     */
+
 }

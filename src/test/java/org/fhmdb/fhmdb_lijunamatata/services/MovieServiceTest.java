@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,7 +20,13 @@ public class MovieServiceTest {
     @BeforeEach
     void setUp() {
         movieService = new MovieService();
-        movies = Movie.initializeMovies();
+        // todo
+        // added Exception try catch
+        try {
+            movies = Movie.initializeMovies();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
