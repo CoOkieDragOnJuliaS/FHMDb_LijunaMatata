@@ -95,6 +95,7 @@ public class Movie {
      * and returns the list
      */
     public static List<Movie> initializeMovies(boolean isTesting) throws IOException {
+
         List<Movie> movies = new ArrayList<>();
 
         movies.add(new Movie(
