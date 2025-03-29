@@ -68,6 +68,23 @@ public class MovieAPI {
         // todo
         //updateStatusLabel("Loading movies...", true);
 
+        String finalUrl = buildUrl(query, genre, releaseYear, ratingFrom);
+        Request request = new Request.Builder()
+                .url(finalUrl)
+                .header("User-Agent", "LiJuna_MatTata_FMHDb")
+                .build();
+
+        try (Response response = getClient().newCall(request).execute()) {
+            return parseResponse(response);
+        }
+        //catch (IOException e) {
+            // todo
+            //updateStatusLabel("Error loading movies. Check your internet connection.", false);
+            //throw e;
+        //}
+    }
+
+    private String buildUrl(String query, String genre, Integer releaseYear, Double ratingFrom) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(getBaseUrl()).newBuilder();
 
         // based on exercise task: 2. Wenn User*innen einen Wert im Freitextfeld und beim Genre selektieren, sollen
@@ -78,37 +95,29 @@ public class MovieAPI {
         if (releaseYear != null) urlBuilder.addQueryParameter("releaseYear", String.valueOf(releaseYear));
         if (ratingFrom != null) urlBuilder.addQueryParameter("ratingFrom", String.valueOf(ratingFrom));
 
-        String finalUrl = urlBuilder.build().toString();
+        return urlBuilder.build().toString();
 
-        Request request = new Request.Builder()
-                .url(finalUrl)
-                .header("User-Agent", "LiJuna_MatTata_FMHDb")
-                .build();
+    }
 
-        try (Response response = getClient().newCall(request).execute()) {
-            if (!response.isSuccessful() || response.body() == null) {
-                // todo
-                //updateStatusLabel("Error loading movies. Try again.", false);
-                throw new IOException("Unexpected response: " + response);
-            }
-
-            String jsonResponse = response.body().string();
-            Type movieListType = new TypeToken<List<Movie>>() {}.getType();
-            List<Movie> movies = gson.fromJson(jsonResponse, movieListType);
-
-            if (movies == null || movies.isEmpty()) {
-                // todo
-                //updateStatusLabel("No movies found.", false);
-                return List.of();
-            }
+    private List<Movie> parseResponse(Response response) throws IOException {
+        if (!response.isSuccessful() || response.body() == null) {
             // todo
-            //updateStatusLabel("", false);
-            return movies;
-        } catch (IOException e) {
-            // todo
-            //updateStatusLabel("Error loading movies. Check your internet connection.", false);
-            throw e;
+            //updateStatusLabel("Error loading movies. Try again.", false);
+            throw new IOException("Unexpected response: " + response);
         }
+
+        String jsonResponse = response.body().string();
+        Type movieListType = new TypeToken<List<Movie>>() {}.getType();
+        List<Movie> movies = gson.fromJson(jsonResponse, movieListType);
+
+        if (movies == null || movies.isEmpty()) {
+            // todo
+            //updateStatusLabel("No movies found.", false);
+            return List.of();
+        }
+        // todo
+        //updateStatusLabel("", false);
+        return movies;
     }
 
     /**

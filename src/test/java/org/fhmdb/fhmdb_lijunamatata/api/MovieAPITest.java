@@ -20,7 +20,9 @@ public class MovieAPITest {
     private MockWebServer mockWebServer;
     private Gson gson;
 
-    //TODO: test case for unset user-agent header (response should be 403)
+    //TODO:
+    // test case for fetchMovies: unchanged user-agent header (response should be 403)
+    // test case for fetchMovies: removed user-agent header (response should be 403)
 
     @BeforeEach
     void setUp() throws IOException {
