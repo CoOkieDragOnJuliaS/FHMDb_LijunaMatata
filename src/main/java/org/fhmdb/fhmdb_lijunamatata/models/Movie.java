@@ -1,5 +1,5 @@
 package org.fhmdb.fhmdb_lijunamatata.models;
-import javafx.scene.control.Label;
+
 import org.fhmdb.fhmdb_lijunamatata.api.MovieAPI;
 
 import java.io.IOException;
@@ -7,17 +7,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Movie {
-    private final String id;
-    private final String title;
-    private final List<Genre> genres;
-    private final int releaseYear;
-    private final String description;
-    private final String imgUrl;
-    private final int lengthInMinutes;
-    private final List<String> directors;
-    private final List<String> writers;
-    private final List<String> mainCast;
-    private final double rating;
+    private String id;
+    private String title;
+    private List<Genre> genres;
+    private int releaseYear;
+    private String description;
+    private String imgUrl;
+    private int lengthInMinutes;
+    private List<String> directors;
+    private List<String> writers;
+    private List<String> mainCast;
+    private double rating;
+
+    public Movie() {
+        //no parameter constructor for testing
+    }
 
     public Movie(String id, String title, List<Genre> genres, int releaseYear, String description,
                  String imgUrl, int lengthInMinutes, List<String> directors, List<String> writers,
@@ -94,7 +98,7 @@ public class Movie {
      * creates a mutable ArrayList of movies,
      * and returns the list
      */
-    public static List<Movie> initializeMovies(boolean isTesting) {
+    public static List<Movie> initializeMoviesTestbase() {
 
         List<Movie> movies = new ArrayList<>();
 
@@ -229,6 +233,24 @@ public class Movie {
                 8.5));
 
         return movies;
+    }
+
+
+    //TODO: Java Streams methods & TESTING (TDD)
+    public String getMostPopularActor(List<Movie> movies) {
+        return "";
+    }
+
+    public int getLongestMovieTitle(List<Movie> movies) {
+        return 0;
+    }
+
+    public long countMoviesFrom(List<Movie> movies, String director) {
+        return 0;
+    }
+
+    public List<Movie> getMoviesBetweenYears(List<Movie> movies, int startYear, int endYear) {
+        return null;
     }
 }
 
