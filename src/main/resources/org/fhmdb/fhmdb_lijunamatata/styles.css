@@ -16,7 +16,7 @@
     -fx-font-size: 12px;
 }
 
-.genre {
+.genre, .releaseYear, .rating{
     -fx-font-weight: bold;
 }
 
