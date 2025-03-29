@@ -1,8 +1,8 @@
 package org.fhmdb.fhmdb_lijunamatata.services;
 
 import org.fhmdb.fhmdb_lijunamatata.api.MovieAPI;
-import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
+import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,17 +41,18 @@ public class MovieService {
     /**
      * Fetches a list of movies based on the provided search text and selected genres
      *
-     * @param movies     The list of movies to be filtered.
      * @param searchText The text to search for in movie titles.
      * @param genre      The genre to filter movies by. If {@code null}, no genre filtering is applied.
      * @param releaseYear The release to filter movies by. If {@code null}, no releaseYear filtering is applied.
      * @param rating The rating to filter movies by. If {@code null}, no rating filtering is applied.
      * @return A list of movies that matches all criteria.
      */
-    public List<Movie> fetchFilteredMovies(List<Movie> movies, String searchText, Genre genre, Integer releaseYear,
+    public List<Movie> fetchFilteredMovies(String searchText, Genre genre, Integer releaseYear,
                                      Double rating) throws IOException {
         return new MovieAPI().fetchMovies(searchText, genre, releaseYear, rating);
     }
+
+    //TODO: Discuss if this method is still needed if we have the fetchfilteredMovies with API
     /**
      * Filters a list of movies based on the provided search text and selected genre.
      * The method checks if the movie's title contains the search text (ignoring case)
@@ -74,6 +75,7 @@ public class MovieService {
         return filteredMovies;
     }
 
+    //TODO: If the method above (filterMovies) is not needed, the following 2 methods are not needed!
     /**
      * Checks if the movie's genres contain the selected genre.
      * Returns {@code true} if the movie matches the selected genre or if no genre is selected.

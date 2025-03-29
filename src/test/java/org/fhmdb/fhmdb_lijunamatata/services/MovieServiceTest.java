@@ -1,16 +1,15 @@
 package org.fhmdb.fhmdb_lijunamatata.services;
 
-import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
+import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Comparator;
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MovieServiceTest {
 
@@ -20,24 +19,19 @@ public class MovieServiceTest {
     @BeforeEach
     void setUp() {
         movieService = new MovieService();
-        // todo
-        // added Exception try catch
-        try {
-            movies = Movie.initializeMovies();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        movies = Movie.initializeMoviesTestbase();
     }
 
+    //TODO: Fix Tests with new movie testbase
     @Test
     @DisplayName("Test sorting in ascending order")
     public void testSortMoviesAscending() {
         List<Movie> expectedMovies = List.of(
-                movies.get(3), // Avatar
+                movies.get(1), // Inception
                 movies.get(0), // Life Is Beautiful
-                movies.get(2), // Puss in Boots
-                movies.get(1), // The Usual Suspects
-                movies.get(4)  // The Wolf of Wall Street
+                movies.get(2), // Parasite
+                movies.get(4), // Pulp Fiction
+                movies.get(3)  // The Godfather
         );
 
         List<Movie> testMovies = new ArrayList<>(movies);
