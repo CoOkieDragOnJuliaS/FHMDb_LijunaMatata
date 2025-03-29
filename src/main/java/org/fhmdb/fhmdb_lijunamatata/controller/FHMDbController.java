@@ -15,11 +15,16 @@ import org.fhmdb.fhmdb_lijunamatata.ui.MovieCell;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 public class FHMDbController {
 
+
     private Genre genre;
+    private int releaseYear;
+    private double rating;
     private boolean isAscending = true;
     private ObservableList<Movie> movies;
     private ObservableList<Movie> filteredMovies;
@@ -31,6 +36,12 @@ public class FHMDbController {
 
     @FXML
     public ComboBox<Genre> genreComboBox;
+
+    @FXML
+    public ComboBox<Integer> releaseYearComboBox;
+
+    @FXML
+    public ComboBox<Double> ratingComboBox;
 
     @FXML
     private ListView<Movie> movieListView;
@@ -62,8 +73,10 @@ public class FHMDbController {
             initializeMovies();
             // Set the ListView items
             initializeMovieListView();
-            // Initialize genreComboBox
+            // Initialize ComboBoxes
             initializeGenreComboBox();
+            initializeReleaseYearComboBox();
+            initializeRatingComboBox();
             // Add listeners
             initializeListeners();
         } catch (IOException e) {
@@ -83,6 +96,14 @@ public class FHMDbController {
 
         genreComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             genre = newValue;
+        });
+
+        releaseYearComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            releaseYear = newValue;
+        });
+
+        ratingComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            rating = newValue;
         });
     }
 
@@ -114,6 +135,42 @@ public class FHMDbController {
         genreOptions.add(null);
         genreOptions.addAll(Genre.values());
         this.genreComboBox.setItems(genreOptions);
+    }
+
+    /**
+     * Initializes the ComboBox with a "no year" option followed by all distinct years from filtered Movies.
+     * The first item, representing "no year", is selected by default.
+     */
+    private void initializeReleaseYearComboBox() {
+        List<Integer> years = filteredMovies.stream() //convert to stream for processing
+                .map(Movie::getReleaseYear) //get only release year of each movie
+                .filter(Objects::nonNull) //safety check to remove any null years
+                .distinct() //keep only unique years
+                .sorted() //ascending
+                .toList(); //convert back to list
+
+        ObservableList<Integer> releaseYearOptions = FXCollections.observableArrayList();
+        releaseYearOptions.add(null);
+        releaseYearOptions.addAll(years);
+        this.releaseYearComboBox.setItems(releaseYearOptions);
+    }
+
+    /**
+     * Initializes the ComboBox with a "no rating" option followed by all distinct ratings from filtered Movies.
+     * The first item, representing "no rating", is selected by default.
+     */
+    private void initializeRatingComboBox() {
+        List<Double> ratings = filteredMovies.stream() //convert to stream for processing
+                .map(Movie::getRating) //get only rating of each movie
+                .filter(Objects::nonNull) //safety check to remove any null ratings
+                .distinct() //keep only unique ratings
+                .sorted() //ascending
+                .toList(); //convert back to list
+
+        ObservableList<Double> ratingOptions = FXCollections.observableArrayList();
+        ratingOptions.add(null);
+        ratingOptions.addAll(ratings);
+        this.ratingComboBox.setItems(ratingOptions);
     }
 
     /**

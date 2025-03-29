@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -30,11 +29,12 @@
     </HBox>
     <HBox spacing="5.0" styleClass="background-black" stylesheets="@styles.css">
         <children>
-            <Button fx:id="sortBtn" styleClass="background-yellow" stylesheets="@styles.css"
-                    text="Sort (asc)" onAction="#onSortButtonClick"/>
-            <TextField fx:id="searchField" prefHeight="25.0" prefWidth="170.0" promptText="Search FHMDb"/>
-            <ComboBox fx:id="genreComboBox" styleClass="filter-combo-box" stylesheets="@styles.css"/>
-            <Button fx:id="filterBtn" styleClass="background-yellow" stylesheets="@styles.css" text="Filter" onAction="#onFilterButtonClick"/>
+            <Button fx:id="sortBtn" onAction="#onSortButtonClick" styleClass="background-yellow" stylesheets="@styles.css" text="Sort (asc)" />
+            <TextField fx:id="searchField" prefHeight="25.0" prefWidth="170.0" promptText="Search FHMDb" />
+            <ComboBox fx:id="genreComboBox" promptText="Filter by Genre" styleClass="filter-combo-box" stylesheets="@styles.css" />
+            <ComboBox fx:id="releaseYearComboBox" promptText="Filter by Release Year" styleClass="filter-combo-box" stylesheets="@styles.css" />
+            <ComboBox fx:id="ratingComboBox" promptText="Filter by Rating" styleClass="filter-combo-box" stylesheets="@styles.css" />
+            <Button fx:id="filterBtn" onAction="#onFilterButtonClick" styleClass="background-yellow" stylesheets="@styles.css" text="Filter" />
         </children>
         <VBox.margin>
             <Insets />
