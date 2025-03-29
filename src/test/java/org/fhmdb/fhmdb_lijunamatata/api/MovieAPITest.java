@@ -7,6 +7,9 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -63,8 +66,8 @@ public class MovieAPITest {
     }
 
     @Test
-    @DisplayName("Test fetchMovies - API error response")
-    void fetchMovies_handlesApiError() {
+    @DisplayName("Test fetchMovies - API 403 error response")
+    void fetchMovies_handles_403_Error() {
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(403)
                 .setBody("")
@@ -72,7 +75,16 @@ public class MovieAPITest {
 
         IOException exception = assertThrows(IOException.class, () -> movieAPI.fetchMovies(null, null,
                                                                                 null, null));
-        assertTrue(exception.getMessage().contains("Unexpected response"), "Exception should indicate API error");
+        assertTrue(exception.getMessage().contains("User-Agent Header"), "Exception should indicate API error");
+    }
+
+    @ParameterizedTest
+    @DisplayName("Test fetchMovies - API status Codes error response")
+    @ValueSource(ints = {400, 401, 408, 500, 502, 503, 511})
+    void fetchMovies_handles_statusCodes(int statusCode) {
+        mockWebServer.enqueue(new MockResponse().setResponseCode(statusCode).setBody(""));
+
+        assertThrows(IOException.class, () -> movieAPI.fetchMovies(null, null, null, null));
     }
 
     @Test
