@@ -99,11 +99,42 @@ public class MovieAPI {
 
     }
 
+    private void handleExceptions(Response response, int statusCode) throws IOException {
+        switch (statusCode) {
+            case 400:
+                throw new IOException("400 Bad Request: The request cannot be fulfilled due to bad syntax. ");
+            case 401:
+                throw new IOException("401 Unauthorized: The request was a legal request, but the server is refusing " +
+                        "to respond to it. For use when authentication is possible but has failed or not yet been " +
+                        "provided. ");
+            case 403:
+                throw new IOException("403 User-Agent Header fault: A custom user-agent header was not set. ")
+            case 408:
+                throw new IOException("408 Request Timeout: The server timed out waiting for the request. ");
+            case 500:
+                throw new IOException("500 Internal Server Error: A generic error message, given when no more " +
+                        "specific message is suitable. ");
+            case 502:
+                throw new IOException("502 Bad Gateway: The server was acting as a gateway or proxy and received an " +
+                        "invalid response from the upstream server. ");
+            case 503:
+                throw new IOException("503 Service Unavailable: The server is currently unavailable (overloaded or " +
+                        "down. ");
+            case 511:
+                throw new IOException("511 Network Authentication Required: The client needs to authenticate to " +
+                        "gain network access. ");
+            default:
+                throw new IOException("Unexpected response: " + response);
+        }
+
+    }
+
     private List<Movie> parseResponse(Response response) throws IOException {
         if (!response.isSuccessful() || response.body() == null) {
             // todo
             //updateStatusLabel("Error loading movies. Try again.", false);
-            throw new IOException("Unexpected response: " + response);
+            handleExceptions(response, response.code());
+
         }
 
         String jsonResponse = response.body().string();
@@ -138,6 +169,7 @@ public class MovieAPI {
     public OkHttpClient getClient() {
         return client;
     }
+
 
 
     /**
