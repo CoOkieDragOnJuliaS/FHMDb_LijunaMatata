@@ -1,6 +1,6 @@
 package org.fhmdb.fhmdb_lijunamatata.controller;
 
-import org.fhmdb.fhmdb_lijunamatata.api.MovieAPI;
+import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,8 +12,9 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -34,9 +35,9 @@ public class FHMDbControllerTest {
     @InjectMocks
     private FHMDbController movieController;
 
-    // changed from  ObservableList to List
-    // ObservableList<Movie> initialMovies;
     List<Movie> initialMovies;
+    //logger to log and debug during testing
+    Logger logger = Logger.getLogger(FHMDbControllerTest.class.getName());
 
     @BeforeEach
     public void setUp() {
@@ -46,15 +47,9 @@ public class FHMDbControllerTest {
          */
         MockitoAnnotations.openMocks(this);
 
-        // todo
-        // changed from observableArrayList to List
-        // initialMovies = FXCollections.observableArrayList(Movie.initializeMovies());
-        MovieAPI movieAPI = new MovieAPI();
-        try {
-            initialMovies = movieAPI.fetchAllMovies();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        //Testing with the initialized movies from testbaste in Movie class
+        //The controller does not know about the MovieAPI
+        initialMovies = Movie.initializeMoviesTestbase();
 
         movieController.setMovies(initialMovies);
 
@@ -84,7 +79,6 @@ public class FHMDbControllerTest {
         /*The verify() method in Mockito is used to confirm that a specific method was called on a mock object during
         the execution of your test. */
         verify(movieService).sortMovies(anyList(), anyBoolean());
-
     }
 
 
@@ -97,7 +91,6 @@ public class FHMDbControllerTest {
         /*The verify() method in Mockito is used to confirm that a specific method was called on a mock object during
         the execution of your test. */
         verify(movieService, never()).sortMovies(anyList(), anyBoolean());
-
     }
 
     @Test
@@ -107,19 +100,26 @@ public class FHMDbControllerTest {
 
         /*The verify() method in Mockito is used to confirm that a specific method was called on a mock object during
         the execution of your test. */
-        verify(movieService).filterMovies(any(), any(), any());
-
+        try {
+            verify(movieService).fetchFilteredMovies(any(), any(), any(), any());
+        }catch(IOException e) {
+            logger.severe(e.getMessage());
+        }
     }
+
 
     @Test
     @DisplayName("Test filterMovies should call movieService's filterMovies method with correct parameter types")
     public void filterMovies_calls_movieServiceFilterMovies_withCorrectParameterTypes() {
+        movieController.setFilterElements("", Genre.DRAMA, 1990, 2.5);
         movieController.filterMovies();
-
         /*The verify() method in Mockito is used to confirm that a specific method was called on a mock object during
         the execution of your test. */
-        verify(movieService).filterMovies(anyList(), anyString(), any());
-
+        try {
+            verify(movieService).fetchFilteredMovies(anyString(), any(Genre.class), anyInt(), anyDouble());
+        }catch(IOException e) {
+            logger.severe(e.getMessage());
+        }
     }
 
 }
