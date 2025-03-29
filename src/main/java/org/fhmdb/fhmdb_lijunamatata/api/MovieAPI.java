@@ -8,6 +8,7 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 
 import java.io.IOException;
@@ -64,7 +65,7 @@ public class MovieAPI {
      * @return A list of movies matching the filters, or an empty list if none are found.
      * @throws IOException If the API request fails.
      */
-    public List<Movie> fetchMovies(String query, String genre, Integer releaseYear, Double ratingFrom) throws IOException {
+    public List<Movie> fetchMovies(String query, Genre genre, Integer releaseYear, Double ratingFrom) throws IOException {
         // todo
         //updateStatusLabel("Loading movies...", true);
 
@@ -84,14 +85,14 @@ public class MovieAPI {
         //}
     }
 
-    private String buildUrl(String query, String genre, Integer releaseYear, Double ratingFrom) {
+    private String buildUrl(String query, Genre genre, Integer releaseYear, Double ratingFrom) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(getBaseUrl()).newBuilder();
 
         // based on exercise task: 2. Wenn User*innen einen Wert im Freitextfeld und beim Genre selektieren, sollen
         //dementsprechende Parameter in der URL gesetzt werden.
 
         if (query != null) urlBuilder.addQueryParameter("query", query);
-        if (genre != null) urlBuilder.addQueryParameter("genre", genre);
+        if (genre != null) urlBuilder.addQueryParameter("genre", String.valueOf(genre));
         if (releaseYear != null) urlBuilder.addQueryParameter("releaseYear", String.valueOf(releaseYear));
         if (ratingFrom != null) urlBuilder.addQueryParameter("ratingFrom", String.valueOf(ratingFrom));
 

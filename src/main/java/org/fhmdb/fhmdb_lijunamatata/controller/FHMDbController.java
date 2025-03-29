@@ -23,8 +23,8 @@ public class FHMDbController {
 
 
     private Genre genre;
-    private int releaseYear;
-    private double rating;
+    private Integer releaseYear;
+    private Double rating;
     private boolean isAscending = true;
     private ObservableList<Movie> movies;
     private ObservableList<Movie> filteredMovies;
@@ -68,7 +68,6 @@ public class FHMDbController {
      */
     @FXML
     public void initialize() {
-        try {
             //Sets the list of movies
             initializeMovies();
             // Set the ListView items
@@ -79,9 +78,7 @@ public class FHMDbController {
             initializeRatingComboBox();
             // Add listeners
             initializeListeners();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
     }
 
     /**
@@ -91,7 +88,7 @@ public class FHMDbController {
     private void initializeListeners() {
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             searchText = newValue;
-            filterMovies();
+            //filterMovies(); //commented out, so that requests don't get send so frequently
         });
 
         genreComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -118,10 +115,13 @@ public class FHMDbController {
     /**
      * Initializes the ObservableArrayList() of movies and filteredMovies
      */
-    private void initializeMovies() throws IOException {
-        this.movies = FXCollections.observableArrayList(Movie.initializeMovies());
-        this.filteredMovies = FXCollections.observableArrayList(this.movies);
-
+    private void initializeMovies()  {
+        try {
+            this.movies = FXCollections.observableArrayList(Movie.initializeMovies());
+            this.filteredMovies = FXCollections.observableArrayList(this.movies);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -228,8 +228,15 @@ public class FHMDbController {
         this.filteredMovies.addAll(this.movies);
         // Get the filtered results from the movieService
         // and add the filtered results to the filteredMovies list
-        this.filteredMovies = FXCollections.observableList(this.movieService.filterMovies(this.movies, this.searchText, this.genre));
-        updateMovieListView();
+        try {
+            this.filteredMovies = FXCollections.observableList(this.movieService.fetchFilteredMovies(this.movies,
+                    this.searchText, this.genre, this.releaseYear, this.rating));
+            //this.filteredMovies = FXCollections.observableList(this.movieService.filterMovies(this.movies,
+            //        this.searchText, this.genre));
+            updateMovieListView();
+        }  catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

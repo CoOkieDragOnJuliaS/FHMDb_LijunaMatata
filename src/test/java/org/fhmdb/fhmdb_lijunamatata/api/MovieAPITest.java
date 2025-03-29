@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import okhttp3.*;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
+import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,9 +24,6 @@ public class MovieAPITest {
     private MockWebServer mockWebServer;
     private Gson gson;
 
-    //TODO:
-    // test case for fetchMovies: unchanged user-agent header (response should be 403)
-    // test case for fetchMovies: removed user-agent header (response should be 403)
 
     @BeforeEach
     void setUp() throws IOException {
@@ -99,7 +97,7 @@ public class MovieAPITest {
                 .setBody(jsonResponse)
                 .addHeader("Content-Type", "application/json"));
 
-        List<Movie> movies = movieAPI.fetchMovies(null, "Action", 1999, null);
+        List<Movie> movies = movieAPI.fetchMovies(null, Genre.valueOf("ACTION"), 1999, null);
 
         assertNotNull(movies, "Movies should not be null");
         assertEquals(1, movies.size(), "There should be one movie in the response");
