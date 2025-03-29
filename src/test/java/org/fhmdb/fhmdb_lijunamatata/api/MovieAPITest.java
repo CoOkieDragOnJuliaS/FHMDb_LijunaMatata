@@ -1,19 +1,17 @@
 package org.fhmdb.fhmdb_lijunamatata.api;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import okhttp3.*;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,14 +20,12 @@ public class MovieAPITest {
 
     private MovieAPI movieAPI;
     private MockWebServer mockWebServer;
-    private Gson gson;
 
 
     @BeforeEach
     void setUp() throws IOException {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
-        gson = new Gson();
 
         movieAPI = new MovieAPI() {
             @Override
@@ -72,7 +68,7 @@ public class MovieAPITest {
                 .addHeader("Content-Type", "application/json"));
 
         IOException exception = assertThrows(IOException.class, () -> movieAPI.fetchMovies(null, null,
-                                                                                null, null));
+                null, null));
         assertTrue(exception.getMessage().contains("User-Agent Header"), "Exception should indicate API error");
     }
 

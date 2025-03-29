@@ -2,8 +2,6 @@ package org.fhmdb.fhmdb_lijunamatata.api;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import javafx.application.Platform;
-import javafx.scene.control.Label;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -24,10 +22,6 @@ public class MovieAPI {
     private static final String BASE_URL = "https://prog2.fh-campuswien.ac.at/movies";
     private final OkHttpClient client;
     private final Gson gson;
-    // todo Labal from javaFX bibliotek
-    //private final Label statusLabel;
-    // todo nicht verwendete variable?
-    // private final boolean isTesting; // Test mode flag
 
     /**
      * Constructor to initialize the API client, JSON parser, and status label.
@@ -39,9 +33,6 @@ public class MovieAPI {
     public MovieAPI() {
         this.client = new OkHttpClient();
         this.gson = new Gson();
-        // todo
-        // this.statusLabel = statusLabel;
-        // this.isTesting = isTesting;
     }
 
     /**
@@ -66,9 +57,6 @@ public class MovieAPI {
      * @throws IOException If the API request fails.
      */
     public List<Movie> fetchMovies(String query, Genre genre, Integer releaseYear, Double ratingFrom) throws IOException {
-        // todo
-        //updateStatusLabel("Loading movies...", true);
-
         String finalUrl = buildUrl(query, genre, releaseYear, ratingFrom);
         Request request = new Request.Builder()
                 .url(finalUrl)
@@ -78,13 +66,9 @@ public class MovieAPI {
         try (Response response = getClient().newCall(request).execute()) {
             return parseResponse(response);
         }
-        //catch (IOException e) {
-            // todo
-            //updateStatusLabel("Error loading movies. Check your internet connection.", false);
-            //throw e;
-        //}
     }
 
+    //TODO: JavaDoc, what does this method do?
     private String buildUrl(String query, Genre genre, Integer releaseYear, Double ratingFrom) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(getBaseUrl()).newBuilder();
 
@@ -100,6 +84,7 @@ public class MovieAPI {
 
     }
 
+    //TODO: JavaDoc, what does this method do?
     private void handleExceptions(Response response, int statusCode) throws IOException {
         switch (statusCode) {
             case 400:
@@ -130,25 +115,21 @@ public class MovieAPI {
 
     }
 
+    //TODO: JavaDoc, what does this method do?
     private List<Movie> parseResponse(Response response) throws IOException {
         if (!response.isSuccessful() || response.body() == null) {
-            // todo
-            //updateStatusLabel("Error loading movies. Try again.", false);
             handleExceptions(response, response.code());
 
         }
 
+        //TODO: Please explain these lines to get an understanding
         String jsonResponse = response.body().string();
         Type movieListType = new TypeToken<List<Movie>>() {}.getType();
         List<Movie> movies = gson.fromJson(jsonResponse, movieListType);
 
         if (movies == null || movies.isEmpty()) {
-            // todo
-            //updateStatusLabel("No movies found.", false);
             return List.of();
         }
-        // todo
-        //updateStatusLabel("", false);
         return movies;
     }
 
@@ -170,28 +151,4 @@ public class MovieAPI {
     public OkHttpClient getClient() {
         return client;
     }
-
-
-
-    /**
-     * Updates the status label with a given message.
-     * Ensures the update runs on the JavaFX UI thread.
-     *
-     * @param message  The message to display.
-     * @param isLoading If true, the label is made visible; otherwise, it's hidden when empty.
-     */
-    /*
-    // todo
-    private void updateStatusLabel(String message, boolean isLoading) {
-        if (isTesting) return; // Turn off UI updates in test mode
-
-        Platform.runLater(() -> {
-            if (statusLabel != null) {
-                statusLabel.setText(message);
-                statusLabel.setVisible(isLoading || !message.isEmpty());
-            }
-        });
-    }
-     */
-
 }
