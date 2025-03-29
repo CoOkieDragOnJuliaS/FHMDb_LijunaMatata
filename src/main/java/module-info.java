@@ -8,6 +8,7 @@ module org.fhmdb.fhmdb_lijunamatata {
     requires com.dlsc.formsfx;
     requires net.synedra.validatorfx;
     requires org.kordamp.ikonli.javafx;
+    requires java.logging;
 
     opens org.fhmdb.fhmdb_lijunamatata to javafx.fxml;
     opens org.fhmdb.fhmdb_lijunamatata.controller to javafx.fxml;
