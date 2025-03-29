@@ -13,6 +13,7 @@ import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
 import org.fhmdb.fhmdb_lijunamatata.ui.MovieCell;
 
+import java.io.IOException;
 import java.util.List;
 
 
@@ -56,14 +57,18 @@ public class FHMDbController {
      */
     @FXML
     public void initialize() {
-        //Sets the list of movies
-        initializeMovies();
-        // Set the ListView items
-        initializeMovieListView();
-        // Initialize genreComboBox
-        initializeGenreComboBox();
-        // Add listeners
-        initializeListeners();
+        try {
+            //Sets the list of movies
+            initializeMovies();
+            // Set the ListView items
+            initializeMovieListView();
+            // Initialize genreComboBox
+            initializeGenreComboBox();
+            // Add listeners
+            initializeListeners();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -92,9 +97,11 @@ public class FHMDbController {
     /**
      * Initializes the ObservableArrayList() of movies and filteredMovies
      */
-    private void initializeMovies() {
-        // this.movies = FXCollections.observableArrayList(Movie.initializeMovies());
+    private void initializeMovies() throws IOException {
+        this.movies = FXCollections.observableArrayList(Movie.initializeMovies());
         this.filteredMovies = FXCollections.observableArrayList(this.movies);
+
+
     }
 
     /**

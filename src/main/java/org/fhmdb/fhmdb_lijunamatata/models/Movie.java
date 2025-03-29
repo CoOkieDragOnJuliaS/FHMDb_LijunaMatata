@@ -94,7 +94,7 @@ public class Movie {
      * creates a mutable ArrayList of movies,
      * and returns the list
      */
-    public static List<Movie> initializeMovies(boolean isTesting) throws IOException {
+    public static List<Movie> initializeMovies(boolean isTesting) {
 
         List<Movie> movies = new ArrayList<>();
 

@@ -82,6 +82,7 @@ public class MovieAPI {
 
         Request request = new Request.Builder()
                 .url(finalUrl)
+                .header("User-Agent", "LiJuna_MatTata_FMHDb")
                 .build();
 
         try (Response response = getClient().newCall(request).execute()) {

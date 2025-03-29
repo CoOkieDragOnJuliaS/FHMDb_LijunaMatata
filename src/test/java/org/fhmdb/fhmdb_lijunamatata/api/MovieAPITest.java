@@ -20,6 +20,8 @@ public class MovieAPITest {
     private MockWebServer mockWebServer;
     private Gson gson;
 
+    //TODO: test case for unset user-agent header (response should be 403)
+
     @BeforeEach
     void setUp() throws IOException {
         mockWebServer = new MockWebServer();
