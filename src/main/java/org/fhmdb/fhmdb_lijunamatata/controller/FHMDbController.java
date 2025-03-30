@@ -68,7 +68,7 @@ public class FHMDbController {
 
     /**
      * initializes the Controller by calling methods for initializing the elements of the class.
-     * <p>
+     *
      * - The `searchText` is automatically updated whenever the user types in the `searchField`.
      * - The `genre` is automatically updated whenever a new genre is selected from the `genreComboBox`.
      */
@@ -182,7 +182,7 @@ public class FHMDbController {
     private void initializeReleaseYearComboBox() {
         ObservableList<Integer> releaseYearOptions = FXCollections.observableArrayList();
         releaseYearOptions.add(null);
-        if (filteredMovies != null) {
+        if (filteredMovies != null && !filteredMovies.isEmpty()) {
             List<Integer> years = filteredMovies.stream() //convert to stream for processing
                     .map(Movie::getReleaseYear) //get only release year of each movie
                     .filter(Objects::nonNull) //safety check to remove any null years
@@ -201,7 +201,7 @@ public class FHMDbController {
     private void initializeRatingComboBox() {
         ObservableList<Double> ratingOptions = FXCollections.observableArrayList();
         ratingOptions.add(null);
-        if (filteredMovies != null) {
+        if (filteredMovies != null && !filteredMovies.isEmpty()) {
             List<Double> ratings = filteredMovies.stream() //convert to stream for processing
                     .map(Movie::getRating) //get only rating of each movie
                     .filter(Objects::nonNull) //safety check to remove any null ratings

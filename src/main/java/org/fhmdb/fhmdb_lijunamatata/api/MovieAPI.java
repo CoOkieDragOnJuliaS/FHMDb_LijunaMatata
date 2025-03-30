@@ -68,7 +68,15 @@ public class MovieAPI {
         }
     }
 
-    //TODO: JavaDoc, what does this method do?
+    /**
+     * Builds the url by concatenating the parameters in the correct format to pass to the HTTP request in fetchMovies
+     *
+     * @param query
+     * @param genre
+     * @param releaseYear
+     * @param ratingFrom
+     * @return the final URL as String
+     */
     private String buildUrl(String query, Genre genre, Integer releaseYear, Double ratingFrom) {
         HttpUrl.Builder urlBuilder = HttpUrl.parse(getBaseUrl()).newBuilder();
 
@@ -84,7 +92,13 @@ public class MovieAPI {
 
     }
 
-    //TODO: JavaDoc, what does this method do?
+    /**
+     * Looks at the status code of the failed response and prints the appropriate error message in the console
+     *
+     * @param response
+     * @param statusCode
+     * @throws IOException
+     */
     private void handleExceptions(Response response, int statusCode) throws IOException {
         switch (statusCode) {
             case 400:
@@ -115,7 +129,13 @@ public class MovieAPI {
 
     }
 
-    //TODO: JavaDoc, what does this method do?
+    /**
+     * Parses the JSON response of the HTTP request into a List of Movies
+     *
+     * @param response
+     * @return a list of movies as List<Movie>
+     * @throws IOException
+     */
     private List<Movie> parseResponse(Response response) throws IOException {
         if (!response.isSuccessful() || response.body() == null) {
             handleExceptions(response, response.code());
