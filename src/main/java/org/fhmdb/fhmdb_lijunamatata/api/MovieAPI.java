@@ -60,7 +60,7 @@ public class MovieAPI {
         String finalUrl = buildUrl(query, genre, releaseYear, ratingFrom);
         Request request = new Request.Builder()
                 .url(finalUrl)
-                .header("User-Agent", "LiJuna_MatTata_FMHDb")
+                .header("User-Agent", "LiJuna_MaTata_FMHDb")
                 .build();
 
         try (Response response = getClient().newCall(request).execute()) {

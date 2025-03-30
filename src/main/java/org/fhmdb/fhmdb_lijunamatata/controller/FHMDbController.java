@@ -155,11 +155,12 @@ public class FHMDbController {
             updateStatusLabel("Loading movies...", false);
             this.movies = FXCollections.observableArrayList(Movie.initializeMovies());
             this.filteredMovies = FXCollections.observableArrayList(this.movies);
+            updateStatusLabel("", false);
         } catch (IOException e) {
             updateStatusLabel("Error loading movies!", true);
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
-        updateStatusLabel("", false);
+
     }
 
     /**
@@ -179,16 +180,17 @@ public class FHMDbController {
      * The first item, representing "no year", is selected by default.
      */
     private void initializeReleaseYearComboBox() {
-        List<Integer> years = filteredMovies.stream() //convert to stream for processing
-                .map(Movie::getReleaseYear) //get only release year of each movie
-                .filter(Objects::nonNull) //safety check to remove any null years
-                .distinct() //keep only unique years
-                .sorted() //ascending
-                .toList(); //convert back to list
-
         ObservableList<Integer> releaseYearOptions = FXCollections.observableArrayList();
         releaseYearOptions.add(null);
-        releaseYearOptions.addAll(years);
+        if (filteredMovies != null) {
+            List<Integer> years = filteredMovies.stream() //convert to stream for processing
+                    .map(Movie::getReleaseYear) //get only release year of each movie
+                    .filter(Objects::nonNull) //safety check to remove any null years
+                    .distinct() //keep only unique years
+                    .sorted() //ascending
+                    .toList(); //convert back to list
+            releaseYearOptions.addAll(years);
+        }
         this.releaseYearComboBox.setItems(releaseYearOptions);
     }
 
@@ -197,16 +199,17 @@ public class FHMDbController {
      * The first item, representing "no rating", is selected by default.
      */
     private void initializeRatingComboBox() {
-        List<Double> ratings = filteredMovies.stream() //convert to stream for processing
-                .map(Movie::getRating) //get only rating of each movie
-                .filter(Objects::nonNull) //safety check to remove any null ratings
-                .distinct() //keep only unique ratings
-                .sorted() //ascending
-                .toList(); //convert back to list
-
         ObservableList<Double> ratingOptions = FXCollections.observableArrayList();
         ratingOptions.add(null);
-        ratingOptions.addAll(ratings);
+        if (filteredMovies != null) {
+            List<Double> ratings = filteredMovies.stream() //convert to stream for processing
+                    .map(Movie::getRating) //get only rating of each movie
+                    .filter(Objects::nonNull) //safety check to remove any null ratings
+                    .distinct() //keep only unique ratings
+                    .sorted() //ascending
+                    .toList(); //convert back to list
+            ratingOptions.addAll(ratings);
+        }
         this.ratingComboBox.setItems(ratingOptions);
     }
 
@@ -260,18 +263,19 @@ public class FHMDbController {
      * Calls the filterMovies method inside the movieService class and updates the movieListView
      */
     void filterMovies() {
-        // Filter movies
-        this.filteredMovies = FXCollections.observableArrayList();
-        this.filteredMovies.addAll(this.movies);
-        // Get the filtered results from the movieService
-        // and add the filtered results to the filteredMovies list
+
         try {
+            // Filter movies
+            this.filteredMovies = FXCollections.observableArrayList();
+            this.filteredMovies.addAll(this.movies);
+            // Get the filtered results from the movieService
+            // and add the filtered results to the filteredMovies list
             this.filteredMovies = FXCollections.observableList(this.movieService.fetchFilteredMovies(
                     this.searchText, this.genre, this.releaseYear, this.rating));
             updateMovieListView();
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             updateStatusLabel("Error loading movies!", true);
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 

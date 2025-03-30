@@ -37,8 +37,8 @@
             <Insets bottom="20.0" left="10.0" top="20.0" />
         </padding>
     </HBox>
-    <HBox>
-        <Label fx:id="statusLabel" styleClass="background-black, text-yellow"/>
+    <HBox styleClass="background-black">
+        <Label fx:id="statusLabel" styleClass="text-yellow"/>
     </HBox>
     <ListView fx:id="movieListView" styleClass="background-black" stylesheets="@styles.css" VBox.vgrow="ALWAYS" />
 </VBox>
