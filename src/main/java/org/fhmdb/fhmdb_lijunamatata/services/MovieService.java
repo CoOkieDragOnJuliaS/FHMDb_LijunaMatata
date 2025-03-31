@@ -145,6 +145,7 @@ public class MovieService {
         //Stream through movies, map to get the title and compare the length with comparingInt()
         return movies.stream()
                 .map(Movie::getTitle)
+                .map(String::trim)
                 .max(Comparator.comparingInt(String::length))
                 .get().length();
     }
