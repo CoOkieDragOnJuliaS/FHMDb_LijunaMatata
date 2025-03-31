@@ -27,11 +27,16 @@ public class MovieServiceTest {
     @DisplayName("Test sorting in ascending order")
     public void testSortMoviesAscending() {
         List<Movie> expectedMovies = List.of(
-                movies.get(1), // Inception
-                movies.get(0), // Life Is Beautiful
-                movies.get(2), // Parasite
-                movies.get(4), // Pulp Fiction
-                movies.get(3)  // The Godfather
+                movies.get(8),  // Amélie
+                movies.get(1),  // Inception
+                movies.get(7),  // Interstellar
+                movies.get(0),  // Life Is Beautiful
+                movies.get(2),  // Parasite
+                movies.get(4),  // Pulp Fiction
+                movies.get(5),  // Spirited Away
+                movies.get(3),  // The Godfather
+                movies.get(6),  // The Shawshank Redemption
+                movies.get(9)   // Whiplash
         );
 
         List<Movie> testMovies = new ArrayList<>(movies);
@@ -43,11 +48,16 @@ public class MovieServiceTest {
     @DisplayName("Test sorting in descending order")
     public void testSortMoviesDescending() {
         List<Movie> expectedMovies = List.of(
-                movies.get(4), // The Wolf of Wall Street
-                movies.get(1), // The Usual Suspects
-                movies.get(2), // Puss in Boots
-                movies.get(0), // Life Is Beautiful
-                movies.get(3)  // Avatar
+                movies.get(9),  // Whiplash
+                movies.get(6),  // The Shawshank Redemption
+                movies.get(3),  // The Godfather
+                movies.get(5),  // Spirited Away
+                movies.get(4),  // Pulp Fiction
+                movies.get(2),  // Parasite
+                movies.get(0),  // Life Is Beautiful
+                movies.get(7),  // Interstellar
+                movies.get(1),  // Inception
+                movies.get(8)    // Amélie
         );
 
         List<Movie> testMovies = new ArrayList<>(movies);
@@ -59,10 +69,13 @@ public class MovieServiceTest {
     @DisplayName("Test filtering by genre DRAMA")
     void testFilterMoviesByGenre() {
         List<Movie> expectedMovies = List.of(
-                movies.get(0), // Life Is Beautiful
-                movies.get(1), // The Usual Suspects
-                movies.get(3), // Avatar
-                movies.get(4)  // The Wolf of Wall Street
+                movies.get(0),  // Life Is Beautiful
+                movies.get(2),  // Parasite
+                movies.get(3),  // The Godfather
+                movies.get(4),  // Pulp Fiction
+                movies.get(6),  // The Shawshank Redemption
+                movies.get(7),  // Interstellar
+                movies.get(9)   // Whiplash
         );
 
         List<Movie> testMovies = new ArrayList<>(movies);
@@ -71,21 +84,23 @@ public class MovieServiceTest {
     }
 
     @Test
-    @DisplayName("Test filtering by search text 'Puss'")
+    @DisplayName("Test filtering by search text 'pu'")
     void testFilterMoviesBySearchText() {
-        List<Movie> expectedMovies = List.of(movies.get(2)); // Puss in Boots
+        //
+        List<Movie> expectedMovies = List.of(
+                movies.get(4)  // Pulp Fiction
+        );
 
         List<Movie> testMovies = new ArrayList<>(movies);
-        List<Movie> filteredMovies = movieService.filterMovies(testMovies, "Puss", null);
-        assertEquals(expectedMovies, filteredMovies, "Filtering by 'Puss' should return 'Puss in Boots'");
+        List<Movie> filteredMovies = movieService.filterMovies(testMovies, "Pu", null);
+        assertEquals(expectedMovies, filteredMovies, "Filtering by 'Pu ' should return 'Pulp Fiction'");
     }
 
     @Test
     @DisplayName("Test filtering by search text 'life' and genre DRAMA")
     void testFilterMoviesBySearchTextAndGenre() {
         List<Movie> expectedMovies = List.of(
-                movies.get(0), // Life Is Beautiful
-                movies.get(4)  // The Wolf of Wall Street
+                movies.get(0) // Life Is Beautiful
         );
 
         List<Movie> testMovies = new ArrayList<>(movies);
