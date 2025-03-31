@@ -5,10 +5,8 @@ import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -19,6 +17,8 @@ import java.util.stream.Collectors;
  * @date 14.02.2025
  */
 public class MovieService {
+
+    Logger logger = Logger.getLogger(MovieService.class.getName());
 
     /**
      * Sorts the given list of movies either in ascending or descending order by title
@@ -43,19 +43,20 @@ public class MovieService {
     /**
      * Fetches a list of movies based on the provided search text and selected genres
      *
-     * @param searchText The text to search for in movie titles.
-     * @param genre      The genre to filter movies by. If {@code null}, no genre filtering is applied.
+     * @param searchText  The text to search for in movie titles.
+     * @param genre       The genre to filter movies by. If {@code null}, no genre filtering is applied.
      * @param releaseYear The release to filter movies by. If {@code null}, no releaseYear filtering is applied.
-     * @param rating The rating to filter movies by. If {@code null}, no rating filtering is applied.
+     * @param rating      The rating to filter movies by. If {@code null}, no rating filtering is applied.
      * @return A list of movies that matches all criteria.
      */
     public List<Movie> fetchFilteredMovies(String searchText, Genre genre, Integer releaseYear,
-                                     Double rating) throws IOException {
+                                           Double rating) throws IOException {
         return new MovieAPI().fetchMovies(searchText, genre, releaseYear, rating);
     }
 
     //TODO: Discuss if this method is still needed if we have the fetchfilteredMovies with API
     //This is still the method for the testing base in MovieService Test --> test data is important
+
     /**
      * Filters a list of movies based on the provided search text and selected genre.
      * The method checks if the movie's title contains the search text (ignoring case)
@@ -79,6 +80,7 @@ public class MovieService {
     }
 
     //TODO: If the method above (filterMovies) is not needed, the following 2 methods are not needed!
+
     /**
      * Checks if the movie's genres contain the selected genre.
      * Returns {@code true} if the movie matches the selected genre or if no genre is selected.
@@ -123,7 +125,7 @@ public class MovieService {
          */
         //create a flat map of a stream of the list of actors inside the movie
         //collect it by grouping it by actors and the count of appearance in a new Map<String,Long>
-        Map<String, Long> actorCount =  movies.stream()
+        Map<String, Long> actorCount = movies.stream()
                 .flatMap(movie -> movie.getMainCast().stream())
                 .collect(Collectors.groupingBy(actor -> actor, Collectors.counting()));
 
@@ -143,11 +145,17 @@ public class MovieService {
      */
     public int getLongestMovieTitle(List<Movie> movies) {
         //Stream through movies, map to get the title and compare the length with comparingInt()
-        return movies.stream()
-                .map(Movie::getTitle)
-                .map(String::trim)
-                .max(Comparator.comparingInt(String::length))
-                .get().length();
+        String movie = "";
+        try {
+            movie = movies.stream()
+                    .map(Movie::getTitle)
+                    .map(String::trim)
+                    .max(Comparator.comparingInt(String::length))
+                    .orElse("");
+        } catch (NoSuchElementException e) {
+            logger.info("No movie found with longest title");
+        }
+        return movie.length();
     }
 
     /**

@@ -214,11 +214,11 @@ public class MovieServiceTest {
         assertEquals(expectedActor, movieService.getMostPopularActor(this.movies));
     }
 
-    //TODO fix test
+
     @Test
     @DisplayName("Test to get the longest movie title of a list of movies")
     void testGetLongestMovieTitle() {
-        String expectedMovieTitle = "The Lord of the Rings: The Return of the King";
+        String expectedMovieTitle = "Star Wars: Episode V - The Empire Strikes Back";
         assertEquals(expectedMovieTitle.length(), movieService.getLongestMovieTitle(this.movies));
     }
 
