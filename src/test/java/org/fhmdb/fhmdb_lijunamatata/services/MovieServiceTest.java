@@ -22,7 +22,6 @@ public class MovieServiceTest {
         movies = Movie.initializeMoviesTestbase();
     }
 
-    //TODO: Fix Tests with new movie testbase
     @Test
     @DisplayName("Test sorting in ascending order")
     public void testSortMoviesAscending() {
@@ -125,5 +124,34 @@ public class MovieServiceTest {
         List<Movie> emptyMovies = new ArrayList<>();
         List<Movie> sortedMovies = movieService.sortMovies(emptyMovies, true);
         assertEquals(expectedMovies, sortedMovies, "Sorting an empty list should return an empty list");
+    }
+
+    //Stream methods TDD
+    @Test
+    @DisplayName("Test to get the most frequent actor of a list of movies")
+    void testGetMostFrequentActor() {
+        String expectedActor = "Tim Robbins";
+        assertEquals(expectedActor, movieService.getMostPopularActor(this.movies));
+    }
+
+    @Test
+    @DisplayName("Test to get the longest movie title of a list of movies")
+    void testGetLongestMovieTitle() {
+        String expectedMovieTitle = "The Shawshank Redemption";
+        assertEquals(expectedMovieTitle.length(), movieService.getLongestMovieTitle(this.movies));
+    }
+
+    @Test
+    @DisplayName("Test to get the count of movies from a specific director")
+    void testGetCountOfMoviesFromDirector() {
+        int expectedCount = 2;
+        assertEquals(expectedCount, movieService.countMoviesFromDirector(this.movies, "Christopher Nolan"));
+    }
+
+    @Test
+    @DisplayName("Test to get the movies between 2 specific years")
+    void testGetMoviesBetweenTwoYears() {
+        List<Movie> expectedMovies = List.of(this.movies.get(7), this.movies.get(9));
+        assertEquals(expectedMovies, movieService.getMoviesBetweenYears(this.movies, 2011, 2018));
     }
 }

@@ -229,7 +229,7 @@ public class Movie {
                 106,
                 List.of("Damien Chazelle"),
                 List.of("Damien Chazelle"),
-                List.of("Miles Teller", "J.K. Simmons"),
+                List.of("Tim Robbins", "J.K. Simmons"),
                 8.5));
 
         return movies;
