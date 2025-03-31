@@ -74,12 +74,12 @@ public class FHMDbController {
      */
     @FXML
     public void initialize() {
+        //initialize Labels
+        initializeStatusLabel();
         //Sets the list of movies
         initializeMovies();
         // Set the ListView items
         initializeMovieListView();
-        //initialize Labels
-        initializeStatusLabel();
         // Initialize ComboBoxes
         initializeGenreComboBox();
         initializeReleaseYearComboBox();
@@ -93,7 +93,6 @@ public class FHMDbController {
      * Adding a new instance to statusLabel and set it to not visible by updating it
      */
     private void initializeStatusLabel() {
-        this.statusLabel = new Label();
         updateStatusLabel("", false);
     }
 
@@ -310,7 +309,10 @@ public class FHMDbController {
         }
     }
 
-    //TODO: JavaDoc
+    /**
+     * Shuts down the scheduler which is setup in the Controller.
+     * Without this option the scheduler would still run after the Application is closed
+     */
     public void shutdownScheduler() {
         if (scheduler != null && !scheduler.isShutdown()) {
             scheduler.shutdown();

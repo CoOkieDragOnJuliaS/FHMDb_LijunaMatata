@@ -20,6 +20,12 @@
     -fx-font-weight: bold;
 }
 
+.statusLabel {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f5c518;
+}
+
 .text-yellow {
     -fx-text-fill: #f5c518;
 }

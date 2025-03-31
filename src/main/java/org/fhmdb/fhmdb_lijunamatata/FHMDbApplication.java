@@ -2,6 +2,7 @@ package org.fhmdb.fhmdb_lijunamatata;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.fhmdb.fhmdb_lijunamatata.controller.FHMDbController;
@@ -14,11 +15,16 @@ public class FHMDbApplication extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        this.controller = new FHMDbController();
         FXMLLoader fxmlLoader = new FXMLLoader(FHMDbApplication.class.getResource("fhmdb-view.fxml"));
+        // Load the FXML and get the root node
+        Parent root = fxmlLoader.load();
+
+        // Get the controller instance from the FXMLLoader
+        this.controller = fxmlLoader.getController();
+
         //Sets the scene by loading the .fxml element, setting the size and adding
         //elements like stylesheet (for css) and "setting the stage" for the scene
-        Scene scene = new Scene(fxmlLoader.load(), 1280, 720);
+        Scene scene = new Scene(root, 1280, 720);
         scene.getStylesheets().add(Objects.requireNonNull(FHMDbApplication.class.getResource("styles.css")).toExternalForm());
         stage.setTitle("FHMDb");
         stage.setScene(scene);
