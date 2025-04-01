@@ -16,8 +16,14 @@
     -fx-font-size: 12px;
 }
 
-.genre {
+.genre, .releaseYear, .rating{
     -fx-font-weight: bold;
+}
+
+.statusLabel {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f5c518;
 }
 
 .text-yellow {

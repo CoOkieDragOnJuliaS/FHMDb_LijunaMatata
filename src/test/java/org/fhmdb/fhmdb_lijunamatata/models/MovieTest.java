@@ -1,7 +1,5 @@
 package org.fhmdb.fhmdb_lijunamatata.models;
 
-import org.fhmdb.fhmdb_lijunamatata.models.Genre;
-import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,7 +9,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class MovieTest {
     private List<Movie> movies;
@@ -19,7 +18,8 @@ public class MovieTest {
     @BeforeEach
     public void setUp() {
         //BeforeSetup
-        this.movies = Movie.initializeMovies();
+        this.movies = Movie.initializeMoviesTestbase();
+
     }
 
     @Test
@@ -39,8 +39,7 @@ public class MovieTest {
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 2, 3, 4})
     public void testInitializeMovies_allMovieTitles_equal_expected(int index) {
-        List<String> expectedTitles = new ArrayList<>(List.of("Life Is Beautiful", "The Usual Suspects", "Puss in " +
-                "Boots", "Avatar", "The Wolf of Wall Street"));
+        List<String> expectedTitles = new ArrayList<>(List.of("Life Is Beautiful", "Inception", "Parasite", "The Godfather", "Pulp Fiction"));
         assertEquals(expectedTitles.get(index), this.movies.get(index).getTitle());
     }
 
@@ -60,19 +59,12 @@ public class MovieTest {
         List<String> expectedDescriptions = new ArrayList<>(List.of("When an open-minded Jewish librarian and his son" +
                         " " +
                         "become victims of" +
-                " the Holocaust, he uses a perfect mixture of will, humor, and imagination to protect his son from " +
-                "the dangers around their camp."
-                , "A sole survivor tells of the twisty events " +
-                "leading up to a horrific gun battle on a boat, which begin when five criminals meet at a seemingly " +
-                "random police lineup."
-                , "An outlaw cat, his childhood egg-friend, and a seductive thief kitty " +
-                "set out in search for the eggs of the fabled Golden Goose to clear his name, restore his lost honor," +
-                " and regain the trust of his mother and town."
-                , "A paraplegic Marine dispatched to the moon Pandora on a unique mission " +
-                "becomes torn between following his orders and protecting the world he feels is his home."
-                , "Based on the true story of Jordan Belfort, from his rise to " +
-                "a wealthy stock-broker living the high life to his fall involving crime, corruption and the federal " +
-                "government."));
+                        " the Holocaust, he uses a perfect mixture of will, humor, and imagination to protect his son from " +
+                        "the dangers around their camp."
+                , "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a CEO."
+                , "Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Park family and the destitute Kim clan."
+                , "An organized crime dynasty's aging patriarch transfers control of his clandestine empire to his reluctant son."
+                , "The lives of two mob hitmen, a boxer, a gangster's wife, and a pair of diner bandits intertwine in four tales of violence and redemption."));
         assertEquals(expectedDescriptions.get(index), this.movies.get(index).getDescription());
     }
 
@@ -89,10 +81,10 @@ public class MovieTest {
     public void testInitializeMovies_allMovieGenres_equal_expected(int index) {
         List<List<Genre>> expectedGenreLists = new ArrayList<>(List.of(
                 List.of(Genre.DRAMA, Genre.ROMANCE),
-                List.of(Genre.CRIME, Genre.DRAMA, Genre.MYSTERY),
-                List.of(Genre.COMEDY, Genre.FAMILY, Genre.ANIMATION),
-                List.of(Genre.ANIMATION, Genre.DRAMA, Genre.ACTION),
-                List.of(Genre.DRAMA, Genre.ROMANCE, Genre.BIOGRAPHY)));
+                List.of(Genre.SCIENCE_FICTION, Genre.ACTION, Genre.THRILLER),
+                List.of(Genre.DRAMA, Genre.THRILLER),
+                List.of(Genre.DRAMA, Genre.CRIME),
+                List.of(Genre.CRIME, Genre.DRAMA)));
         assertEquals(expectedGenreLists.get(index), this.movies.get(index).getGenres());
     }
 }
