@@ -59,20 +59,8 @@ public class Movie {
         return description;
     }
 
-    public String getImgUrl() {
-        return imgUrl;
-    }
-
-    public int getLengthInMinutes() {
-        return lengthInMinutes;
-    }
-
     public List<String> getDirectors() {
         return directors;
-    }
-
-    public List<String> getWriters() {
-        return writers;
     }
 
     public List<String> getMainCast() {
