@@ -1,7 +1,7 @@
 ### Maven POM.xml Documentation
 
 This document explains the structure of the **`pom.xml`** file used in this project.  
-Maven is responsible for **building, testing, and managing dependencies**.
+Maven is responsible for **building**, **testing**, **resolving dependencies**, and **running** the JavaFX application.
 
 ---
 
@@ -46,58 +46,123 @@ These properties define **configurable values** used in the project:
 
 This section defines **external libraries** required for the project.
 
-```xml
-<dependencies>
-    <!-- JavaFX for GUI -->
-    <dependency>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-controls</artifactId>
-        <version>17.0.6</version>
-    </dependency>
-
-    <dependency>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-fxml</artifactId>
-        <version>17.0.6</version>
-    </dependency>
-
-    <!-- UI Enhancements -->
-    <dependency>
-        <groupId>org.controlsfx</groupId>
-        <artifactId>controlsfx</artifactId>
-        <version>11.2.1</version>
-    </dependency>
-
-    <!-- JUnit for Testing -->
-    <dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter-api</artifactId>
-        <version>${junit.version}</version>
-        <scope>test</scope>
-    </dependency>
-
-    <dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter-engine</artifactId>
-        <version>${junit.version}</version>
-        <scope>test</scope>
-    </dependency>
-</dependencies>
-```
-- **JavaFX dependencies** – Required for the GUI.
-- **JUnit dependencies** – Required for testing.
-- **ControlsFX, FormsFX, ValidatorFX** – Additional UI enhancements.
-
-**Excluding unnecessary JavaFX dependencies** to avoid conflicts:
+### JavaFX & UI Frameworks
 
 ```xml
-<exclusions>
-    <exclusion>
-        <groupId>org.openjfx</groupId>
-        <artifactId>*</artifactId>
-    </exclusion>
-</exclusions>
+<dependency>
+    <groupId>org.openjfx</groupId>
+    <artifactId>javafx-controls</artifactId>
+    <version>17.0.6</version>
+</dependency>
+
+<dependency>
+    <groupId>org.openjfx</groupId>
+    <artifactId>javafx-fxml</artifactId>
+    <version>17.0.6</version>
+</dependency>
+
+<dependency>
+    <groupId>org.controlsfx</groupId>
+    <artifactId>controlsfx</artifactId>
+    <version>11.2.1</version>
+</dependency>
+
+<dependency>
+    <groupId>com.dlsc.formsfx</groupId>
+    <artifactId>formsfx-core</artifactId>
+    <version>11.6.0</version>
+    <exclusions>
+        <exclusion>
+            <groupId>org.openjfx</groupId>
+            <artifactId>*</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+<dependency>
+    <groupId>net.synedra</groupId>
+    <artifactId>validatorfx</artifactId>
+    <version>0.5.0</version>
+    <exclusions>
+        <exclusion>
+            <groupId>org.openjfx</groupId>
+            <artifactId>*</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+
+<dependency>
+    <groupId>org.kordamp.ikonli</groupId>
+    <artifactId>ikonli-javafx</artifactId>
+    <version>12.3.1</version>
+</dependency>
 ```
+
+These dependencies enhance the JavaFX GUI with components, validation, and icons.
+
+---
+
+### API & JSON Parsing
+
+```xml
+<dependency>
+    <groupId>com.squareup.okhttp3</groupId>
+    <artifactId>okhttp</artifactId>
+    <version>4.12.0</version>
+</dependency>
+
+<dependency>
+    <groupId>com.google.code.gson</groupId>
+    <artifactId>gson</artifactId>
+    <version>2.9.0</version>
+</dependency>
+```
+
+- `okhttp` is used to send HTTP requests to the MovieAPI.
+- `gson` is used to parse JSON responses into Java objects.
+
+---
+
+### Testing Dependencies
+
+```xml
+<dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter-api</artifactId>
+    <version>${junit.version}</version>
+    <scope>test</scope>
+</dependency>
+
+<dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter-engine</artifactId>
+    <version>${junit.version}</version>
+    <scope>test</scope>
+</dependency>
+
+<dependency>
+    <groupId>org.junit.jupiter</groupId>
+    <artifactId>junit-jupiter-params</artifactId>
+    <version>${junit.version}</version>
+    <scope>test</scope>
+</dependency>
+
+<dependency>
+    <groupId>org.mockito</groupId>
+    <artifactId>mockito-junit-jupiter</artifactId>
+    <version>5.10.0</version>
+    <scope>test</scope>
+</dependency>
+
+<dependency>
+    <groupId>com.squareup.okhttp3</groupId>
+    <artifactId>mockwebserver</artifactId>
+    <version>4.12.0</version>
+    <scope>test</scope>
+</dependency>
+```
+
+These libraries enable modern unit testing, mocking, and mocking HTTP server responses.
 
 ---
 
