@@ -43,9 +43,23 @@ public class MovieAPITest {
     @Test
     @DisplayName("Test fetching all movies - valid response")
     void fetchAllMovies_returnsMovieList() throws IOException {
-        String jsonResponse = "[{\"id\":\"1\",\"title\":\"Inception\",\"genres\":[],\"releaseYear\":2010," +
-                "\"description\":\"A mind-bending thriller\",\"imgUrl\":\"\",\"lengthInMinutes\":148,\"directors" +
-                "\":[],\"writers\":[],\"mainCast\":[],\"rating\":8.8}]";
+        String jsonResponse =
+                """
+                        [
+                          {
+                            "id": "1",
+                            "title": "Inception",
+                            "genres": [],
+                            "releaseYear": 2010,
+                            "description": "A mind-bending thriller",
+                            "imgUrl": "",
+                            "lengthInMinutes": 148,
+                            "directors": [],
+                            "writers": [],
+                            "mainCast": [],
+                            "rating": 8.8
+                          }
+                        ]""";
 
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)
@@ -84,9 +98,23 @@ public class MovieAPITest {
     @Test
     @DisplayName("Test fetchMovies with filters - valid response")
     void fetchMovies_withFilters() throws IOException {
-        String jsonResponse = "[{\"id\":\"2\",\"title\":\"The Matrix\",\"genres\":[],\"releaseYear\":1999," +
-                "\"description\":\"A sci-fi classic\",\"imgUrl\":\"\",\"lengthInMinutes\":136,\"directors" +
-                "\":[],\"writers\":[],\"mainCast\":[],\"rating\":8.7}]";
+        String jsonResponse =
+                """
+                        [
+                          {
+                            "id": "2",
+                            "title": "The Matrix",
+                            "genres": [],
+                            "releaseYear": 1999,
+                            "description": "A sci-fi classic",
+                            "imgUrl": "",
+                            "lengthInMinutes": 136,
+                            "directors": [],
+                            "writers": [],
+                            "mainCast": [],
+                            "rating": 8.7
+                          }
+                        ]""";
 
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)
