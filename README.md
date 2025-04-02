@@ -1,36 +1,50 @@
-## Mirrored Template for Exercise 1
-The Goal of this Exercise is to have a functioning Movie Database for the FH Movie Database - with dummy data in the beginning implemented directly into the code structure.
+## Mirrored Template for Exercise 2
+The goal of this exercise is to extend the FHMDb application by connecting it to a remote MovieAPI and enabling dynamic data loading, filtering, and stream-based analysis.
 ## K.O. Criteria are the following:
-  .) The Project has to have a GUI showing the database movies</br>
-  .) The Project has to have proper JUnit Testing, possible to start directly from Maven</br>
-  .) The Project has to be based on Maven</br>
-  .) The Project has to be done in GitHub with all the Project teammembers set as Contributors</br>
+- The application must connect to the MovieAPI and display fetched movies in the GUI.
+- The application must use a proper Java HTTP library (e.g., OkHttp) to send GET requests.
+- The application must parse JSON responses using Gson or Jackson into Java objects.
+- The project must be based on Maven.
+- The project must include JUnit Testing, runnable with Maven.
+- The project must be hosted on GitHub with all contributors added.
 
 ## Following Tasks have to be done:
-  .) Create the dummy database with a few movies to pick from and work with</br>
-   >   .) The methods name is initializeMovies() and returns a List of Movie Objects
-> 
-> The Movie object consists of following attributes:
-> ![img.png](movieObject.png)
-      
-  .) Make sure the movies are shown in the correct order from the beginning (shown on the screen with the Sort Button)
-   >   .) Pressing the Sort Button has to go From Ascended to Descended and back (with each press)</br>
-   >   .) Sorting algorithm is updated via the title of the movie
-      
-  .) Implement the Feature to Search the Database with a String according to the Exercise Sheet
-  >  .) The search has to be updated continously after pressing a button or writing something in the text field</br>
-  >  .) The search query has to be inside the title and/or inside the description</br>
-  >  .) The search query is NOT case sensitive
-      
-  .) Implement the feature to filter the Database with a Genre according to the Exercise Sheet
-   >   .) The filtering logic can only work after pressing the button on the right</br>
-   >   .) Filtering can be undone (option to none in the Dropdown menu or deactivate the filter somehow)
-      
-  .) Have a logic that updates the given movies, filtered and searched for, on the screen (view)
+- Create a `MovieAPI` class to handle HTTP requests and responses from the API.
+- The `MovieAPI` class must be able to build correct URLs with query parameters (`genre`, `query`, `releaseYear`, `ratingFrom`).
+- Make sure to include a `User-Agent` header in every request to avoid HTTP 403 errors.
 
-  .) Implement a Testing Logic for every method / at least 90% Code Coverage
-  >    .) Testing the individual sorting, searching and filtering algorithms is mandatory</br>
-  >    .) JUnit Tests can be automatically started with maven (mvn test) - implementing the habit to do so (internet)
+- Adapt your existing `Movie` class to match the attributes provided by the MovieAPI.
+
+- Update your GUI to allow users to configure query parameters such as:
+  - Genre
+  - Release Year
+  - Rating From
+  - Search Query
+
+- On application start, load all movies from the API with no filters.
+  - Example URL: `https://prog2.fh-campuswien.ac.at/movies`
+
+- Enable dynamic API requests when the user performs a search or applies filters.
+  - Example URL: `https://prog2.fh-campuswien.ac.at/movies?query=darkknight&genre=ACTION`
+
+- Parse the returned JSON using **Gson** or **Jackson** and map the data into `Movie` objects.
+
+- Display the parsed movies in the GUI and update the view when filters or search queries are applied.
+
+- Implement the following methods using **Java Streams** only (no loops allowed), and write Unit Tests for each of them:
+
+  ```java
+  String getMostPopularActor(List<Movie> movies)
+  // Returns the actor who appears most frequently in the mainCast list of all movies.
+
+  int getLongestMovieTitle(List<Movie> movies)
+  // Returns the length (character count) of the longest movie title.
+
+  long countMoviesFrom(List<Movie> movies, String director)
+  // Returns the number of movies directed by the specified director.
+
+  List<Movie> getMoviesBetweenYears(List<Movie> movies, int startYear, int endYear)
+  // Returns a list of movies released between the given years.
 
 ## Coding Conventions:
   .) Naming Conventions are in English, camelCase is mandatory</br>
