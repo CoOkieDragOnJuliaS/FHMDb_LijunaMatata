@@ -13,11 +13,10 @@ public class HttpExceptionHandler {
      * Analyzes the HTTP status code and throws an appropriate IOException with a descriptive message.
      *
      * @param response   the HTTP response object (used in case of unexpected status codes)
-     * @param statusCode the HTTP status code returned by the server
      * @throws IOException an exception containing details about the error
      */
-    public static void handle(Response response, int statusCode) throws IOException {
-        switch (statusCode) {
+    public static void handle(Response response) throws IOException {
+        switch (response.code()) {
             case 400:
                 // Error: The request has bad syntax
                 throw new IOException("400 Bad Request: The request cannot be fulfilled due to bad syntax.");

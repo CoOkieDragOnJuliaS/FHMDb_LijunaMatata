@@ -88,7 +88,7 @@ public class MovieAPITest {
 
     @ParameterizedTest
     @DisplayName("Test fetchMovies - API status Codes error response")
-    @ValueSource(ints = {400, 401, 408, 500, 502, 503, 511})
+    @ValueSource(ints = {400, 401, 408, 500, 502, 503, 511, 519})
     void fetchMovies_handles_statusCodes(int statusCode) {
         mockWebServer.enqueue(new MockResponse().setResponseCode(statusCode).setBody(""));
 

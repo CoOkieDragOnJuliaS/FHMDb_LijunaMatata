@@ -102,7 +102,7 @@ public class MovieAPI {
      */
     private List<Movie> parseResponse(Response response) throws IOException {
         if (!response.isSuccessful() || response.body() == null) {
-            HttpExceptionHandler.handle(response, response.code());
+            HttpExceptionHandler.handle(response);
         }
 
         assert response.body() != null;
