@@ -106,9 +106,13 @@ public class MovieAPI {
         }
 
         assert response.body() != null;
-        // TODO: Please explain these lines to get an understanding
+
+        // Converts the response body (which contains JSON) into a raw JSON string
         String jsonResponse = response.body().string();
+        // Defines the type of the object we want to deserialize into: a List of Movie objects
+        // TypeToken is used to preserve generic type information at runtime
         Type movieListType = new TypeToken<List<Movie>>() {}.getType();
+        // Uses Gson to convert the JSON string into a List<Movie> based on the specified type.
         List<Movie> movies = gson.fromJson(jsonResponse, movieListType);
 
         if (movies == null || movies.isEmpty()) {
