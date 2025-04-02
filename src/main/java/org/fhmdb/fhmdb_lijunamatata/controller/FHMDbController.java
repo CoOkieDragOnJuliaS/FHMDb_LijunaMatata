@@ -294,7 +294,6 @@ public class FHMDbController {
         }
     }
 
-    //TODO: Testing statusLabel
     /**
      * Updates the status label with a given message.
      * Ensures the update runs on the JavaFX UI thread.
@@ -302,7 +301,7 @@ public class FHMDbController {
      * @param message The message to display.
      * @param isError If true, the label is made visible; otherwise, it's hidden when empty message and not an error.
      */
-    private void updateStatusLabel(String message, boolean isError) {
+    public void updateStatusLabel(String message, boolean isError) {
         if (statusLabel != null) {
             statusLabel.setText(message);
             statusLabel.setVisible(isError || !message.isEmpty());

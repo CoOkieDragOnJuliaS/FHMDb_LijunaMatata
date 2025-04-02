@@ -27,6 +27,9 @@ public class FHMDbControllerTest {
     @Mock
     private MovieService movieService;
 
+    @Mock
+    private FHMDbController fhmDbController;
+
     /*For fields annotated with @InjectMocks, Mockito creates an instance of the class and then tries to inject the
     mock objects (created in the previous step) into the constructor, fields, or setter methods of that instance.
     The injection is based on type matching: if a field or constructor parameter has a type that matches the type of
@@ -68,6 +71,12 @@ public class FHMDbControllerTest {
     @DisplayName("updateSortButtonText should not throw exception")
     public void updateSortButtonText_doesnt_throw_exception() {
         assertDoesNotThrow(() -> movieController.updateSortButtonText());
+    }
+
+    @Test
+    @DisplayName("updateStatusLabel exception test")
+    public void updateStatusLabel_doesnt_throw_exception() {
+        assertDoesNotThrow(() -> movieController.updateStatusLabel("", false));
     }
 
     @Test
@@ -121,6 +130,29 @@ public class FHMDbControllerTest {
             logger.severe(e.getMessage());
         }
     }
+    @Test
+    @DisplayName("Test updateMovieListView should call updateLabelStatus method with correct parameter")
+    public void updateMovieListView_calls_movieServiceFilterLabelStatus_withCorrectParameter() {
+        movieController.setFilteredMovies(null);
+        movieController.updateMovieListView();
+
+        try{
+            verify(movieController).updateStatusLabel("No movies found!", false);
+        }catch(Exception e){
+            logger.severe(e.getMessage());
+        }
+
+        movieController.setFilteredMovies(initialMovies);
+        movieController.updateMovieListView();
+
+        try{
+            verify(movieController).updateStatusLabel("", false);
+        }catch(Exception e){
+            logger.severe(e.getMessage());
+        }
+    }
+
+
 
 }
 
