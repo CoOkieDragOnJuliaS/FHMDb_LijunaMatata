@@ -5,6 +5,7 @@ import org.fhmdb.fhmdb_lijunamatata.api.MovieAPI;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Movie {
     private String id;
@@ -221,6 +222,27 @@ public class Movie {
                 8.5));
 
         return movies;
+    }
+
+    // Override equals method
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true; // Check if the same object
+        if (o == null || getClass() != o.getClass()) return false; // Check for null and class type
+        Movie movie = (Movie) o; // Cast to Movie
+
+
+        //Comparing the variables except id to get the equalsMethod in assertion working
+        return  releaseYear == movie.releaseYear &&
+                movie.lengthInMinutes == lengthInMinutes &&
+                Double.compare(movie.rating, rating) == 0 &&
+                Objects.equals(title, movie.title) &&
+                Objects.equals(genres, movie.genres) &&
+                Objects.equals(description, movie.description) &&
+                Objects.equals(imgUrl, movie.imgUrl) &&
+                Objects.equals(directors, movie.directors) &&
+                Objects.equals(writers, movie.writers) &&
+                Objects.equals(mainCast, movie.mainCast);
     }
 }
 

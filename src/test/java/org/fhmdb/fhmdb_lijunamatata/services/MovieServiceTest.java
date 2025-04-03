@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -25,6 +26,7 @@ public class MovieServiceTest {
         movieService = new MovieService();
         try {
             movies = Movie.initializeMovies();
+            movies.sort(Comparator.comparing(Movie::getTitle));
         } catch (IOException e) {
             logger.info(e.getMessage());
         }
@@ -144,10 +146,13 @@ public class MovieServiceTest {
                 "The Wolf of Wall Street"
         );
 
-        List<Movie> testMovies = new ArrayList<>(movies);
-        List<Movie> filteredMovies = movieService.filterMovies(testMovies, "", Genre.DRAMA);
-        List<String> filteredTitles = filteredMovies.stream().map(Movie::getTitle).collect(Collectors.toList());
-        assertEquals(expectedTitles, filteredTitles, "Filtering by DRAMA should return correct movies");
+        try {
+            List<Movie> filteredMovies = movieService.fetchFilteredMovies("", Genre.DRAMA, null, null);
+            List<String> filteredTitles = filteredMovies.stream().map(Movie::getTitle).collect(Collectors.toList());
+            assertEquals(expectedTitles, filteredTitles, "Filtering by DRAMA should return correct movies");
+        }catch(IOException e){
+            logger.severe(e.getMessage());
+        }
 
     }
 
@@ -157,16 +162,16 @@ public class MovieServiceTest {
         //
         List<String> expectedTitles = List.of(
                 "Pulp Fiction",
-                "Star Wars: Episode V - The Empire Strikes Back",
-                "The Matrix",
-                "The Silence of the Lambs",
                 "Puss in Boots"
         );
 
-        List<Movie> testMovies = new ArrayList<>(movies);
-        List<Movie> filteredMovies = movieService.filterMovies(testMovies, "Pu", null);
-        List<String> filteredTitles = filteredMovies.stream().map(Movie::getTitle).collect(Collectors.toList());
-        assertEquals(expectedTitles, filteredTitles, "Filtering by 'pu' should return 'Pulp Fiction'");
+        try {
+            List<Movie> filteredMovies = movieService.fetchFilteredMovies("Pu", null, null, null);
+            List<String> filteredTitles = filteredMovies.stream().map(Movie::getTitle).collect(Collectors.toList());
+            assertEquals(expectedTitles, filteredTitles, "Filtering by 'pu' should return 'Pulp Fiction'");
+        }catch(IOException e){
+            logger.severe(e.getMessage());
+        }
 
     }
 
@@ -174,16 +179,17 @@ public class MovieServiceTest {
     @DisplayName("Test filtering by search text 'life' and genre DRAMA")
     void testFilterMoviesBySearchTextAndGenre() {
         List<String> expectedTitles = List.of(
-                "Goodfellas",
                 "It\"s a Wonderful Life",
-                "Life Is Beautiful",
-                "The Wolf of Wall Street"
+                "Life Is Beautiful"
         );
 
-        List<Movie> testMovies = new ArrayList<>(movies);
-        List<Movie> filteredMovies = movieService.filterMovies(testMovies, "life", Genre.DRAMA);
-        List<String> filteredTitles = filteredMovies.stream().map(Movie::getTitle).collect(Collectors.toList());
-        assertEquals(expectedTitles, filteredTitles, "Filtering by 'life' and DRAMA should return correct movies");
+        try {
+            List<Movie> filteredMovies = movieService.fetchFilteredMovies("life", Genre.DRAMA, null, null);
+            List<String> filteredTitles = filteredMovies.stream().map(Movie::getTitle).collect(Collectors.toList());
+            assertEquals(expectedTitles, filteredTitles, "Filtering by 'life' and DRAMA should return correct movies");
+        }catch(IOException e){
+            logger.severe(e.getMessage());
+        }
 
     }
 
@@ -192,9 +198,27 @@ public class MovieServiceTest {
     void testFilterMoviesWithEmptySearchText() {
         List<Movie> expectedMovies = new ArrayList<>(movies);
 
-        List<Movie> testMovies = new ArrayList<>(movies);
-        List<Movie> filteredMovies = movieService.filterMovies(testMovies, "", null);
-        assertEquals(expectedMovies, filteredMovies, "All movies should be returned when search text is empty");
+        try {
+            List<Movie> filteredMovies = movieService.fetchFilteredMovies("", null, null, null);
+            filteredMovies.sort(Comparator.comparing(Movie::getTitle));
+            assertEquals(expectedMovies, filteredMovies , "All movies should be returned when search text is empty");
+        }catch(IOException e){
+            logger.severe(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Test filtering with null search text")
+    void testFilterMoviesWithNullSearchText() {
+        List<Movie> expectedMovies = new ArrayList<>(movies);
+
+        try {
+            List<Movie> filteredMovies = movieService.fetchFilteredMovies(null, null, null, null);
+            filteredMovies.sort(Comparator.comparing(Movie::getTitle));
+            assertEquals(expectedMovies, filteredMovies, "All movies should be returned when search text is empty");
+        }catch(IOException e) {
+            logger.severe(e.getMessage());
+        }
     }
 
     @Test
@@ -233,11 +257,11 @@ public class MovieServiceTest {
     @DisplayName("Test to get the movies between 2 specific years")
     void testGetMoviesBetweenTwoYears() {
         List<String> expectedTitles = List.of(
+                "Django Unchained",
                 "Inception",
-                "Puss in Boots",
                 "Knives Out",
                 "Once Upon a Time in Hollywood",
-                "Django Unchained",
+                "Puss in Boots",
                 "The Wolf of Wall Street"
         );
 

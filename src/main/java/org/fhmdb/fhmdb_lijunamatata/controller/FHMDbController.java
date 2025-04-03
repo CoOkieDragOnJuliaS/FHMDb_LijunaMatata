@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 
 public class FHMDbController {
@@ -58,6 +59,7 @@ public class FHMDbController {
     //Filtering mechanism for filtering delayed
     private Runnable filterTask;
 
+    Logger logger = Logger.getLogger(FHMDbController.class.getName());
     /**
      * sets up the logic by initializing movieService
      */
@@ -288,8 +290,10 @@ public class FHMDbController {
         this.movieListView.getItems().addAll(this.filteredMovies);
         //if there is no result, because the filtering does not return movies, set the label
         if (this.filteredMovies.isEmpty()) {
+            logger.info("No movies found!");
             updateStatusLabel("No movies found!", false);
         } else {
+            logger.info("movies found, calling updateStatusLabel");
             updateStatusLabel("", false);
         }
     }
@@ -303,6 +307,7 @@ public class FHMDbController {
      */
     public void updateStatusLabel(String message, boolean isError) {
         if (statusLabel != null) {
+            logger.info("Updating status label...");
             statusLabel.setText(message);
             statusLabel.setVisible(isError || !message.isEmpty());
         }

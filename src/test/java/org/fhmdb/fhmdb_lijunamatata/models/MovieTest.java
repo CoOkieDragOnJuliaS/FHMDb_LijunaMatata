@@ -1,5 +1,6 @@
 package org.fhmdb.fhmdb_lijunamatata.models;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,17 +8,20 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class MovieTest {
+    Movie movie;
     private List<Movie> movies;
 
     @BeforeEach
     public void setUp() {
         //BeforeSetup
+        this.movie = new Movie();
         this.movies = Movie.initializeMoviesTestbase();
 
     }
@@ -86,5 +90,20 @@ public class MovieTest {
                 List.of(Genre.DRAMA, Genre.CRIME),
                 List.of(Genre.CRIME, Genre.DRAMA)));
         assertEquals(expectedGenreLists.get(index), this.movies.get(index).getGenres());
+    }
+
+    @Test
+    @DisplayName("Test 2 different sets of objects(movie) with same movie list")
+    public void test2DifferentSetsMovieList_equals_expected() {
+        List<Movie> newListOfMovies = Movie.initializeMoviesTestbase();
+        Assertions.assertTrue(this.movies.equals(newListOfMovies));
+    }
+
+    @Test
+    @DisplayName("Test 2 different sets of objects(movie) with not the same movie list")
+    public void test2DifferentSetsMovieList_Notequals_expected() {
+        List<Movie> newListOfMovies = Movie.initializeMoviesTestbase();
+        newListOfMovies.sort(Comparator.comparing(Movie::getTitle).reversed());
+        Assertions.assertFalse(this.movies.equals(newListOfMovies));
     }
 }

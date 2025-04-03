@@ -43,7 +43,7 @@ public class MovieService {
     /**
      * Fetches a list of movies based on the provided search text and selected genres
      *
-     * @param searchText  The text to search for in movie titles.
+     * @param searchText  The text to search for in movie titles. If {@code null}, empty query string filtering is applied.
      * @param genre       The genre to filter movies by. If {@code null}, no genre filtering is applied.
      * @param releaseYear The release to filter movies by. If {@code null}, no releaseYear filtering is applied.
      * @param rating      The rating to filter movies by. If {@code null}, no rating filtering is applied.
@@ -54,57 +54,6 @@ public class MovieService {
         return new MovieAPI().fetchMovies(searchText, genre, releaseYear, rating);
     }
 
-    //TODO: Discuss if this method is still needed if we have the fetchfilteredMovies with API
-    //This is still the method for the testing base in MovieService Test --> test data is important
-
-    /**
-     * Filters a list of movies based on the provided search text and selected genre.
-     * The method checks if the movie's title contains the search text (ignoring case)
-     * and if the movie's genre matches the selected genre.
-     *
-     * @param movies     The list of movies to be filtered.
-     * @param searchText The text to search for in movie titles.
-     * @param genre      The genre to filter movies by. If {@code null}, no genre filtering is applied.
-     * @return A list of movies that match both the search text and selected genre.
-     */
-    public List<Movie> filterMovies(List<Movie> movies, String searchText, Genre genre) {
-        List<Movie> filteredMovies = new ArrayList<>();
-        for (Movie movie : movies) {
-            boolean matchesSearchText = isMatchesSearchText(searchText, movie);
-            boolean matchesGenre = isMatchesGenre(genre, movie);
-            if (matchesSearchText && matchesGenre) {
-                filteredMovies.add(movie);
-            }
-        }
-        return filteredMovies;
-    }
-
-    //TODO: If the method above (filterMovies) is not needed, the following 2 methods are not needed!
-
-    /**
-     * Checks if the movie's genres contain the selected genre.
-     * Returns {@code true} if the movie matches the selected genre or if no genre is selected.
-     *
-     * @param genre The genre to check against.
-     * @param movie The movie to check.
-     * @return {@code true} if the movie matches the selected genre or if no genre is selected; {@code false} otherwise.
-     */
-    private static boolean isMatchesGenre(Genre genre, Movie movie) {
-        return (genre == null || movie.getGenres().contains(genre));
-    }
-
-    /**
-     * Checks if the movie's title and description contains the search text, ignoring case.
-     *
-     * @param searchText The text to search for in the movie's title.
-     * @param movie      The movie whose title is to be checked.
-     * @return {@code true} if the movie's title and the movie's description contains the search text; {@code false} otherwise.
-     */
-    private static boolean isMatchesSearchText(String searchText, Movie movie) {
-
-        return movie.getTitle().toLowerCase().contains(searchText.toLowerCase()) ||
-                movie.getDescription().toLowerCase().contains(searchText.toLowerCase());
-    }
 
     /**
      * Streams through a list of movies to get the actor who appears most frequently in the main cast
