@@ -18,4 +18,6 @@ module org.fhmdb.fhmdb_lijunamatata {
     exports org.fhmdb.fhmdb_lijunamatata.controller;
     exports org.fhmdb.fhmdb_lijunamatata.models;
     exports org.fhmdb.fhmdb_lijunamatata.api;
+    exports org.fhmdb.fhmdb_lijunamatata.database;
+    opens org.fhmdb.fhmdb_lijunamatata.database to com.google.gson, javafx.fxml;
 }
