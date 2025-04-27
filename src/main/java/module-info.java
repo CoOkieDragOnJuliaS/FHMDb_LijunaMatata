@@ -10,6 +10,7 @@ module org.fhmdb.fhmdb_lijunamatata {
     requires org.kordamp.ikonli.javafx;
     requires ormlite.jdbc;
     requires java.sql;
+    requires com.h2database;
 
     opens org.fhmdb.fhmdb_lijunamatata to javafx.fxml;
     opens org.fhmdb.fhmdb_lijunamatata.controller to javafx.fxml;

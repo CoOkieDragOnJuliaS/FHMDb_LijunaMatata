@@ -6,8 +6,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.fhmdb.fhmdb_lijunamatata.controller.FHMDbController;
+import org.fhmdb.fhmdb_lijunamatata.database.DatabaseManager;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class FHMDbApplication extends Application {
@@ -29,6 +31,13 @@ public class FHMDbApplication extends Application {
         stage.setTitle("FHMDb");
         stage.setScene(scene);
         stage.show();
+
+        //for testing: delete after moving database initialization to actual position
+        try {
+            DatabaseManager.getDatabaseManager().testDB();
+        } catch(SQLException e){
+
+        }
     }
 
     @Override

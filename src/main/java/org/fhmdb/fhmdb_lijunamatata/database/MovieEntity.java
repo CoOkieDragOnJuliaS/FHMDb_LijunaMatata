@@ -76,18 +76,19 @@ public class MovieEntity {
      * @return new Movie object
      */
     public static Movie toMovie(MovieEntity movieEntity) {
-        return new Movie(
-                movieEntity.getApiId(),
-                movieEntity.getTitle(),
-                stringToGenres(movieEntity.getGenres()),
-                movieEntity.getReleaseYear(),
-                movieEntity.getDescription(),
-                movieEntity.getImgUrl(),
-                movieEntity.getLengthInMinutes(),
-                Collections.emptyList(),
-                Collections.emptyList(),
-                Collections.emptyList(),
-                movieEntity.getRating());
+        try {
+            return new Movie(
+                    movieEntity.getApiId(),
+                    movieEntity.getTitle(),
+                    stringToGenres(movieEntity.getGenres()),
+                    movieEntity.getReleaseYear(),
+                    movieEntity.getDescription(),
+                    movieEntity.getImgUrl(),
+                    movieEntity.getLengthInMinutes(),
+                    Collections.emptyList(),
+                    Collections.emptyList(),
+                    Collections.emptyList(),
+                    movieEntity.getRating());
         /*Movie movie = new Movie();
         movie.setId(movieEntity.getApiId());
         movie.setTitle(movieEntity.getTitle());
@@ -98,6 +99,9 @@ public class MovieEntity {
         movie.setLengthInMinutes(movieEntity.getLengthInMinutes());
         movie.setRating(movieEntity.getRating());
         return movie;*/
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
     }
 
     /**
@@ -130,15 +134,16 @@ public class MovieEntity {
                 .collect(Collectors.joining(", ")); //join genres by comma
     }
 
-    private static Genre stringToGenre(String genreString) throws DatabaseException {
+    private static Genre stringToGenre(String genreString) throws IllegalArgumentException {
         try {
             return Genre.valueOf(genreString.toUpperCase().replace(" ", "_"));
         } catch (IllegalArgumentException e) {
-            throw new DatabaseException("Invalid genre: " + genreString, e);
+        //    throw new DatabaseException("Invalid genre: " + genreString, e);
+            throw e;
         }
     }
 
-    private static List<Genre> stringToGenres(String genresString) throws DatabaseException {
+    private static List<Genre> stringToGenres(String genresString) throws IllegalArgumentException {
         if (genresString == null || genresString.trim().isEmpty()) {
             return Collections.emptyList();
         }
@@ -148,7 +153,7 @@ public class MovieEntity {
                     .filter(genreString -> !genreString.isEmpty())//ignore empty entries
                     .map(MovieEntity::stringToGenre) //convert each string to GENRE enum
                     .collect(Collectors.toList());
-        } catch (DatabaseException e) {
+        } catch (IllegalArgumentException e) {
             throw e;
         }
     }
