@@ -10,9 +10,9 @@ import org.h2.tools.Server;
 import java.sql.SQLException;
 
 public class DatabaseManager {
-    public static final String DB_URL ="jdbc:h2:file:./db/moviesdb"; //Path for embedded version of H2
-    public static final String username = "user";
-    public static final String password = "password";
+    private static final String DB_URL ="jdbc:h2:file:./db/moviesdb"; //Path for embedded version of H2
+    private static final String username = "user";
+    private static final String password = "password";
     private static ConnectionSource connectionSource;
     Dao<MovieEntity, Long> movieDao; //DAO = Data Access Object
     Dao<WatchlistMovieEntity, Long> watchlistDao;
@@ -22,7 +22,7 @@ public class DatabaseManager {
      * start web-based admin console on port 8082
      * @throws SQLException
      */
-    private static void startH2Console() throws SQLException {
+    protected static void startH2Console() throws SQLException {
         Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
         System.out.println("H2 Console: http://localhost:8082");
     }
@@ -51,12 +51,12 @@ public class DatabaseManager {
         return instance;
     }
 
-    private static void createTables() throws SQLException{
+    protected static void createTables() throws SQLException{
         TableUtils.createTableIfNotExists(connectionSource, MovieEntity.class);
         TableUtils.createTableIfNotExists(connectionSource, WatchlistMovieEntity.class);
     }
 
-    private static void createConnectionSource() throws SQLException{
+    protected static void createConnectionSource() throws SQLException{
         try {
             connectionSource = new JdbcConnectionSource(DB_URL, username, password);
         } catch (SQLException e) {
