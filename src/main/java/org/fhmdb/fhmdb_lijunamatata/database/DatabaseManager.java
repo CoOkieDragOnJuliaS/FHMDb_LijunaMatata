@@ -19,7 +19,7 @@ public class DatabaseManager {
     private static DatabaseManager instance; //Singleton Pattern: we only want a single instance of DatabaseManager
 
     /**
-     * start web-based admin console on port 8082
+     * starts web-based H2 Console on specified port
      * @throws SQLException
      */
     protected static void startH2Console() throws SQLException {
@@ -27,6 +27,10 @@ public class DatabaseManager {
         System.out.println("H2 Console: http://localhost:8082");
     }
 
+    /**
+     * initializes connectionSource, H2console, DAOs and tables
+     * @throws SQLException
+     */
     private DatabaseManager() throws SQLException{
         try {
             createConnectionSource();
@@ -40,10 +44,11 @@ public class DatabaseManager {
         }
     }
 
-    public void testDB() {
-        MovieEntity movie = new MovieEntity();
-    }
-
+    /**
+     * initializes DatabaseManager object, if it doesn't exist yet. Otherwise it returns the current instance
+     * @return DatabaseManager
+     * @throws SQLException
+     */
     public static DatabaseManager getDatabaseManager() throws SQLException{
         if (instance == null) {
             instance = new DatabaseManager();
@@ -51,11 +56,19 @@ public class DatabaseManager {
         return instance;
     }
 
+    /**
+     * creates the SQL tables for MovieEntity and WatchlistMovieEntity classes
+     * @throws SQLException
+     */
     protected static void createTables() throws SQLException{
         TableUtils.createTableIfNotExists(connectionSource, MovieEntity.class);
         TableUtils.createTableIfNotExists(connectionSource, WatchlistMovieEntity.class);
     }
 
+    /**
+     * initializes the connection to the database
+     * @throws SQLException
+     */
     protected static void createConnectionSource() throws SQLException{
         try {
             connectionSource = new JdbcConnectionSource(DB_URL, username, password);

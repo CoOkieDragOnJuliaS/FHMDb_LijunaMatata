@@ -34,7 +34,7 @@ public class FHMDbApplication extends Application {
 
         //for testing: delete after moving database initialization to actual position
         try {
-            DatabaseManager.getDatabaseManager().testDB();
+            DatabaseManager.getDatabaseManager();
         } catch(SQLException e){
 
         }
