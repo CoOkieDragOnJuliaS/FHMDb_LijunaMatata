@@ -1,50 +1,64 @@
-## Mirrored Template for Exercise 2
-The goal of this exercise is to extend the FHMDb application by connecting it to a remote MovieAPI and enabling dynamic data loading, filtering, and stream-based analysis.
+## Mirrored Template for Exercise 3
+The goal of this exercise is to extend the FHMDb application by introducing a multi-layered architecture (UI Layer, Business/Logic Layer, Data Layer), adding persistence with an H2 database using ORMLite, and implementing robust exception handling.
 ## K.O. Criteria are the following:
-- The application must connect to the MovieAPI and display fetched movies in the GUI.
-- The application must use a proper Java HTTP library (e.g., OkHttp) to send GET requests.
-- The application must parse JSON responses using Gson or Jackson into Java objects.
+- The project must include a GUI (no console applications allowed).
 - The project must be based on Maven.
-- The project must include JUnit Testing, runnable with Maven.
-- The project must be hosted on GitHub with all contributors added.
+- The project must be available on GitHub with public access.
+- If any K.O. criterion is not met, the submission will be evaluated as failed.
+## Tasks
 
-## Following Tasks have to be done:
-- Create a `MovieAPI` class to handle HTTP requests and responses from the API.
-- The `MovieAPI` class must be able to build correct URLs with query parameters (`genre`, `query`, `releaseYear`, `ratingFrom`).
-- Make sure to include a `User-Agent` header in every request to avoid HTTP 403 errors.
+### Presentation Layer
 
-- Adapt your existing `Movie` class to match the attributes provided by the MovieAPI.
+- Implement navigation between the **MovieScreen** (all movies) and the **WatchlistScreen** (saved movies).
+- In the **MovieScreen**, allow users to **add movies to the Watchlist** (e.g., via a button).
+- In the **WatchlistScreen**, allow users to **remove movies from the Watchlist**.
 
-- Update your GUI to allow users to configure query parameters such as:
-  - Genre
-  - Release Year
-  - Rating From
-  - Search Query
+### Data Layer
 
-- On application start, load all movies from the API with no filters.
-  - Example URL: `https://prog2.fh-campuswien.ac.at/movies`
+- Implement the following classes:
+  - `MovieEntity`: Represents movie data to be stored in the database.  
+    (Lists like directors, writers, and mainCast are excluded; genres are stored as comma-separated strings.)
+  - `WatchlistMovieEntity`: Represents entries in the Watchlist (stores only the API ID of the movie).
+  - `DatabaseManager`: Manages the database connection and DAO instances.
+  - `MovieRepository` and `WatchlistRepository`: Provide functions for:
+    - Retrieving all entries from the respective database tables.
+    - Deleting all or specific entries.
+    - Adding a movie to the Watchlist (only if it does not already exist).
 
-- Enable dynamic API requests when the user performs a search or applies filters.
-  - Example URL: `https://prog2.fh-campuswien.ac.at/movies?query=darkknight&genre=ACTION`
+### Business/Logic Layer
 
-- Parse the returned JSON using **Gson** or **Jackson** and map the data into `Movie` objects.
+- Extend the **Controller** to interact between the UI and the Data Layer.
+- When a user clicks **"Add to Watchlist"** or **"Remove from Watchlist"**, handle the action using a **Lambda Expression**.
+- Create a `ClickEventHandler` functional interface with the method:
+```java
+void onClick(T t);
+```
+Example usage:
 
-- Display the parsed movies in the GUI and update the view when filters or search queries are applied.
+## In MovieCell class:
+```java
+watchlistBtn.setOnMouseClicked(mouseEvent -> {
+    addToWatchlistClicked.onClick(getItem());
+});
+```
+## In the Controller:
+```java
+private final ClickEventHandler onAddToWatchlistClicked = (clickedItem) -> {
+    // code to add movie to watchlist
+};
+```
+### Exception Handling
+- Implement two custom exception classes:
+  - `DatabaseException`
+  - `MovieApiException`
+- Properly propagate exceptions:
+  - Data Layer exceptions → `DatabaseException`
+  - API Layer exceptions → `MovieApiException`
+- Handle exceptions in the **Controller**.
 
-- Implement the following methods using **Java Streams** only (no loops allowed), and write Unit Tests for each of them:
-
-  ```java
-  String getMostPopularActor(List<Movie> movies)
-  // Returns the actor who appears most frequently in the mainCast list of all movies.
-
-  int getLongestMovieTitle(List<Movie> movies)
-  // Returns the length (character count) of the longest movie title.
-
-  long countMoviesFrom(List<Movie> movies, String director)
-  // Returns the number of movies directed by the specified director.
-
-  List<Movie> getMoviesBetweenYears(List<Movie> movies, int startYear, int endYear)
-  // Returns a list of movies released between the given years.
+- Display user-friendly error messages in the GUI.
+- If the MovieAPI is unavailable, fallback to cached movies from the database.
+- The application must never crash and should always provide meaningful feedback to users.
 
 ## Coding Conventions:
   .) Naming Conventions are in English, camelCase is mandatory</br>
