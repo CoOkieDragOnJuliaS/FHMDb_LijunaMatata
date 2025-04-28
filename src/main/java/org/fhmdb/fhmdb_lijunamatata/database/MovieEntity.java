@@ -64,7 +64,7 @@ public class MovieEntity {
      * @param movies List<Movie>
      * @return List<MovieEntity>
      */
-    public List<MovieEntity> fromMovies(List<Movie> movies) {
+    public static List<MovieEntity> fromMovies(List<Movie> movies) {
         return movies.stream()
                 .map(MovieEntity::new) //constructs one MovieEntity for each Movie
                 .collect(Collectors.toList());
@@ -109,7 +109,7 @@ public class MovieEntity {
      * @param movieEntities List<MovieEntity>
      * @return List<Movie>
      */
-    public List<Movie> toMovies(List<MovieEntity> movieEntities) {
+    public static List<Movie> toMovies(List<MovieEntity> movieEntities) {
         if (movieEntities == null) {
             return Collections.emptyList();
         }
@@ -125,7 +125,7 @@ public class MovieEntity {
      * @param genres List<Genre>
      * @return comma-separated String of genres
      */
-    private static String genresToString(List<Genre> genres) {
+    protected static String genresToString(List<Genre> genres) {
         if (genres == null || genres.isEmpty()) {
             return "";
         }
@@ -134,16 +134,16 @@ public class MovieEntity {
                 .collect(Collectors.joining(", ")); //join genres by comma
     }
 
-    private static Genre stringToGenre(String genreString) throws IllegalArgumentException {
+    protected static Genre stringToGenre(String genreString) throws IllegalArgumentException {
         try {
-            return Genre.valueOf(genreString.toUpperCase().replace(" ", "_"));
+            return Genre.valueOf(genreString.trim().toUpperCase().replace(" ", "_"));
         } catch (IllegalArgumentException e) {
         //    throw new DatabaseException("Invalid genre: " + genreString, e);
             throw e;
         }
     }
 
-    private static List<Genre> stringToGenres(String genresString) throws IllegalArgumentException {
+    protected static List<Genre> stringToGenres(String genresString) throws IllegalArgumentException {
         if (genresString == null || genresString.trim().isEmpty()) {
             return Collections.emptyList();
         }
