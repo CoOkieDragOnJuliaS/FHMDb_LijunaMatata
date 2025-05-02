@@ -10,23 +10,27 @@ import org.h2.tools.Server;
 import java.sql.SQLException;
 
 public class DatabaseManager {
-    public static final String DB_URL ="jdbc:h2:file:./db/moviesdb"; //Path for embedded version of H2
-    public static final String username = "user";
-    public static final String password = "password";
+    private static final String DB_URL ="jdbc:h2:file:./db/moviesdb"; //Path for embedded version of H2
+    private static final String username = "user";
+    private static final String password = "password";
     private static ConnectionSource connectionSource;
     Dao<MovieEntity, Long> movieDao; //DAO = Data Access Object
     Dao<WatchlistMovieEntity, Long> watchlistDao;
     private static DatabaseManager instance; //Singleton Pattern: we only want a single instance of DatabaseManager
 
     /**
-     * start web-based admin console on port 8082
+     * starts web-based H2 Console on specified port
      * @throws SQLException
      */
-    private static void startH2Console() throws SQLException {
+    protected static void startH2Console() throws SQLException {
         Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
         System.out.println("H2 Console: http://localhost:8082");
     }
 
+    /**
+     * initializes connectionSource, H2console, DAOs and tables
+     * @throws SQLException
+     */
     private DatabaseManager() throws SQLException{
         try {
             createConnectionSource();
@@ -40,10 +44,11 @@ public class DatabaseManager {
         }
     }
 
-    public void testDB() {
-        MovieEntity movie = new MovieEntity();
-    }
-
+    /**
+     * initializes DatabaseManager object, if it doesn't exist yet. Otherwise it returns the current instance
+     * @return DatabaseManager
+     * @throws SQLException
+     */
     public static DatabaseManager getDatabaseManager() throws SQLException{
         if (instance == null) {
             instance = new DatabaseManager();
@@ -51,12 +56,20 @@ public class DatabaseManager {
         return instance;
     }
 
-    private static void createTables() throws SQLException{
+    /**
+     * creates the SQL tables for MovieEntity and WatchlistMovieEntity classes
+     * @throws SQLException
+     */
+    protected static void createTables() throws SQLException{
         TableUtils.createTableIfNotExists(connectionSource, MovieEntity.class);
         TableUtils.createTableIfNotExists(connectionSource, WatchlistMovieEntity.class);
     }
 
-    private static void createConnectionSource() throws SQLException{
+    /**
+     * initializes the connection to the database
+     * @throws SQLException
+     */
+    protected static void createConnectionSource() throws SQLException{
         try {
             connectionSource = new JdbcConnectionSource(DB_URL, username, password);
         } catch (SQLException e) {
