@@ -1,4 +1,5 @@
 ./db
+./db/*.db
 
 target/
 !.mvn/wrapper/maven-wrapper.jar

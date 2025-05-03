@@ -40,9 +40,7 @@ public class WatchlistRepository {
      */
     public void addToWatchlist(MovieEntity movieEntity) throws SQLException {
         if (!existsInWatchlist(movieEntity.getApiId())) {
-            WatchlistMovieEntity watchlistMovie = new WatchlistMovieEntity();
-            watchlistMovie.setApiId(movieEntity.getApiId());
-            watchlistDao.create(watchlistMovie);
+            watchlistDao.create(new WatchlistMovieEntity(movieEntity.getApiId()));
         }
     }
 

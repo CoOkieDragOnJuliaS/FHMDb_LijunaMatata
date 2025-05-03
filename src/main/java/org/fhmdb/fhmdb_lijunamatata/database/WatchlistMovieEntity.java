@@ -11,6 +11,12 @@ public class WatchlistMovieEntity {
     @DatabaseField()
     private String apiId;
 
+    public WatchlistMovieEntity() {}
+
+    public WatchlistMovieEntity(String apiId) {
+        this.apiId = apiId;
+    }
+
     // --- Getter for id ---
     public long getId() {
         return id;

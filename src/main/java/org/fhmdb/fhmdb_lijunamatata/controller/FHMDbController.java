@@ -194,8 +194,8 @@ public class FHMDbController {
         releaseYearOptions.add(null);
         if (filteredMovies != null && !filteredMovies.isEmpty()) {
             List<Integer> years = filteredMovies.stream() //convert to stream for processing
+                    .filter(Objects::nonNull) //safety check to remove any null objects
                     .map(Movie::getReleaseYear) //get only release year of each movie
-                    .filter(Objects::nonNull) //safety check to remove any null years
                     .distinct() //keep only unique years
                     .sorted() //ascending
                     .toList(); //convert back to list
@@ -213,8 +213,8 @@ public class FHMDbController {
         ratingOptions.add(null);
         if (filteredMovies != null && !filteredMovies.isEmpty()) {
             List<Double> ratings = filteredMovies.stream() //convert to stream for processing
+                    .filter(Objects::nonNull) //safety check to remove any null objects
                     .map(Movie::getRating) //get only rating of each movie
-                    .filter(Objects::nonNull) //safety check to remove any null ratings
                     .distinct() //keep only unique ratings
                     .sorted() //ascending
                     .toList(); //convert back to list
