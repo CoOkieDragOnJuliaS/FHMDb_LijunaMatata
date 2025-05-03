@@ -1,5 +1,5 @@
-./db
-./db/*.db
+# Ignore the entire 'db' folder and all its contents
+db/
 
 target/
 !.mvn/wrapper/maven-wrapper.jar
