@@ -1,0 +1,67 @@
+[
+    {
+       "id": "1",
+       "title": "Inception",
+       "genres": ["Thriller", "Science-Fiction"],
+       "releaseYear": 2010,
+       "description": "A mind-bending thriller that explores the world of dreams.",
+       "imgUrl": "",
+       "lengthInMinutes": 148,
+       "directors": ["Christopher Nolan"],
+       "writers": ["Christopher Nolan"],
+       "mainCast": ["Leonardo DiCaprio", "Joseph Gordon-Levitt", "Elliot Page"],
+       "rating": 8.8
+     },
+     {
+       "id": "2",
+       "title": "Bibibap",
+       "genres": ["Comedy", "Drama"],
+       "releaseYear": 2010,
+       "description": "A heartwarming story about friendship and food.",
+       "imgUrl": "",
+       "lengthInMinutes": 120,
+       "directors": ["John Doe"],
+       "writers": ["Jane Smith"],
+       "mainCast": ["Actor A", "Leonardo DiCaprio", "Actor C"],
+       "rating": 7.5
+     },
+     {
+       "id": "3",
+       "title": "The Matrix",
+       "genres": ["Action", "Science-Fiction"],
+       "releaseYear": 1999,
+       "description": "A computer hacker learns about the true nature of his reality.",
+       "imgUrl": "",
+       "lengthInMinutes": 136,
+       "directors": ["Lana Wachowski", "Lilly Wachowski"],
+       "writers": ["Lana Wachowski", "Lilly Wachowski"],
+       "mainCast": ["Keanu Reeves", "Laurence Fishburne", "Carrie-Anne Moss"],
+       "rating": 8.7
+     },
+     {
+       "id": "4",
+       "title": "The Shawshank Redemption",
+       "genres": ["Drama"],
+       "releaseYear": 1994,
+       "description": "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
+       "imgUrl": "",
+       "lengthInMinutes": 142,
+       "directors": ["Frank Darabont"],
+       "writers": ["Stephen King", "Frank Darabont"],
+       "mainCast": ["Tim Robbins", "Morgan Freeman", "Bob Gunton"],
+       "rating": 9.3
+     },
+     {
+       "id": "5",
+       "title": "Parasite",
+       "genres": ["Thriller", "Drama"],
+       "releaseYear": 2019,
+       "description": "A poor family schemes to become employed by a wealthy family.",
+       "imgUrl": "",
+       "lengthInMinutes": 132,
+       "directors": ["Bong Joon-ho"],
+       "writers": ["Bong Joon-ho", "Han Jin-won"],
+       "mainCast": ["Kang-ho Song", "Yeo-jeong Jo", "Choi Woo-shik"],
+       "rating": 8.6
+     }
+]
