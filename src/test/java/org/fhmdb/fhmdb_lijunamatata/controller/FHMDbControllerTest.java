@@ -61,7 +61,7 @@ public class FHMDbControllerTest {
     @Test
     @DisplayName("updateMovieListView should not throw exception")
     public void updateMovieListView_doesnt_throw_exception() {
-        assertDoesNotThrow(() -> movieController.updateMovieListView());
+        assertDoesNotThrow(() -> movieController.updateMovieListView("", "", 0, 0));
     }
 
     @Test

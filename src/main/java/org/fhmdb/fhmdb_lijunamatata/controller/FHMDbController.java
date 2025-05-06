@@ -16,7 +16,6 @@ import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
 
 
 public class FHMDbController {
@@ -41,7 +40,7 @@ public class FHMDbController {
     public ComboBox<Integer> releaseYearComboBox;
 
     @FXML
-    public ComboBox<Double> ratingComboBox;
+    public ComboBox<String> ratingComboBox;
 
     @FXML
     private ListView<Movie> movieListView;
@@ -59,7 +58,6 @@ public class FHMDbController {
     //Filtering mechanism for filtering delayed
     private Runnable filterTask;
 
-    Logger logger = Logger.getLogger(FHMDbController.class.getName());
     /**
      * sets up the logic by initializing movieService
      */
@@ -136,7 +134,7 @@ public class FHMDbController {
         });
 
         ratingComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            rating = newValue;
+            updateRatingFilter(newValue);
         });
     }
 
@@ -156,7 +154,7 @@ public class FHMDbController {
             updateStatusLabel("Loading movies...", false);
             this.movies = FXCollections.observableArrayList(Movie.initializeMovies());
             this.filteredMovies = FXCollections.observableArrayList(this.movies);
-            updateStatusLabel("", false);
+            updateStatusLabel("Movies loaded - initialized list is now shown!", false);
         } catch (IOException e) {
             updateStatusLabel("Error loading movies!", true);
             e.printStackTrace();
@@ -200,18 +198,42 @@ public class FHMDbController {
      * The first item, representing "no rating", is selected by default.
      */
     private void initializeRatingComboBox() {
-        ObservableList<Double> ratingOptions = FXCollections.observableArrayList();
-        ratingOptions.add(null);
-        if (filteredMovies != null && !filteredMovies.isEmpty()) {
-            List<Double> ratings = filteredMovies.stream() //convert to stream for processing
-                    .map(Movie::getRating) //get only rating of each movie
-                    .filter(Objects::nonNull) //safety check to remove any null ratings
-                    .distinct() //keep only unique ratings
-                    .sorted() //ascending
-                    .toList(); //convert back to list
-            ratingOptions.addAll(ratings);
-        }
+        ObservableList<String> ratingOptions = FXCollections.observableArrayList();
+        ratingOptions.add("All Ratings");
+        ratingOptions.add("> 1");
+        ratingOptions.add("> 2");
+        ratingOptions.add("> 3");
+        ratingOptions.add("> 4");
+        ratingOptions.add("> 5");
+        ratingOptions.add("> 6");
+        ratingOptions.add("> 7");
+        ratingOptions.add("> 8");
+        ratingOptions.add("> 9");
+
         this.ratingComboBox.setItems(ratingOptions);
+    }
+
+    /**
+     *
+     * @param selectedRatingString
+     * This method updates the rating variable which is used for filtering movies
+     * according to the value picked in the ratingComboBox (e.g. > 2)
+     */
+    private void updateRatingFilter(String selectedRatingString) {
+        if (selectedRatingString == null || selectedRatingString.equals("All Ratings")) {
+            this.rating = null; // Pass null to the service to indicate no rating filter
+        } else if (selectedRatingString.startsWith("> ")) {
+            try {
+                // Extract the number and set the 'rating' variable to this value
+                this.rating = Double.parseDouble(selectedRatingString.substring(2));
+            } catch (NumberFormatException e) {
+                System.err.println("Error parsing rating threshold: " + selectedRatingString);
+                this.rating = null; // Reset rating if parsing fails
+            }
+        } else {
+            // Handle any other unexpected strings, perhaps set rating to null
+            this.rating = null;
+        }
     }
 
     /**
@@ -237,7 +259,9 @@ public class FHMDbController {
         updateSortButtonText();
 
         this.isAscending = !this.isAscending;
-        updateMovieListView();
+        updateMovieListView(this.searchText, this.genre!=null ? this.genre.name() : "",
+                this.releaseYear!=null ? this.releaseYear : 0,
+                this.rating!=null ? this.rating : 0);
     }
 
     /**
@@ -273,7 +297,9 @@ public class FHMDbController {
             // and add the filtered results to the filteredMovies list
             this.filteredMovies = FXCollections.observableList(this.movieService.fetchFilteredMovies(
                     this.searchText, this.genre, this.releaseYear, this.rating));
-            updateMovieListView();
+            updateMovieListView(this.searchText, this.genre!=null ? this.genre.name() : "",
+                    this.releaseYear!= null ? this.releaseYear : 0,
+                    this.rating!=null ? this.rating : 0);
         } catch (IOException | NullPointerException e) {
             updateStatusLabel("Error loading movies!", true);
             e.printStackTrace();
@@ -284,17 +310,16 @@ public class FHMDbController {
      * Updates the movie list view by clearing and repopulating it with sorted movie titles.
      * Ensures the UI list correctly reflects the current order of movies.
      */
-    public void updateMovieListView() {
+    public void updateMovieListView(String searchText, String genre, int releaseYear, double rating) {
         if (this.movieListView == null) return;
         this.movieListView.getItems().clear();
         this.movieListView.getItems().addAll(this.filteredMovies);
         //if there is no result, because the filtering does not return movies, set the label
         if (this.filteredMovies.isEmpty()) {
-            logger.info("No movies found!");
             updateStatusLabel("No movies found!", false);
         } else {
-            logger.info("movies found, calling updateStatusLabel");
-            updateStatusLabel("", false);
+            updateStatusLabel(String.format("Movies found with Query = %s / Genre = %s / ReleaseYear = %d and Rating from %.1f",
+                    searchText, genre, releaseYear, rating), false);
         }
     }
 
@@ -307,7 +332,6 @@ public class FHMDbController {
      */
     public void updateStatusLabel(String message, boolean isError) {
         if (statusLabel != null) {
-            logger.info("Updating status label...");
             statusLabel.setText(message);
             statusLabel.setVisible(isError || !message.isEmpty());
         }
