@@ -61,6 +61,7 @@ public class FHMDbController {
     private Runnable filterTask;
 
     Logger logger = Logger.getLogger(FHMDbController.class.getName());
+
     /**
      * sets up the logic by initializing movieService
      */
@@ -71,6 +72,11 @@ public class FHMDbController {
 
 
     //WatchlistActions with ClickEventHandler
+    /**
+     * Implementation of the ClickEventHandler to work as a intermediate layer between
+     * Data-Layer and UI-Layer --> the clickEventHandlers are then used in the constructor
+     * of the MovieCell below in the initialization method!
+     */
     private final ClickEventHandler<Movie> onAddToWatchlistClicked =
             (clickedMovie) -> {
                 //TODO: Implement logic to add to watchlist database --> with data layer
@@ -87,7 +93,7 @@ public class FHMDbController {
 
     /**
      * initializes the Controller by calling methods for initializing the elements of the class.
-     *
+     * <p>
      * - The `searchText` is automatically updated whenever the user types in the `searchField`.
      * - The `genre` is automatically updated whenever a new genre is selected from the `genreComboBox`.
      */
@@ -131,7 +137,7 @@ public class FHMDbController {
             searchText = newValue;
 
             //Cancel previously scheduled elements
-            if(this.filterTask  != null) {
+            if (this.filterTask != null) {
                 scheduler.shutdownNow();
                 // Reinitialize the scheduler
                 initializeSchedulers();

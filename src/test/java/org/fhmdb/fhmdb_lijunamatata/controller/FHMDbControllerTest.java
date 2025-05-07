@@ -3,6 +3,7 @@ package org.fhmdb.fhmdb_lijunamatata.controller;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
+import org.fhmdb.fhmdb_lijunamatata.utils.ClickEventHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -51,7 +53,14 @@ public class FHMDbControllerTest {
         //The controller does not know about the MovieAPI
         initialMovies = Movie.initializeMoviesTestbase();
 
+        movieController = new FHMDbController();
+        //Creating a spy (mocked object) before making calls to the controller itself
+        movieController = spy(movieController);
+
         movieController.setMovies(initialMovies);
+
+        //Try to mock updateStatusLabel to isolate tests and interaction with JavaFX UI
+        doNothing().when(movieController).updateStatusLabel(anyString(), anyBoolean());
 
         //Update: Mocking the Buttons e.g. does not work because Mockito is not able to mock JavaFX private elements or final classes
         //Avoiding the UI elements and focusing on the testing of logic in the method is necessary
@@ -108,7 +117,7 @@ public class FHMDbControllerTest {
         the execution of your test. */
         try {
             verify(movieService).fetchFilteredMovies(any(), any(), any(), any());
-        }catch(IOException e) {
+        } catch (IOException e) {
             logger.severe(e.getMessage());
         }
     }
@@ -123,9 +132,66 @@ public class FHMDbControllerTest {
         the execution of your test. */
         try {
             verify(movieService).fetchFilteredMovies(anyString(), any(Genre.class), anyInt(), anyDouble());
-        }catch(IOException e) {
+        } catch (IOException e) {
             logger.severe(e.getMessage());
         }
+    }
+
+    @Test
+    @DisplayName("Testing of onAddToWatchlistClicked method")
+    public void onAddToWatchlistClicked_methodCall() {
+        Movie dummyMovie = new Movie();
+        try {
+            Field addToWatchlistField = FHMDbController.class.getDeclaredField("onAddToWatchlistClicked");
+            addToWatchlistField.setAccessible(true);
+            Object onAddToWatchlistClicked = addToWatchlistField.get(movieController);
+
+            dummyMovie = new Movie("test-id", "test-name", List.of(Genre.ACTION, Genre.DRAMA), 2023, "Ein neuer Film",
+                    "fake_url", 120, List.of("Director Name"), List.of("Writer Name"), List.of("Main Cast Name"), 1.0);
+
+            //Invoking Lambda Expression
+            if(onAddToWatchlistClicked instanceof ClickEventHandler) {
+                ((ClickEventHandler<Movie>) onAddToWatchlistClicked).onClick(dummyMovie);
+            }else {
+                throw new AssertionError("onAddToWatchlistClicked() is not a ClickEventHandler");
+            }
+        } catch (NoSuchFieldException | IllegalAccessException exception) {
+            logger.severe(exception.getMessage());
+        }
+
+        //verify updateStatusLabel was called
+        verify(movieController).updateStatusLabel("Added " + dummyMovie.getTitle() + " to Watchlist!", false);
+
+        //TODO: Verify data-layer method is called
+    }
+
+
+    @Test
+    @DisplayName("Testing of onRemoveFromWatchlistClicked method")
+    public void onRemoveFromWatchlistClicked_methodCall() {
+        Movie dummyMovie = new Movie();
+        try {
+            Field removeFromWatchlistField = FHMDbController.class.getDeclaredField("onRemoveFromWatchlistClicked");
+            removeFromWatchlistField.setAccessible(true);
+            Object onRemoveFromWatchlistClicked = removeFromWatchlistField.get(movieController);
+
+            dummyMovie = new Movie("test-id", "test-name", List.of(Genre.ACTION, Genre.DRAMA), 2023, "Ein neuer Film",
+                    "fake_url", 120, List.of("Director Name"), List.of("Writer Name"), List.of("Main Cast Name"), 1.0);
+
+            //Invoking Lambda Expression
+            if(onRemoveFromWatchlistClicked instanceof ClickEventHandler) {
+                ((ClickEventHandler<Movie>) onRemoveFromWatchlistClicked).onClick(dummyMovie);
+            }else {
+                throw new AssertionError("onRemoveFromWatchlistClicked() is not a ClickEventHandler");
+            }
+        } catch (NoSuchFieldException | IllegalAccessException exception) {
+            logger.severe(exception.getMessage());
+        }
+
+        //verify updateStatusLabel was called
+        verify(movieController).updateStatusLabel("Removed " + dummyMovie.getTitle() + " from Watchlist!", false);
+
+        //TODO: Verify data-layer method is called
     }
 }
 
