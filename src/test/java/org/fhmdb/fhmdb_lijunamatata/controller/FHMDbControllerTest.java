@@ -52,7 +52,6 @@ public class FHMDbControllerTest {
         //Testing with the initialized movies from testbaste in Movie class
         //The controller does not know about the MovieAPI
         initialMovies = Movie.initializeMoviesTestbase();
-
         movieController = new FHMDbController();
         //Creating a spy (mocked object) before making calls to the controller itself
         movieController = spy(movieController);
@@ -62,9 +61,59 @@ public class FHMDbControllerTest {
         //Try to mock updateStatusLabel to isolate tests and interaction with JavaFX UI
         doNothing().when(movieController).updateStatusLabel(anyString(), anyBoolean());
 
+        initializeOnAddToWatchlistField();
+        initializeOnRemoveToWatchlistField();
         //Update: Mocking the Buttons e.g. does not work because Mockito is not able to mock JavaFX private elements or final classes
         //Avoiding the UI elements and focusing on the testing of logic in the method is necessary
         //Another solution (maybe later purposes) is using WrapperClasses to wrap around the JavaFX elements needed to moc
+    }
+
+    /**
+     * Initializes the ClickEventHandler for adding a movie to the watchlist.
+     *  * <p>
+     *  * This method creates and assigns a {@link ClickEventHandler} lambda to the
+     *  * {@code onAddToWatchlistClicked} field. The handler updates the status label
+     *  * for testing purposes.
+     *  * </p>
+     *  * <p>
+     *  * This method is a mirrored test-initialization which is normally used
+     *  * in the application itself when the correct button is clicked.
+     *  * </p>
+     */
+    private void initializeOnAddToWatchlistField() {
+        try {
+            Field addToWatchlistField = FHMDbController.class.getDeclaredField("onAddToWatchlistClicked");
+            addToWatchlistField.setAccessible(true);
+
+            ClickEventHandler<Movie> testHandler = movie -> {
+                movieController.updateStatusLabel("Added " + movie.getTitle() + " to Watchlist!", false);
+            };
+            addToWatchlistField.set(movieController, testHandler);
+        }catch(NoSuchFieldException | IllegalAccessException e) {
+            throw new AssertionError(e);
+        }
+    }
+
+    /**
+     * Initializes the ClickEventHandler for removing a movie from the watchlist.
+     *  * <p>
+     *  * This method creates and assigns a {@link ClickEventHandler} lambda to the
+     *  * {@code onRemoveFromWatchlistClicked} field. The handler updates the status label
+     *  * for testing purposes.
+     *  * </p>
+     */
+    private void initializeOnRemoveToWatchlistField() {
+        try {
+            Field removeFromWatchlistField = FHMDbController.class.getDeclaredField("onRemoveFromWatchlistClicked");
+            removeFromWatchlistField.setAccessible(true);
+
+            ClickEventHandler<Movie> testHandler = movie -> {
+                movieController.updateStatusLabel("Removed " + movie.getTitle() + " from Watchlist!", false);
+            };
+            removeFromWatchlistField.set(movieController, testHandler);
+        }catch(NoSuchFieldException | IllegalAccessException e) {
+            throw new AssertionError(e);
+        }
     }
 
     @Test
@@ -142,14 +191,17 @@ public class FHMDbControllerTest {
     public void onAddToWatchlistClicked_methodCall() {
         Movie dummyMovie = new Movie();
         try {
+            //A field with the name onAddToWatchlistClicked is searched for and stored in the Field variable
             Field addToWatchlistField = FHMDbController.class.getDeclaredField("onAddToWatchlistClicked");
+            //setAccessible(true) indicates that, even though the method is private in the Controller, it makes it testable
             addToWatchlistField.setAccessible(true);
+            //get the current/actual value of the field declared above from the movieController instance
             Object onAddToWatchlistClicked = addToWatchlistField.get(movieController);
 
             dummyMovie = new Movie("test-id", "test-name", List.of(Genre.ACTION, Genre.DRAMA), 2023, "Ein neuer Film",
                     "fake_url", 120, List.of("Director Name"), List.of("Writer Name"), List.of("Main Cast Name"), 1.0);
 
-            //Invoking Lambda Expression
+            //Execution of ClickEventHandler and simulating a UI handled click
             if(onAddToWatchlistClicked instanceof ClickEventHandler) {
                 ((ClickEventHandler<Movie>) onAddToWatchlistClicked).onClick(dummyMovie);
             }else {
@@ -178,7 +230,7 @@ public class FHMDbControllerTest {
             dummyMovie = new Movie("test-id", "test-name", List.of(Genre.ACTION, Genre.DRAMA), 2023, "Ein neuer Film",
                     "fake_url", 120, List.of("Director Name"), List.of("Writer Name"), List.of("Main Cast Name"), 1.0);
 
-            //Invoking Lambda Expression
+            //Execution of ClickEventHandler and simulating a UI handled click
             if(onRemoveFromWatchlistClicked instanceof ClickEventHandler) {
                 ((ClickEventHandler<Movie>) onRemoveFromWatchlistClicked).onClick(dummyMovie);
             }else {
