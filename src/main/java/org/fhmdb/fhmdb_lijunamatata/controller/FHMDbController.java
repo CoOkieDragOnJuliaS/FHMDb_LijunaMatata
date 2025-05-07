@@ -9,6 +9,7 @@ import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
 import org.fhmdb.fhmdb_lijunamatata.ui.MovieCell;
+import org.fhmdb.fhmdb_lijunamatata.utils.ClickEventHandler;
 
 import java.io.IOException;
 import java.util.List;
@@ -67,6 +68,22 @@ public class FHMDbController {
         //No args constructor for initialization
         this.movieService = new MovieService();
     }
+
+
+    //WatchlistActions with ClickEventHandler
+    private final ClickEventHandler<Movie> onAddToWatchlistClicked =
+            (clickedMovie) -> {
+                //TODO: Implement logic to add to watchlist database --> with data layer
+                logger.info("Adding movie to watchlist: " + clickedMovie.getTitle());
+                updateStatusLabel("Added " + clickedMovie.getTitle() + " to Watchlist!", false);
+            };
+
+    private final ClickEventHandler<Movie> onRemoveFromWatchlistClicked =
+            (clickedMovie) -> {
+                //TODO: Implement logic to remove from watchlist database --> with data layer
+                logger.info("Removing movie from watchlist: " + clickedMovie.getTitle());
+                updateStatusLabel("Removed " + clickedMovie.getTitle() + " from Watchlist!", false);
+            };
 
     /**
      * initializes the Controller by calling methods for initializing the elements of the class.
@@ -145,7 +162,8 @@ public class FHMDbController {
      */
     private void initializeMovieListView() {
         movieListView.setItems(this.filteredMovies);
-        movieListView.setCellFactory(movieListView -> new MovieCell());
+        movieListView.setCellFactory(movieListView ->
+                new MovieCell(onAddToWatchlistClicked, onRemoveFromWatchlistClicked));
     }
 
     /**
