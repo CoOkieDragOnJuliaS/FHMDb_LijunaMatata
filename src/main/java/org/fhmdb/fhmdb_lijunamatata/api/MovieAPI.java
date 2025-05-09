@@ -6,15 +6,13 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.fhmdb.fhmdb_lijunamatata.exceptions.HttpExceptionHandler;
+import org.fhmdb.fhmdb_lijunamatata.exceptions.MovieApiException;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
-
-import org.fhmdb.fhmdb_lijunamatata.exceptions.MovieApiException;
 
 /**
  * MovieAPI class is responsible for fetching movie data from an external API.
@@ -59,6 +57,7 @@ public class MovieAPI {
      * @return A list of movies matching the filters, or an empty list if none are found.
      * @throws IOException If the API request fails.
      */
+    //TODO: Try-catch the error at the earliest? When do we catch?
     public List<Movie> fetchMovies(String query, Genre genre, Integer releaseYear, Double ratingFrom) throws IOException {
         String finalUrl = buildUrl(query, genre, releaseYear, ratingFrom);
         Request request = new Request.Builder()

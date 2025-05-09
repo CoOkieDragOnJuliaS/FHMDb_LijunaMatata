@@ -17,9 +17,18 @@ import java.util.stream.Collectors;
  * @date 14.02.2025
  */
 public class MovieService {
+    MovieAPI movieAPI;
 
     Logger logger = Logger.getLogger(MovieService.class.getName());
 
+    public MovieService() {
+        this.movieAPI = new MovieAPI();
+        //no args constructor
+    }
+
+    public MovieService(MovieAPI movieAPI) {
+        this.movieAPI = movieAPI;
+    }
     /**
      * Sorts the given list of movies either in ascending or descending order by title
      *
@@ -51,7 +60,8 @@ public class MovieService {
      */
     public List<Movie> fetchFilteredMovies(String searchText, Genre genre, Integer releaseYear,
                                            Double rating) throws IOException {
-        return new MovieAPI().fetchMovies(searchText, genre, releaseYear, rating);
+        System.out.println("filterMovies() invoked");
+        return this.movieAPI.fetchMovies(searchText, genre, releaseYear, rating);
     }
 
 

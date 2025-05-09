@@ -5,15 +5,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import org.fhmdb.fhmdb_lijunamatata.database.MovieEntity;
 import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 import org.fhmdb.fhmdb_lijunamatata.exceptions.MovieApiException;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
+import org.fhmdb.fhmdb_lijunamatata.repositories.WatchlistRepository;
 import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
 import org.fhmdb.fhmdb_lijunamatata.ui.MovieCell;
 import org.fhmdb.fhmdb_lijunamatata.utils.ClickEventHandler;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
@@ -57,10 +60,17 @@ public class FHMDbController {
 
     @FXML
     private Label statusLabel;
+
+    private ClickEventHandler<Movie> onAddToWatchlistClicked;
+    private ClickEventHandler<Movie> onRemoveFromWatchlistClicked;
+
     //Scheduler for delaying filtering with API after keypress
     private ScheduledExecutorService scheduler;
     //Filtering mechanism for filtering delayed
     private Runnable filterTask;
+
+    //WatchlistRepository
+    private WatchlistRepository watchlistRepository;
 
     Logger logger = Logger.getLogger(FHMDbController.class.getName());
 
@@ -69,29 +79,20 @@ public class FHMDbController {
      */
     public FHMDbController() {
         //No args constructor for initialization
-        this.movieService = new MovieService();
+        try {
+            this.movieService = new MovieService();
+            this.watchlistRepository = new WatchlistRepository();
+        }catch(DatabaseException sqlException) {
+            logger.severe(sqlException.getMessage());
+            updateStatusLabel("Access to Database was not successful!", true);
+        }
     }
 
-
-    //WatchlistActions with ClickEventHandler
-    /**
-     * Implementation of the ClickEventHandler to work as a intermediate layer between
-     * Data-Layer and UI-Layer --> the clickEventHandlers are then used in the constructor
-     * of the MovieCell below in the initialization method!
-     */
-    private final ClickEventHandler<Movie> onAddToWatchlistClicked =
-            (clickedMovie) -> {
-                //TODO: Implement logic to add to watchlist database --> with data layer
-                logger.info("Adding movie to watchlist: " + clickedMovie.getTitle());
-                updateStatusLabel("Added " + clickedMovie.getTitle() + " to Watchlist!", false);
-            };
-
-    private final ClickEventHandler<Movie> onRemoveFromWatchlistClicked =
-            (clickedMovie) -> {
-                //TODO: Implement logic to remove from watchlist database --> with data layer
-                logger.info("Removing movie from watchlist: " + clickedMovie.getTitle());
-                updateStatusLabel("Removed " + clickedMovie.getTitle() + " from Watchlist!", false);
-            };
+    //Constructor with Constructor Injection for testing
+    public FHMDbController(WatchlistRepository watchlistRepository, MovieService movieService) {
+        this.movieService = movieService;
+        this.watchlistRepository = watchlistRepository;
+    }
 
     /**
      * initializes the Controller by calling methods for initializing the elements of the class.
@@ -101,6 +102,7 @@ public class FHMDbController {
      */
     @FXML
     public void initialize() {
+        initializeClickHandlers();
         //initialize Labels
         initializeStatusLabel();
         //Sets the list of movies
@@ -114,6 +116,39 @@ public class FHMDbController {
         // Add listeners
         initializeListeners();
         initializeSchedulers();
+    }
+
+    /**
+     * Implementation of the ClickEventHandler to work as a intermediate layer between
+     * Data-Layer and UI-Layer --> the clickEventHandler is then used in the constructor
+     * of the MovieCell/or new scene below in the initialization method!
+     */
+    protected void initializeClickHandlers() {
+        onAddToWatchlistClicked =
+                (clickedMovie) -> {
+                    try {
+                        MovieEntity movieEntity = new MovieEntity(clickedMovie);
+                        watchlistRepository.addToWatchlist(movieEntity);
+                        logger.info("Adding movie to watchlist: " + clickedMovie.getTitle());
+                        updateStatusLabel("Added " + clickedMovie.getTitle() + " to Watchlist!", false);
+                    }catch(SQLException sqlException) {
+                        logger.severe(sqlException.getMessage());
+                        updateStatusLabel("Movie " + clickedMovie.getTitle() + " could not be added to the watchlist!", true);
+                    }
+                };
+
+        onRemoveFromWatchlistClicked =
+                (clickedMovie) -> {
+                    try {
+                        MovieEntity movieEntity = new MovieEntity(clickedMovie);
+                        watchlistRepository.removeFromWatchlist(movieEntity.getApiId());
+                        logger.info("Removing movie from watchlist: " + clickedMovie.getTitle());
+                        updateStatusLabel("Removed " + clickedMovie.getTitle() + " from Watchlist!", false);
+                    }catch(SQLException sqlException) {
+                        logger.severe(sqlException.getMessage());
+                        updateStatusLabel("Movie " + clickedMovie.getTitle() + " could not be added to the watchlist!", true);
+                    }
+                };
     }
 
     /**
@@ -185,10 +220,10 @@ public class FHMDbController {
             updateStatusLabel("", false);
         } catch (MovieApiException e) {
             updateStatusLabel("API-Fehler: " + e.getMessage(), true);
-            e.printStackTrace();
+            logger.severe(e.getMessage());
         } catch (DatabaseException e) {
             updateStatusLabel("Datenbankfehler: " + e.getMessage(), true);
-            e.printStackTrace();
+            logger.severe(e.getMessage());
         }
         // TODO Movie.initializeMovies() ???  updateStatusLabel ???
         catch (IOException e) {
@@ -309,10 +344,10 @@ public class FHMDbController {
             updateMovieListView();
         }  catch (MovieApiException e) {
             updateStatusLabel("API-error: " + e.getMessage(), true);
-            e.printStackTrace();
+            logger.severe(e.getMessage());
         } catch (DatabaseException e) {
             updateStatusLabel("Database error:: " + e.getMessage(), true);
-            e.printStackTrace();
+            logger.severe(e.getMessage());
         } catch (IOException e) {
             // TODO  updateStatusLabel???
             throw new RuntimeException(e);
@@ -373,7 +408,6 @@ public class FHMDbController {
         }
     }
 
-    //TODO: Discuss if method for testing is relevant?
     public void setFilterElements(String searchText, Genre genre, int releaseYear, double rating) {
         this.searchText = searchText;
         this.genre = genre;

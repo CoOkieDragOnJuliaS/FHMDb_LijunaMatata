@@ -5,6 +5,7 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import org.fhmdb.fhmdb_lijunamatata.database.DatabaseManager;
 import org.fhmdb.fhmdb_lijunamatata.database.MovieEntity;
 import org.fhmdb.fhmdb_lijunamatata.database.WatchlistMovieEntity;
+import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -20,8 +21,13 @@ public class WatchlistRepository {
      * Constructor that initializes the WatchlistRepository by obtaining the DAO instance.
      * @throws SQLException if database access fails
      */
-    public WatchlistRepository() throws SQLException {
-        this.watchlistDao = DatabaseManager.getDatabaseManager().getWatchlistDao();
+    public WatchlistRepository() {
+        try {
+            this.watchlistDao = DatabaseManager.getDatabaseManager().getWatchlistDao();
+        }catch(SQLException e) {
+            //TODO: Catching the Exception the earliest?
+            throw new DatabaseException(e.getMessage());
+        }
     }
 
     /**
