@@ -366,8 +366,11 @@ public class FHMDbController {
             // and add the filtered results to the filteredMovies list
             this.filteredMovies = FXCollections.observableList(this.movieService.fetchFilteredMovies(
                     this.searchText, this.genre, this.releaseYear, this.rating));
-            updateMovieListView();
-            updateMovieListView();
+            //New updateMovieListView call with null check
+            updateMovieListView(this.searchText, this.genre!=null ? this.genre.name() : "",
+                    this.releaseYear!= null ? this.releaseYear : 0,
+                    this.rating!=null ? this.rating : 0);
+
         } catch (MovieApiException e) {
             updateStatusLabel("API-error: " + e.getMessage(), true);
             logger.severe(e.getMessage());
