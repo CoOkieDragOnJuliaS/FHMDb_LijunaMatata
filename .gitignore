@@ -1,5 +1,6 @@
 # Ignore the entire 'db' folder and all its contents
 db/
+db/moviesdb.mv.db
 
 target/
 !.mvn/wrapper/maven-wrapper.jar
