@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import org.fhmdb.fhmdb_lijunamatata.exceptions.MovieApiException;
+
 /**
  * MovieAPI class is responsible for fetching movie data from an external API.
  * It handles building API request URLs, making HTTP requests, and parsing JSON responses into movie objects.
@@ -102,7 +104,8 @@ public class MovieAPI {
      */
     private List<Movie> parseResponse(Response response) throws IOException {
         if (!response.isSuccessful() || response.body() == null) {
-            HttpExceptionHandler.handle(response);
+            throw new MovieApiException("Error fetching movies: HTTP " + response.code());
+            // HttpExceptionHandler.handle(response);
         }
 
         assert response.body() != null;

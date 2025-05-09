@@ -5,6 +5,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
+import org.fhmdb.fhmdb_lijunamatata.exceptions.MovieApiException;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
@@ -181,9 +183,16 @@ public class FHMDbController {
             this.movies = FXCollections.observableArrayList(Movie.initializeMovies());
             this.filteredMovies = FXCollections.observableArrayList(this.movies);
             updateStatusLabel("", false);
-        } catch (IOException e) {
-            updateStatusLabel("Error loading movies!", true);
+        } catch (MovieApiException e) {
+            updateStatusLabel("API-Fehler: " + e.getMessage(), true);
             e.printStackTrace();
+        } catch (DatabaseException e) {
+            updateStatusLabel("Datenbankfehler: " + e.getMessage(), true);
+            e.printStackTrace();
+        }
+        // TODO Movie.initializeMovies() ???  updateStatusLabel ???
+        catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
     }
@@ -209,8 +218,8 @@ public class FHMDbController {
         releaseYearOptions.add(null);
         if (filteredMovies != null && !filteredMovies.isEmpty()) {
             List<Integer> years = filteredMovies.stream() //convert to stream for processing
+                    .filter(Objects::nonNull) //safety check to remove any null objects
                     .map(Movie::getReleaseYear) //get only release year of each movie
-                    .filter(Objects::nonNull) //safety check to remove any null years
                     .distinct() //keep only unique years
                     .sorted() //ascending
                     .toList(); //convert back to list
@@ -228,8 +237,8 @@ public class FHMDbController {
         ratingOptions.add(null);
         if (filteredMovies != null && !filteredMovies.isEmpty()) {
             List<Double> ratings = filteredMovies.stream() //convert to stream for processing
+                    .filter(Objects::nonNull) //safety check to remove any null objects
                     .map(Movie::getRating) //get only rating of each movie
-                    .filter(Objects::nonNull) //safety check to remove any null ratings
                     .distinct() //keep only unique ratings
                     .sorted() //ascending
                     .toList(); //convert back to list
@@ -298,9 +307,15 @@ public class FHMDbController {
             this.filteredMovies = FXCollections.observableList(this.movieService.fetchFilteredMovies(
                     this.searchText, this.genre, this.releaseYear, this.rating));
             updateMovieListView();
-        } catch (IOException | NullPointerException e) {
-            updateStatusLabel("Error loading movies!", true);
+        }  catch (MovieApiException e) {
+            updateStatusLabel("API-error: " + e.getMessage(), true);
             e.printStackTrace();
+        } catch (DatabaseException e) {
+            updateStatusLabel("Database error:: " + e.getMessage(), true);
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO  updateStatusLabel???
+            throw new RuntimeException(e);
         }
     }
 
