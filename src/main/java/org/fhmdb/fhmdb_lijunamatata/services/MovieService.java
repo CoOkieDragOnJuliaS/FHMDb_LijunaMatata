@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
  * @date 14.02.2025
  */
 public class MovieService {
+    MovieAPI movieAPI;
 
     Logger logger = Logger.getLogger(MovieService.class.getName());
-    private final MovieAPI movieAPI;
 
     public MovieService() {
         this.movieAPI = new MovieAPI();
-        //no parameter constructor
+        //no args constructor
     }
 
     public MovieService(MovieAPI movieAPI) {
@@ -60,7 +60,8 @@ public class MovieService {
      */
     public List<Movie> fetchFilteredMovies(String searchText, Genre genre, Integer releaseYear,
                                            Double rating) throws IOException {
-        return movieAPI.fetchMovies(searchText, genre, releaseYear, rating);
+        System.out.println("filterMovies() invoked");
+        return this.movieAPI.fetchMovies(searchText, genre, releaseYear, rating);
     }
 
 

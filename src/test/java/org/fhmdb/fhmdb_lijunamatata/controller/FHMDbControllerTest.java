@@ -1,16 +1,20 @@
 package org.fhmdb.fhmdb_lijunamatata.controller;
 
+import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
+import org.fhmdb.fhmdb_lijunamatata.repositories.WatchlistRepository;
 import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
+import org.fhmdb.fhmdb_lijunamatata.utils.ClickEventHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -27,12 +31,14 @@ public class FHMDbControllerTest {
     @Mock
     private MovieService movieService;
 
+    private WatchlistRepository watchlistRepository;
+
     /*For fields annotated with @InjectMocks, Mockito creates an instance of the class and then tries to inject the
     mock objects (created in the previous step) into the constructor, fields, or setter methods of that instance.
     The injection is based on type matching: if a field or constructor parameter has a type that matches the type of
      a mock object, Mockito will inject the mock into that field or parameter.
      */
-    @InjectMocks
+    //Update 09.05.2025 --> @InjectMocks not needed because of Constructor Injection
     private FHMDbController movieController;
 
     List<Movie> initialMovies;
@@ -50,12 +56,78 @@ public class FHMDbControllerTest {
         //Testing with the initialized movies from testbaste in Movie class
         //The controller does not know about the MovieAPI
         initialMovies = Movie.initializeMoviesTestbase();
+        try {
+            watchlistRepository = new WatchlistRepository();
+        }catch(DatabaseException e) {
+            logger.severe(e.getMessage());
+        }
+
+        //spying on the watchlistRepository to verify calls
+        watchlistRepository = spy(watchlistRepository);
+
+        movieController = new FHMDbController(watchlistRepository, movieService);
+        //Creating a spy (mocked object) before making calls to the controller itself
+        movieController = spy(movieController);
 
         movieController.setMovies(initialMovies);
+        //Try to mock updateStatusLabel to isolate tests and interaction with JavaFX UI
+        doNothing().when(movieController).updateStatusLabel(anyString(), anyBoolean());
 
+        initializeOnAddToWatchlistField();
+        initializeOnRemoveToWatchlistField();
+        // Call initializeHandlers to set lambdas after repo is assigned/spied
+        movieController.initializeClickHandlers();
         //Update: Mocking the Buttons e.g. does not work because Mockito is not able to mock JavaFX private elements or final classes
         //Avoiding the UI elements and focusing on the testing of logic in the method is necessary
         //Another solution (maybe later purposes) is using WrapperClasses to wrap around the JavaFX elements needed to moc
+    }
+
+    /**
+     * Initializes the ClickEventHandler for adding a movie to the watchlist.
+     *  * <p>
+     *  * This method creates and assigns a {@link ClickEventHandler} lambda to the
+     *  * {@code onAddToWatchlistClicked} field. The handler updates the status label
+     *  * for testing purposes.
+     *  * </p>
+     *  * <p>
+     *  * This method is a mirrored test-initialization which is normally used
+     *  * in the application itself when the correct button is clicked.
+     *  * </p>
+     */
+    private void initializeOnAddToWatchlistField() {
+        try {
+            Field addToWatchlistField = FHMDbController.class.getDeclaredField("onAddToWatchlistClicked");
+            addToWatchlistField.setAccessible(true);
+
+            ClickEventHandler<Movie> testHandler = movie -> {
+                movieController.updateStatusLabel("Added " + movie.getTitle() + " to Watchlist!", false);
+            };
+            addToWatchlistField.set(movieController, testHandler);
+        }catch(NoSuchFieldException | IllegalAccessException e) {
+            throw new AssertionError(e);
+        }
+    }
+
+    /**
+     * Initializes the ClickEventHandler for removing a movie from the watchlist.
+     *  * <p>
+     *  * This method creates and assigns a {@link ClickEventHandler} lambda to the
+     *  * {@code onRemoveFromWatchlistClicked} field. The handler updates the status label
+     *  * for testing purposes.
+     *  * </p>
+     */
+    private void initializeOnRemoveToWatchlistField() {
+        try {
+            Field removeFromWatchlistField = FHMDbController.class.getDeclaredField("onRemoveFromWatchlistClicked");
+            removeFromWatchlistField.setAccessible(true);
+
+            ClickEventHandler<Movie> testHandler = movie -> {
+                movieController.updateStatusLabel("Removed " + movie.getTitle() + " from Watchlist!", false);
+            };
+            removeFromWatchlistField.set(movieController, testHandler);
+        }catch(NoSuchFieldException | IllegalAccessException e) {
+            throw new AssertionError(e);
+        }
     }
 
     @Test
@@ -107,8 +179,8 @@ public class FHMDbControllerTest {
         /*The verify() method in Mockito is used to confirm that a specific method was called on a mock object during
         the execution of your test. */
         try {
-            verify(movieService).fetchFilteredMovies(any(), any(), any(), any());
-        }catch(IOException e) {
+            verify(movieService, times(1)).fetchFilteredMovies(any(), any(), any(), any());
+        } catch (IOException e) {
             logger.severe(e.getMessage());
         }
     }
@@ -123,7 +195,79 @@ public class FHMDbControllerTest {
         the execution of your test. */
         try {
             verify(movieService).fetchFilteredMovies(anyString(), any(Genre.class), anyInt(), anyDouble());
-        }catch(IOException e) {
+        } catch (IOException e) {
+            logger.severe(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("Testing of onAddToWatchlistClicked method")
+    public void onAddToWatchlistClicked_methodCall() {
+        Movie dummyMovie = new Movie();
+        try {
+            //A field with the name onAddToWatchlistClicked is searched for and stored in the Field variable
+            Field addToWatchlistField = FHMDbController.class.getDeclaredField("onAddToWatchlistClicked");
+            //setAccessible(true) indicates that, even though the method is private in the Controller, it makes it testable
+            addToWatchlistField.setAccessible(true);
+            //get the current/actual value of the field declared above from the movieController instance
+            Object onAddToWatchlistClicked = addToWatchlistField.get(movieController);
+
+            dummyMovie = new Movie("test-id", "test-name", List.of(Genre.ACTION, Genre.DRAMA), 2023, "Ein neuer Film",
+                    "fake_url", 120, List.of("Director Name"), List.of("Writer Name"), List.of("Main Cast Name"), 1.0);
+
+            //Execution of ClickEventHandler and simulating a UI handled click
+            if(onAddToWatchlistClicked instanceof ClickEventHandler) {
+                ((ClickEventHandler<Movie>) onAddToWatchlistClicked).onClick(dummyMovie);
+            }else {
+                throw new AssertionError("onAddToWatchlistClicked() is not a ClickEventHandler");
+            }
+        } catch (NoSuchFieldException | IllegalAccessException exception) {
+            logger.severe(exception.getMessage());
+        }
+
+        //verify updateStatusLabel was called
+        verify(movieController).updateStatusLabel("Added " + dummyMovie.getTitle() + " to Watchlist!", false);
+
+        //Creating the MovieEntity and verify the update to the add
+        try {
+            Movie finalDummyMovie = dummyMovie;
+            verify(watchlistRepository).addToWatchlist(argThat(movieEntity ->
+                    movieEntity.getApiId().equals(finalDummyMovie.getId())));
+        }catch (SQLException e) {
+            logger.severe(e.getMessage());
+        }
+    }
+
+
+    @Test
+    @DisplayName("Testing of onRemoveFromWatchlistClicked method")
+    public void onRemoveFromWatchlistClicked_methodCall() {
+        Movie dummyMovie = new Movie();
+        try {
+            Field removeFromWatchlistField = FHMDbController.class.getDeclaredField("onRemoveFromWatchlistClicked");
+            removeFromWatchlistField.setAccessible(true);
+            Object onRemoveFromWatchlistClicked = removeFromWatchlistField.get(movieController);
+
+            dummyMovie = new Movie("test-id", "test-name", List.of(Genre.ACTION, Genre.DRAMA), 2023, "Ein neuer Film",
+                    "fake_url", 120, List.of("Director Name"), List.of("Writer Name"), List.of("Main Cast Name"), 1.0);
+
+            //Execution of ClickEventHandler and simulating a UI handled click
+            if(onRemoveFromWatchlistClicked instanceof ClickEventHandler) {
+                ((ClickEventHandler<Movie>) onRemoveFromWatchlistClicked).onClick(dummyMovie);
+            }else {
+                throw new AssertionError("onRemoveFromWatchlistClicked() is not a ClickEventHandler");
+            }
+        } catch (NoSuchFieldException | IllegalAccessException exception) {
+            logger.severe(exception.getMessage());
+        }
+
+        //verify updateStatusLabel was called
+        verify(movieController).updateStatusLabel("Removed " + dummyMovie.getTitle() + " from Watchlist!", false);
+
+        //Creating the MovieEntity and verify the update to the add
+        try {
+            verify(watchlistRepository).removeFromWatchlist(dummyMovie.getId());
+        }catch (SQLException e) {
             logger.severe(e.getMessage());
         }
     }

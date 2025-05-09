@@ -4,6 +4,7 @@ import okhttp3.Response;
 import java.io.IOException;
 
 
+
 /**
  * Utility class for handling HTTP errors based on response status codes.
  */
