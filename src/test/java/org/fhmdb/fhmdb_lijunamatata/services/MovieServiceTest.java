@@ -4,25 +4,20 @@ import okhttp3.mockwebserver.MockWebServer;
 import org.fhmdb.fhmdb_lijunamatata.api.MovieAPI;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test class for MovieService functionality.
- * Uses MockWebServer to simulate API responses and test movie filtering and sorting operations.
+ * Unit tests for the MovieService class.
+ * Uses a mock API to verify filtering, sorting, and analytical methods.
  */
 public class MovieServiceTest {
     Logger logger = Logger.getLogger(MovieServiceTest.class.getName());
@@ -33,8 +28,8 @@ public class MovieServiceTest {
     private static List<Movie> movies;
 
     /**
-     * Sets up the test environment before each test.
-     * Initializes MockWebServer, MovieAPI, and MovieService with test data.
+     * Initialize mock web server and override MovieAPI base URL for tests.
+     * Handles IOException and logs any setup failures.
      */
     @BeforeEach
     void setUp() {
@@ -42,6 +37,7 @@ public class MovieServiceTest {
             mockWebServer = new MockWebServer();
             mockWebServer.start();
 
+            // Override getBaseUrl to return the mock URL
             movieAPI = new MovieAPI() {
                 @Override
                 protected String getBaseUrl() {
@@ -50,14 +46,14 @@ public class MovieServiceTest {
             };
 
             movieService = new MovieService(movieAPI);
-            setDispatcher();
+            setDispatcher(); // Loads test JSON data
         } catch (IOException e) {
-            System.err.println(e.getMessage());
+            logger.severe("Setup failed: " + e.getMessage());
         }
     }
 
     /**
-     * Cleans up resources after each test.
+     * Shutdown the mock web server after each test to avoid port binding issues.
      */
     @AfterEach
     void tearDown() throws IOException {
@@ -67,7 +63,8 @@ public class MovieServiceTest {
     }
 
     /**
-     * Fetches all movies from the API and sorts them by title.
+     * Fetches and sorts movies by title.
+     * If fetching fails, logs the exception and proceeds with empty list.
      */
     private void fetchAllMovies() {
         try {
@@ -76,24 +73,26 @@ public class MovieServiceTest {
                 movies.sort(Comparator.comparing(Movie::getTitle));
             }
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            logger.severe("Error fetching movies: " + e.getMessage());
         }
     }
 
     /**
-     * Helper method to fetch filtered movies based on various criteria.
+     * Wrapper for fetchFilteredMovies with runtime exception on failure.
+     * This is helpful in tests where checked exceptions are not ideal.
      */
     private List<Movie> fetchFilteredMovies(String query, Genre genre, Integer releaseYear, Double ratingFrom) {
         try {
             return movieService.fetchFilteredMovies(query, genre, releaseYear, ratingFrom);
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            throw new RuntimeException("Failed to fetch movies: " + e.getMessage());
+        } catch (Exception e) {
+            logger.severe("Filtering failed: " + e.getMessage());
+            throw new RuntimeException(e); // throws unchecked to fail fast
         }
     }
 
     /**
-     * Sets up the mock dispatcher with test data from JSON file.
+     * Loads JSON from resource file and sets dispatcher for mock responses.
+     * Throws RuntimeException if test data is missing.
      */
     private void setDispatcher() {
         String jsonResponse = getJsonResponse();
@@ -101,12 +100,13 @@ public class MovieServiceTest {
             mockWebServer.setDispatcher(new MovieDispatcher(jsonResponse));
             fetchAllMovies();
         } else {
-            throw new RuntimeException("Failed to load test data");
+            throw new RuntimeException("Test JSON data not found");
         }
     }
 
     /**
-     * Loads test movie data from JSON file.
+     * Loads mock movie data from a JSON test file.
+     * Handles IOException and returns null if file is not found.
      */
     private static String getJsonResponse() {
         String path = "org.fhmdb.fhmdb_lijunamatata/jsonMovieResponse.txt";
@@ -117,185 +117,110 @@ public class MovieServiceTest {
             }
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            System.err.println("Error reading JSON from file: " + e.getMessage());
+            System.err.println("Failed to read test data: " + e.getMessage());
             return null;
         }
     }
 
-    /**
-     * Tests if movies are correctly sorted in ascending order by title.
-     */
+    // === TEST CASES ===
+
     @Test
-    @DisplayName("Test sorting in ascending order")
+    @DisplayName("Should sort movies ascending by title")
     public void testSortMoviesAscending() {
-        List<String> expectedTitles = List.of(
-                "Bibibap",
-                "Inception",
-                "Parasite",
-                "The Matrix",
-                "The Shawshank Redemption"
-        );
-        List<Movie> testMovies = new ArrayList<>(movies);
-        List<Movie> sortedMovies = movieService.sortMovies(testMovies, true);
-        List<String> sortedTitles = sortedMovies.stream().map(Movie::getTitle).collect(Collectors.toList());
-        assertEquals(expectedTitles, sortedTitles, "Movies should be sorted in ascending order by title");
+        List<String> expected = List.of("Bibibap", "Inception", "Parasite", "The Matrix", "The Shawshank Redemption");
+        List<String> actual = movieService.sortMovies(new ArrayList<>(movies), true).stream()
+                .map(Movie::getTitle).toList();
+        assertEquals(expected, actual);
     }
 
-    /**
-     * Tests if movies are correctly sorted in descending order by title.
-     */
     @Test
-    @DisplayName("Test sorting in descending order")
-    void testSortMoviesDescending() {
-        List<String> expectedTitles = List.of(
-                "The Shawshank Redemption",
-                "The Matrix",
-                "Parasite",
-                "Inception",
-                "Bibibap"
-        );
-
-        List<Movie> testMovies = new ArrayList<>(movies);
-        List<Movie> sortedMovies = movieService.sortMovies(testMovies, false);
-        List<String> sortedTitles = sortedMovies.stream().map(Movie::getTitle).collect(Collectors.toList());
-        assertEquals(expectedTitles, sortedTitles, "Movies should be sorted in descending order by title");
+    @DisplayName("Should sort movies descending by title")
+    public void testSortMoviesDescending() {
+        List<String> expected = List.of("The Shawshank Redemption", "The Matrix", "Parasite", "Inception", "Bibibap");
+        List<String> actual = movieService.sortMovies(new ArrayList<>(movies), false).stream()
+                .map(Movie::getTitle).toList();
+        assertEquals(expected, actual);
     }
 
-    /**
-     * Tests if movies are correctly filtered by genre (DRAMA).
-     */
     @Test
-    @DisplayName("Test filtering by genre DRAMA")
-    void testFilterMoviesByGenre() {
-        List<String> expectedTitles = List.of(
-                "Bibibap",
-                "Parasite",
-                "The Shawshank Redemption"
-        );
-        List<Movie> filteredMovies = fetchFilteredMovies("", Genre.DRAMA, null, null);
-        List<String> filteredTitles = filteredMovies.stream().map(Movie::getTitle).sorted().collect(Collectors.toList());
-        assertEquals(expectedTitles, filteredTitles, "Filtering by DRAMA should return correct movies");
+    @DisplayName("Should filter by DRAMA genre")
+    public void testFilterMoviesByGenre() {
+        List<String> expected = List.of("Bibibap", "Parasite", "The Shawshank Redemption");
+        List<String> actual = fetchFilteredMovies("", Genre.DRAMA, null, null)
+                .stream().map(Movie::getTitle).sorted().toList();
+        assertEquals(expected, actual);
     }
 
-    /**
-     * Tests if movies are correctly filtered by search text.
-     */
     @Test
-    @DisplayName("Test filtering by search text")
-    void testFilterMoviesBySearchText() {
-        List<String> expectedTitles = List.of(
-                "The Matrix"
-        );
-
-        List<Movie> filteredMovies = fetchFilteredMovies("pu", null, null, null);
-        List<String> filteredTitles = filteredMovies.stream().map(Movie::getTitle).collect(Collectors.toList());
-        assertEquals(expectedTitles, filteredTitles, "Filtering by 'pu' should return 'The Matrix'");
+    @DisplayName("Should filter by search text 'pu'")
+    public void testFilterMoviesBySearchText() {
+        List<String> expected = List.of("The Matrix");
+        List<String> actual = fetchFilteredMovies("pu", null, null, null).stream()
+                .map(Movie::getTitle).toList();
+        assertEquals(expected, actual);
     }
 
-    /**
-     * Tests if movies are correctly filtered by both search text and genre.
-     */
     @Test
-    @DisplayName("Test filtering by search text 'real' and genre Action")
-    void testFilterMoviesBySearchTextAndGenre() {
-        List<String> expectedTitles = List.of(
-                "The Matrix"
-        );
-
-        List<Movie> filteredMovies = fetchFilteredMovies("real", Genre.ACTION, null, null);
-        List<String> filteredTitles = filteredMovies.stream().map(Movie::getTitle).collect(Collectors.toList());
-        assertEquals(expectedTitles, filteredTitles, "Filtering by 'real' and ACTION should return correct movies");
+    @DisplayName("Should filter by text 'real' and genre ACTION")
+    public void testFilterMoviesByTextAndGenre() {
+        List<String> expected = List.of("The Matrix");
+        List<String> actual = fetchFilteredMovies("real", Genre.ACTION, null, null).stream()
+                .map(Movie::getTitle).toList();
+        assertEquals(expected, actual);
     }
 
-    /**
-     * Tests if all movies are returned when search text is empty.
-     */
     @Test
-    @DisplayName("Test filtering with empty search text")
-    void testFilterMoviesWithEmptySearchText() {
+    @DisplayName("Empty query returns all movies")
+    public void testEmptySearchTextReturnsAll() {
         fetchAllMovies();
-        List<Movie> filteredMovies = fetchFilteredMovies("", null, null, null);
-        filteredMovies.sort(Comparator.comparing(Movie::getTitle));
-        assertEquals(movies, filteredMovies, "All movies should be returned when search text is empty");
+        List<Movie> result = fetchFilteredMovies("", null, null, null);
+        result.sort(Comparator.comparing(Movie::getTitle));
+        assertEquals(movies, result);
     }
 
-    /**
-     * Tests if all movies are returned when search text is null.
-     */
     @Test
-    @DisplayName("Test filtering with null search text")
-    void testFilterMoviesWithNullSearchText() {
+    @DisplayName("Null query returns all movies")
+    public void testNullSearchTextReturnsAll() {
         fetchAllMovies();
-        List<Movie> filteredMovies = fetchFilteredMovies(null, null, null, null);
-        filteredMovies.sort(Comparator.comparing(Movie::getTitle));
-        assertEquals(movies, filteredMovies, "All movies should be returned when search text is null");
+        List<Movie> result = fetchFilteredMovies(null, null, null, null);
+        result.sort(Comparator.comparing(Movie::getTitle));
+        assertEquals(movies, result);
     }
 
-    /**
-     * Tests if sorting an empty movie list returns an empty list.
-     */
     @Test
-    @DisplayName("Test sorting movies with an empty list")
-    void testSortMoviesWithEmptyList() {
-        List<Movie> expectedMovies = new ArrayList<>();
-        List<Movie> emptyMovies = new ArrayList<>();
-        List<Movie> sortedMovies = movieService.sortMovies(emptyMovies, true);
-        assertEquals(expectedMovies, sortedMovies, "Sorting an empty list should return an empty list");
+    @DisplayName("Sorting empty list returns empty list")
+    public void testSortEmptyList() {
+        assertEquals(List.of(), movieService.sortMovies(List.of(), true));
     }
 
-    /**
-     * Tests if the most frequent actor is correctly identified.
-     */
     @Test
-    @DisplayName("Test to get the most frequent actor of a list of movies")
-    void testGetMostFrequentActor() {
+    @DisplayName("Should return most frequent actor")
+    public void testMostPopularActor() {
         fetchAllMovies();
-        String expectedActor = "Leonardo DiCaprio";
-        List<Movie> actualMovies = new ArrayList<>(movies);
-        assertEquals(expectedActor, movieService.getMostPopularActor(actualMovies));
+        assertEquals("Leonardo DiCaprio", movieService.getMostPopularActor(movies));
     }
 
-    /**
-     * Tests if the longest movie title length is correctly calculated.
-     */
     @Test
-    @DisplayName("Test to get the longest movie title of a list of movies")
-    void testGetLongestMovieTitle() {
+    @DisplayName("Should return length of longest movie title")
+    public void testLongestMovieTitle() {
         fetchAllMovies();
-        String expectedMovieTitle = "The Shawshank Redemption";
-        List<Movie> actualMovies = new ArrayList<>(movies);
-        assertEquals(expectedMovieTitle.length(), movieService.getLongestMovieTitle(actualMovies));
+        assertEquals("The Shawshank Redemption".length(), movieService.getLongestMovieTitle(movies));
     }
 
-    /**
-     * Tests if the count of movies by a specific director is correct.
-     */
     @Test
-    @DisplayName("Test to get the count of movies from a specific director")
-    void testGetCountOfMoviesFromDirector() {
+    @DisplayName("Should count movies from Christopher Nolan")
+    public void testMoviesFromDirector() {
         fetchAllMovies();
-        int expectedCount = 1;
-        logger.info("Christopher Nolan did in the testMovieDatabase 1 movie, Inception!");
-        List<Movie> actualMovies = new ArrayList<>(movies);
-        assertEquals(expectedCount, movieService.countMoviesFromDirector(actualMovies, "Christopher Nolan"));
+        assertEquals(1, movieService.countMoviesFromDirector(movies, "Christopher Nolan"));
     }
 
-    /**
-     * Tests if movies are correctly filtered by release year range.
-     */
     @Test
-    @DisplayName("Test to get the movies between 2 specific years")
-    void testGetMoviesBetweenTwoYears() {
+    @DisplayName("Should return movies between 2010 and 2019")
+    public void testMoviesBetweenYears() {
         fetchAllMovies();
-        List<String> expectedTitles = List.of(
-                "Bibibap",
-                "Inception",
-                "Parasite"
-        );
-
-        List<Movie> actualMovies = new ArrayList<>(movies);
-        List<Movie> filteredMovies = movieService.getMoviesBetweenYears(actualMovies, 2010, 2019);
-        List<String> filteredTitles = filteredMovies.stream().map(Movie::getTitle).collect(Collectors.toList());
-        assertEquals(expectedTitles, filteredTitles);
+        List<String> expected = List.of("Bibibap", "Inception", "Parasite");
+        List<String> actual = movieService.getMoviesBetweenYears(movies, 2010, 2019)
+                .stream().map(Movie::getTitle).toList();
+        assertEquals(expected, actual);
     }
 }

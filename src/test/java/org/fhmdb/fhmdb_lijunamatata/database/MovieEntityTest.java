@@ -1,5 +1,6 @@
 package org.fhmdb.fhmdb_lijunamatata.database;
 
+import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.junit.jupiter.api.BeforeAll;
@@ -201,10 +202,11 @@ public class MovieEntityTest {
         }
 
         @Test
-        @DisplayName("Test stringToGenre: invalid string throws exception")
+        @DisplayName("Test stringToGenre: invalid string throws DatabaseException")
         public void testStringToGenre_invalid_throws_exception() {
-            String testString = "THILLER";
-            assertThrows(IllegalArgumentException.class, () -> MovieEntity.stringToGenre(testString));
+            String testString = "THILLER";  // Invalid genre
+            assertThrows(DatabaseException.class, () -> MovieEntity.stringToGenre(testString));
         }
+
     }
 }

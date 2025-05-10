@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.fhmdb.fhmdb_lijunamatata.controller.FHMDbController;
 import org.fhmdb.fhmdb_lijunamatata.database.DatabaseManager;
+import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -35,9 +36,11 @@ public class FHMDbApplication extends Application {
         //for testing: delete after moving database initialization to actual position
         try {
             DatabaseManager.getDatabaseManager();
-        } catch(SQLException e){
-
+        } catch (DatabaseException e) {
+            // Optional: log or show a message if needed
+            System.err.println("Failed to initialize DB: " + e.getMessage());
         }
+
     }
 
     @Override
