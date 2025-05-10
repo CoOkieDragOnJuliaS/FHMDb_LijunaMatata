@@ -2,6 +2,7 @@ package org.fhmdb.fhmdb_lijunamatata.database;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 
@@ -134,12 +135,11 @@ public class MovieEntity {
                 .collect(Collectors.joining(", ")); //join genres by comma
     }
 
-    protected static Genre stringToGenre(String genreString) throws IllegalArgumentException {
+    protected static Genre stringToGenre(String genreString) {
         try {
             return Genre.valueOf(genreString.trim().toUpperCase().replace(" ", "_"));
         } catch (IllegalArgumentException e) {
-        //    throw new DatabaseException("Invalid genre: " + genreString, e);
-            throw e;
+            throw new DatabaseException("Invalid genre: " + genreString, e);
         }
     }
 
@@ -154,7 +154,7 @@ public class MovieEntity {
                     .map(MovieEntity::stringToGenre) //convert each string to GENRE enum
                     .collect(Collectors.toList());
         } catch (IllegalArgumentException e) {
-            throw e;
+            throw new DatabaseException("Failed to parse genre list: '" + genresString + "'", e);
         }
     }
 

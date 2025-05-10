@@ -16,7 +16,6 @@ import org.fhmdb.fhmdb_lijunamatata.ui.MovieCell;
 import org.fhmdb.fhmdb_lijunamatata.utils.ClickEventHandler;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
@@ -132,8 +131,8 @@ public class FHMDbController {
                         watchlistRepository.addToWatchlist(movieEntity);
                         logger.info("Adding movie to watchlist: " + clickedMovie.getTitle());
                         updateStatusLabel("Added " + clickedMovie.getTitle() + " to Watchlist!", false);
-                    }catch(SQLException sqlException) {
-                        logger.severe(sqlException.getMessage());
+                    }catch(DatabaseException dbException) {
+                        logger.severe(dbException.getMessage());
                         updateStatusLabel("Movie " + clickedMovie.getTitle() + " could not be added to the watchlist!", true);
                     }
                 };
@@ -145,8 +144,8 @@ public class FHMDbController {
                         watchlistRepository.removeFromWatchlist(movieEntity.getApiId());
                         logger.info("Removing movie from watchlist: " + clickedMovie.getTitle());
                         updateStatusLabel("Removed " + clickedMovie.getTitle() + " from Watchlist!", false);
-                    }catch(SQLException sqlException) {
-                        logger.severe(sqlException.getMessage());
+                    }catch(DatabaseException dbException) {
+                        logger.severe(dbException.getMessage());
                         updateStatusLabel("Movie " + clickedMovie.getTitle() + " could not be added to the watchlist!", true);
                     }
                 };
@@ -226,7 +225,6 @@ public class FHMDbController {
             updateStatusLabel("Datenbankfehler: " + e.getMessage(), true);
             logger.severe(e.getMessage());
         }
-        // TODO Movie.initializeMovies() ???  updateStatusLabel ???
         catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -377,9 +375,6 @@ public class FHMDbController {
         } catch (DatabaseException e) {
             updateStatusLabel("Database error:: " + e.getMessage(), true);
             logger.severe(e.getMessage());
-        } catch (IOException e) {
-            // TODO  updateStatusLabel???
-            throw new RuntimeException(e);
         }
     }
 

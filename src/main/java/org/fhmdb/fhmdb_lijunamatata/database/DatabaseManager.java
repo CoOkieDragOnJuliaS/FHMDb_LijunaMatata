@@ -5,6 +5,7 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
+import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 import org.h2.tools.Server;
 
 import java.sql.SQLException;
@@ -23,15 +24,20 @@ public class DatabaseManager {
      * @throws SQLException
      */
     protected static void startH2Console() throws SQLException {
-        Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
-        System.out.println("H2 Console: http://localhost:8082");
+        try {
+            Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
+            System.out.println("H2 Console: http://localhost:8082");
+        } catch (SQLException e) {
+            // Wrap H2 startup issues in a higher-level custom exception
+            throw new DatabaseException("Failed to start H2 console", e);
+        }
     }
 
     /**
      * initializes connectionSource, H2console, DAOs and tables
      * @throws SQLException
      */
-    private DatabaseManager() throws SQLException{
+    private DatabaseManager() {
         try {
             createConnectionSource();
             startH2Console();
@@ -39,17 +45,16 @@ public class DatabaseManager {
             watchlistDao = DaoManager.createDao(connectionSource, WatchlistMovieEntity.class);
             createTables();
         } catch (SQLException e) {
-            throw new SQLException();
-            //throw new DatabaseException("Error while constructing DatabaseManager", e);
+            // Wrap low-level SQLException into a custom unchecked DatabaseException
+            throw new DatabaseException("Failed to initialize DatabaseManager", e);
         }
     }
 
     /**
-     * initializes DatabaseManager object, if it doesn't exist yet. Otherwise it returns the current instance
-     * @return DatabaseManager
-     * @throws SQLException
+     * Initializes the DatabaseManager singleton instance.
+     * @return DatabaseManager instance
      */
-    public static DatabaseManager getDatabaseManager() throws SQLException{
+    public static DatabaseManager getDatabaseManager() {
         if (instance == null) {
             instance = new DatabaseManager();
         }
@@ -61,8 +66,13 @@ public class DatabaseManager {
      * @throws SQLException
      */
     protected static void createTables() throws SQLException{
-        TableUtils.createTableIfNotExists(connectionSource, MovieEntity.class);
-        TableUtils.createTableIfNotExists(connectionSource, WatchlistMovieEntity.class);
+        try {
+            TableUtils.createTableIfNotExists(connectionSource, MovieEntity.class);
+            TableUtils.createTableIfNotExists(connectionSource, WatchlistMovieEntity.class);
+        } catch (SQLException e) {
+            // Ensure table creation failures are not silently ignored
+            throw new DatabaseException("Failed to create tables", e);
+        }
     }
 
     /**
@@ -73,7 +83,8 @@ public class DatabaseManager {
         try {
             connectionSource = new JdbcConnectionSource(DB_URL, username, password);
         } catch (SQLException e) {
-            throw new SQLException("Error while creating Connection source", e);
+            // Clearly signals that DB connection failed
+            throw new DatabaseException("Error while creating connection source", e);
         }
 
     }

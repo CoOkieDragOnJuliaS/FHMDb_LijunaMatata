@@ -57,7 +57,6 @@ public class MovieAPI {
      * @return A list of movies matching the filters, or an empty list if none are found.
      * @throws IOException If the API request fails.
      */
-    //TODO: Try-catch the error at the earliest? When do we catch?
     public List<Movie> fetchMovies(String query, Genre genre, Integer releaseYear, Double ratingFrom) throws IOException {
         String finalUrl = buildUrl(query, genre, releaseYear, ratingFrom);
         Request request = new Request.Builder()
@@ -67,6 +66,8 @@ public class MovieAPI {
 
         try (Response response = getClient().newCall(request).execute()) {
             return parseResponse(response);
+        } catch (IOException e) {
+        throw new MovieApiException("Failed to fetch movies from API", e);
         }
     }
 
@@ -80,7 +81,11 @@ public class MovieAPI {
      * @return the final URL as String
      */
     private String buildUrl(String query, Genre genre, Integer releaseYear, Double ratingFrom) {
-        HttpUrl.Builder urlBuilder = HttpUrl.parse(getBaseUrl()).newBuilder();
+        HttpUrl base = HttpUrl.parse(getBaseUrl());
+        if (base == null) {
+            throw new MovieApiException("Invalid base URL: " + getBaseUrl());
+        }
+        HttpUrl.Builder urlBuilder = base.newBuilder();
 
         // based on exercise task: 2. Wenn User*innen einen Wert im Freitextfeld und beim Genre selektieren, sollen
         //dementsprechende Parameter in der URL gesetzt werden.
@@ -106,8 +111,6 @@ public class MovieAPI {
             throw new MovieApiException("Error fetching movies: HTTP " + response.code());
             // HttpExceptionHandler.handle(response);
         }
-
-        assert response.body() != null;
 
         // Converts the response body (which contains JSON) into a raw JSON string
         String jsonResponse = response.body().string();

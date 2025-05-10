@@ -1,6 +1,7 @@
 package org.fhmdb.fhmdb_lijunamatata.services;
 
 import org.fhmdb.fhmdb_lijunamatata.api.MovieAPI;
+import org.fhmdb.fhmdb_lijunamatata.exceptions.MovieApiException;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 
@@ -59,10 +60,14 @@ public class MovieService {
      * @return A list of movies that matches all criteria.
      */
     public List<Movie> fetchFilteredMovies(String searchText, Genre genre, Integer releaseYear,
-                                           Double rating) throws IOException {
-        System.out.println("filterMovies() invoked");
-        return this.movieAPI.fetchMovies(searchText, genre, releaseYear, rating);
+                                           Double rating) {
+        try {
+            return this.movieAPI.fetchMovies(searchText, genre, releaseYear, rating);
+        } catch (Exception e) {
+            throw new MovieApiException("Error fetching filtered movies", e);
+        }
     }
+
 
 
     /**
@@ -105,16 +110,12 @@ public class MovieService {
     public int getLongestMovieTitle(List<Movie> movies) {
         //Stream through movies, map to get the title and compare the length with comparingInt()
         String movie = "";
-        try {
-            movie = movies.stream()
-                    .map(Movie::getTitle)
-                    .map(String::trim)
-                    .max(Comparator.comparingInt(String::length))
-                    .orElse("");
-        } catch (NoSuchElementException e) {
-            logger.info("No movie found with longest title");
-        }
-        return movie.length();
+        movie = movies.stream()
+                .map(Movie::getTitle)
+                .map(String::trim)
+                .max(Comparator.comparingInt(String::length))
+                .orElse("");  // If the list is empty, use an empty string
+        return movie.length();     // Return the number of characters in the longest title
     }
 
     /**
