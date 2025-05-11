@@ -57,8 +57,6 @@ public class DatabaseManagerTest {
                 // Acceptable outcome if port 8082 is already in use
                 assertTrue(e.getMessage().contains("Failed to start H2 console"),
                         "Expected exception message to indicate console startup failure");
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
             }
         }
 
@@ -75,8 +73,6 @@ public class DatabaseManagerTest {
                 DatabaseManager.startH2Console();
             } catch (DatabaseException ignored) {
                 // Port might already be in use; ignore for first call
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
             }
 
             // Second call must throw DatabaseException
