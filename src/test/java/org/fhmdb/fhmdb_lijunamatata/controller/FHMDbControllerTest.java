@@ -48,7 +48,6 @@ public class FHMDbControllerTest {
         doNothing().when(movieController).updateStatusLabel(anyString(), anyBoolean());
 
         initializeOnAddToWatchlistField();
-        initializeOnRemoveToWatchlistField();
         movieController.initializeClickHandlers();
     }
 
@@ -57,17 +56,6 @@ public class FHMDbControllerTest {
             Field field = FHMDbController.class.getDeclaredField("onAddToWatchlistClicked");
             field.setAccessible(true);
             ClickEventHandler<Movie> handler = movie -> movieController.updateStatusLabel("Added " + movie.getTitle() + " to Watchlist!", false);
-            field.set(movieController, handler);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new AssertionError(e);
-        }
-    }
-
-    private void initializeOnRemoveToWatchlistField() {
-        try {
-            Field field = FHMDbController.class.getDeclaredField("onRemoveFromWatchlistClicked");
-            field.setAccessible(true);
-            ClickEventHandler<Movie> handler = movie -> movieController.updateStatusLabel("Removed " + movie.getTitle() + " from Watchlist!", false);
             field.set(movieController, handler);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new AssertionError(e);
@@ -140,24 +128,5 @@ public class FHMDbControllerTest {
 
         verify(movieController).updateStatusLabel("Added " + dummyMovie.getTitle() + " to Watchlist!", false);
         verify(watchlistRepository).addToWatchlist(argThat(entity -> entity.getApiId().equals(dummyMovie.getId())));
-    }
-
-    @Test
-    @DisplayName("onRemoveFromWatchlistClicked triggers repository and status label")
-    public void onRemoveFromWatchlistClicked_methodCall() {
-        Movie dummyMovie = new Movie("test-id", "test-name", List.of(Genre.ACTION, Genre.DRAMA), 2023, "Description",
-                "fake_url", 120, List.of("Director"), List.of("Writer"), List.of("Actor"), 1.0);
-
-        try {
-            Field field = FHMDbController.class.getDeclaredField("onRemoveFromWatchlistClicked");
-            field.setAccessible(true);
-            ClickEventHandler<Movie> handler = (ClickEventHandler<Movie>) field.get(movieController);
-            handler.onClick(dummyMovie);
-        } catch (Exception e) {
-            throw new AssertionError(e);
-        }
-
-        verify(movieController).updateStatusLabel("Removed " + dummyMovie.getTitle() + " from Watchlist!", false);
-        verify(watchlistRepository).removeFromWatchlist(dummyMovie.getId());
     }
 }

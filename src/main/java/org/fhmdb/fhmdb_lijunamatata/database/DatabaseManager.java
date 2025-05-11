@@ -18,12 +18,18 @@ public class DatabaseManager {
     Dao<MovieEntity, Long> movieDao; //DAO = Data Access Object
     Dao<WatchlistMovieEntity, Long> watchlistDao;
     private static DatabaseManager instance; //Singleton Pattern: we only want a single instance of DatabaseManager
+    private static boolean h2ConsoleStarted = false; // Track if H2 console is running
 
     /**
      * starts web-based H2 Console on specified port
      * @throws SQLException
      */
-    protected static void startH2Console() {
+    protected static synchronized void startH2Console() {
+        // If console is already started, don't try again
+        if (h2ConsoleStarted) {
+            throw new DatabaseException("H2 Console is already running");
+        }
+
         System.out.println("Starting H2 Console...");
         
         // Try ports in range 8082-8092
@@ -35,16 +41,17 @@ public class DatabaseManager {
                     "-webPort", String.valueOf(port)
                 );
                 server.start();
+                h2ConsoleStarted = true;
                 System.out.println("H2 Console started at: " + server.getURL());
                 return;
             } catch (SQLException e) {
-                if (port < 8092) {
-                    System.out.println("Port " + port + " is in use, trying next port...");
-                } else {
-                    System.err.println("Could not start H2 console on any port. Continuing without web console.");
-                }
+                System.out.println("Port " + port + " is in use, trying next port...");
             }
         }
+        
+        // If we get here, no ports were available
+        System.err.println("Could not start H2 console on any port. Continuing without web console.");
+        throw new DatabaseException("Failed to start H2 console on any port");
     }
 
     /**

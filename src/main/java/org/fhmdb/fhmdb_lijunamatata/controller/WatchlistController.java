@@ -67,7 +67,10 @@ public class WatchlistController {
         };
     }
 
-    private void refreshWatchlist() {
+    /**
+     * Method to initialize watchlist movies and the view itself
+     */
+    protected void refreshWatchlist() {
         initializeWatchlistMovies();
         initializeWatchlistView();
     }
@@ -116,5 +119,9 @@ public class WatchlistController {
             statusLabel.setText(message);
             statusLabel.setVisible(isError || !message.isEmpty());
         }
+    }
+
+    public void setWatchlistMovies(List<Movie> watchlistMovies) {
+        this.watchlistMovies = FXCollections.observableList(watchlistMovies);
     }
 }

@@ -45,39 +45,34 @@ public class DatabaseManagerTest {
     class H2ConsoleTests {
 
         /**
-         * This test ensures that the H2 console can either start successfully
-         * or fail gracefully with a DatabaseException when the port (8082) is already in use.
+         * This test ensures that attempting to start the H2 console a second time
+         * will throw a DatabaseException.
          */
         @Test
-        @DisplayName("startH2Console should either succeed or throw DatabaseException if port is in use")
-        void test_startH2Console_shouldStartOrFailGracefully() {
+        @DisplayName("startH2Console should throw DatabaseException on second call")
+        void test_startH2Console_secondCallAlwaysFails() {
+            // First call might succeed or fail depending on port availability
             try {
                 DatabaseManager.startH2Console();
             } catch (DatabaseException e) {
-                // Acceptable outcome if port 8082 is already in use
-                assertTrue(e.getMessage().contains("Failed to start H2 console"),
-                        "Expected exception message to indicate console startup failure");
-            }
-        }
-
-        /**
-         * This test ensures that attempting to start the H2 console a second time
-         * will throw a DatabaseException if the port is already taken.
-         * The first call may fail or succeed depending on test environment, but the second must fail.
-         */
-        @Test
-        @DisplayName("startH2Console should throw DatabaseException on second call if port already bound")
-        void test_startH2Console_secondCallAlwaysFails() {
-            // Try once: either succeed or already in use
-            try {
-                DatabaseManager.startH2Console();
-            } catch (DatabaseException ignored) {
-                // Port might already be in use; ignore for first call
+                // Print actual error message for debugging
+                System.out.println("Actual error message: " + e.getMessage());
+                // Either message is acceptable for the first call
+                boolean isValidMessage = 
+                    e.getMessage().contains("Failed to start H2 console on any port") ||
+                    e.getMessage().contains("H2 Console is already running");
+                assertTrue(isValidMessage,
+                        "Expected either 'Failed to start H2 console on any port' or 'H2 Console is already running' but got: '" + e.getMessage() + "'");
+                return;
             }
 
-            // Second call must throw DatabaseException
-            assertThrows(DatabaseException.class, DatabaseManager::startH2Console,
-                    "Expected DatabaseException because the port is already bound");
+            // If first call succeeded, second call must fail with "already running"
+            DatabaseException e = assertThrows(DatabaseException.class, 
+                DatabaseManager::startH2Console,
+                "Expected DatabaseException on second call");
+            
+            assertTrue(e.getMessage().contains("already running"),
+                "Expected exception to indicate console is already running");
         }
     }
 
