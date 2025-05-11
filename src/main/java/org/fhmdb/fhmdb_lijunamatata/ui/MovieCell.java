@@ -97,13 +97,10 @@ public class MovieCell extends ListCell<Movie> {
             releaseRatingLayout.setPadding(new Insets(0, 0, 0, 0)); // Optional: adjust padding as needed
             releaseRatingLayout.setSpacing(5); // Optional: adjust spacing as needed
 
-            //buttonLayout.getChildren().add(watchlistButton);
-            buttonLayout.setAlignment(Pos.BOTTOM_RIGHT);
+            buttonLayout.setAlignment(Pos.CENTER_RIGHT);
 
             // Add the releaseRatingLayout to the main layout
             layout.getChildren().addAll(releaseRatingLayout, buttonLayout);
-            //layout.getChildren().add(releaseRatingLayout);
-            //layout.getChildren().add(watchlistButton);
             setGraphic(layout);
         }
     }

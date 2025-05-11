@@ -1,6 +1,8 @@
 package org.fhmdb.fhmdb_lijunamatata.models;
 
 import org.fhmdb.fhmdb_lijunamatata.api.MovieAPI;
+import org.fhmdb.fhmdb_lijunamatata.database.MovieEntity;
+import org.fhmdb.fhmdb_lijunamatata.repositories.MovieRepository;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -132,6 +134,8 @@ public class Movie {
     public static List<Movie> initializeMovies() throws IOException {
         MovieAPI movieAPI = new MovieAPI();
         List<Movie> movies = movieAPI.fetchAllMovies();
+        MovieRepository movieRepository = new MovieRepository();
+        movieRepository.addAllMovies(MovieEntity.fromMovies(movies));
         return movies;
     }
 

@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <VBox prefHeight="331.0" prefWidth="570.0" xmlns="httfhmdb-view.fxmlp://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.fhmdb.fhmdb_lijunamatata.controller.FHMDbController" stylesheets="@styles.css">
+      fx:controller="org.fhmdb.fhmdb_lijunamatata.controller.WatchlistController" stylesheets="@styles.css">
     <HBox alignment="CENTER_LEFT" prefHeight="42.0" prefWidth="347.0" spacing="20.0"
           style="-fx-background-color: black;">
         <padding>

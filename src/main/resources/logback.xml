@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Silence all debug messages -->
+    <logger name="com.j256.ormlite" level="ERROR"/>
+    <logger name="org.h2" level="ERROR"/>
+    <logger name="com.j256.ormlite.stmt.StatementExecutor" level="ERROR"/>
+    <logger name="com.j256.ormlite.stmt.StatementBuilder" level="ERROR"/>
+    <logger name="com.j256.ormlite.stmt.mapped.BaseMappedStatement" level="ERROR"/>
+    <logger name="com.j256.ormlite.dao.DaoManager" level="ERROR"/>
+    <logger name="com.j256.ormlite.jdbc.JdbcPooledConnectionSource" level="ERROR"/>
+    
+    <!-- Set root level to WARN to reduce general noise -->
+    <root level="WARN">
+        <appender-ref ref="CONSOLE" />
+    </root>
+</configuration>

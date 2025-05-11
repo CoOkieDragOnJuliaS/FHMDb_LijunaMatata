@@ -1,6 +1,7 @@
 package org.fhmdb.fhmdb_lijunamatata.ui;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -27,8 +28,8 @@ public class WatchlistCell extends ListCell<Movie> {
     private final Label rating = new Label();
     private final VBox layout = new VBox(title, description, genre, releaseYear, rating);
     private final HBox releaseRatingLayout = new HBox(releaseYear, new Label(" | "), rating);
-
     private final Button removeButton = new Button("Remove from Watchlist");
+    private final HBox watchlistLayout = new HBox(removeButton);
 
     //Functional interfaces to handle the buttonClicks
     private final ClickEventHandler<Movie> removeFromWatchlistClicked;
@@ -97,9 +98,10 @@ public class WatchlistCell extends ListCell<Movie> {
             releaseRatingLayout.setPadding(new Insets(0, 0, 0, 0)); // Optional: adjust padding as needed
             releaseRatingLayout.setSpacing(5); // Optional: adjust spacing as needed
 
+            watchlistLayout.setAlignment(Pos.CENTER_RIGHT);
+
             // Add the releaseRatingLayout to the main layout
-            layout.getChildren().add(releaseRatingLayout);
-            layout.getChildren().add(removeButton);
+            layout.getChildren().addAll(releaseRatingLayout, watchlistLayout);
             setGraphic(layout);
 
         }

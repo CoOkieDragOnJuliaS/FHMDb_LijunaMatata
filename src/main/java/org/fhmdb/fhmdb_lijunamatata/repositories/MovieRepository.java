@@ -19,8 +19,16 @@ public class MovieRepository {
      * Constructor that initializes the MovieRepository by obtaining the DAO instance.
      * @throws SQLException if database access fails
      */
-    public MovieRepository() throws SQLException {
-        this.movieDao = DatabaseManager.getDatabaseManager().getMovieDao();
+    public MovieRepository() {
+        DatabaseManager dbManager = DatabaseManager.getDatabaseManager();
+        if (dbManager != null) {
+            this.movieDao = dbManager.getMovieDao();
+            if (this.movieDao == null) {
+                throw new DatabaseException("MovieDao is null after initialization");
+            }
+        } else {
+            throw new DatabaseException("DatabaseManager is not initialized");
+        }
     }
 
     /**

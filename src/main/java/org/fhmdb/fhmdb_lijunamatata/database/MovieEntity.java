@@ -90,16 +90,6 @@ public class MovieEntity {
                     Collections.emptyList(),
                     Collections.emptyList(),
                     movieEntity.getRating());
-        /*Movie movie = new Movie();
-        movie.setId(movieEntity.getApiId());
-        movie.setTitle(movieEntity.getTitle());
-        movie.setDescription(movieEntity.getDescription());
-        movie.setGenres(stringToGenres(movieEntity.getGenres()));
-        movie.setReleaseYear(movieEntity.getReleaseYear());
-        movie.setImgUrl(movieEntity.getImgUrl());
-        movie.setLengthInMinutes(movieEntity.getLengthInMinutes());
-        movie.setRating(movieEntity.getRating());
-        return movie;*/
         } catch (IllegalArgumentException e) {
             throw e;
         }

@@ -77,13 +77,18 @@ public class FHMDbController {
      * sets up the logic by initializing movieService
      */
     public FHMDbController() {
-        //No args constructor for initialization
         try {
+            // Initialize services first
             this.movieService = new MovieService();
             this.watchlistRepository = new WatchlistRepository();
-        } catch (DatabaseException sqlException) {
-            logger.severe(sqlException.getMessage());
-            updateStatusLabel("Access to Database was not successful!", true);
+        } catch (DatabaseException e) {
+            logger.severe("Database initialization failed: " + e.getMessage());
+            // Don't call updateStatusLabel here as JavaFX components aren't initialized yet
+            // Instead, store the error to show later
+            Platform.runLater(() -> updateStatusLabel("Database initialization failed: " + e.getMessage(), true));
+        } catch (Exception e) {
+            logger.severe("Initialization failed: " + e.getMessage());
+            Platform.runLater(() -> updateStatusLabel("Initialization failed: " + e.getMessage(), true));
         }
     }
 
@@ -101,20 +106,31 @@ public class FHMDbController {
      */
     @FXML
     public void initialize() {
-        initializeClickHandlers();
-        //initialize Labels
-        initializeStatusLabel();
-        //Sets the list of movies
-        initializeMovies();
-        // Set the ListView items
-        initializeMovieListView();
-        // Initialize ComboBoxes
-        initializeGenreComboBox();
-        initializeReleaseYearComboBox();
-        initializeRatingComboBox();
-        // Add listeners
-        initializeListeners();
-        initializeSchedulers();
+        try {
+            // First initialize UI components and handlers
+            initializeClickHandlers();
+            initializeStatusLabel();
+            initializeSchedulers();
+            
+            // Then initialize data and UI components that depend on data
+            initializeMovies();
+            initializeGenreComboBox();
+            initializeReleaseYearComboBox();
+            initializeRatingComboBox();
+            
+            // Initialize ListView
+            initializeMovieListView();
+            
+            // Initialize listeners last to avoid premature filtering
+            initializeListeners();
+            
+            // Initial filter
+            filterMovies();
+            
+        } catch (Exception e) {
+            logger.severe("Failed to initialize: " + e.getMessage());
+            updateStatusLabel("Failed to initialize application: " + e.getMessage(), true);
+        }
     }
 
     /**
@@ -124,14 +140,23 @@ public class FHMDbController {
      */
     protected void initializeClickHandlers() {
         onAddToWatchlistClicked = (clickedMovie) -> {
+            if (watchlistRepository == null) {
+                logger.severe("WatchlistRepository is not initialized");
+                updateStatusLabel("Cannot add to watchlist: Database not initialized", true);
+                return;
+            }
+            
             try {
                 MovieEntity movieEntity = new MovieEntity(clickedMovie);
                 watchlistRepository.addToWatchlist(movieEntity);
                 logger.info("Adding movie to watchlist: " + clickedMovie.getTitle());
                 updateStatusLabel("Added " + clickedMovie.getTitle() + " to Watchlist!", false);
             } catch (DatabaseException dbException) {
-                logger.severe(dbException.getMessage());
-                updateStatusLabel("Movie " + clickedMovie.getTitle() + " could not be added to the watchlist!", true);
+                logger.severe("Database error: " + dbException.getMessage());
+                updateStatusLabel("Movie " + clickedMovie.getTitle() + " could not be added to the watchlist: " + dbException.getMessage(), true);
+            } catch (Exception e) {
+                logger.severe("Unexpected error: " + e.getMessage());
+                updateStatusLabel("Unexpected error adding movie to watchlist: " + e.getMessage(), true);
             }
         };
 
@@ -156,21 +181,28 @@ public class FHMDbController {
      * changing the genre in the genreComboBox. Old value is compared with new one.
      */
     private void initializeListeners() {
+        // Search field listener with debouncing
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             searchText = newValue;
-
-            //Cancel previously scheduled elements
-            if (this.filterTask != null) {
+            
+            // Cancel any pending filter task
+            if (filterTask != null) {
                 scheduler.shutdownNow();
-                // Reinitialize the scheduler
                 initializeSchedulers();
             }
-
-            //Call to filterTask to filterMovies and set scheduler
-            filterTask = () -> {
-                Platform.runLater(this::filterMovies);
-            };
-            scheduler.schedule(filterTask, 2, TimeUnit.SECONDS);
+            
+            // Create new filter task with debouncing
+            filterTask = () -> Platform.runLater(() -> {
+                try {
+                    filterMovies();
+                } catch (Exception e) {
+                    logger.severe("Error filtering movies: " + e.getMessage());
+                    updateStatusLabel("Error filtering movies: " + e.getMessage(), true);
+                }
+            });
+            
+            // Schedule with 500ms delay for better performance
+            scheduler.schedule(filterTask, 500, TimeUnit.MILLISECONDS);
         });
 
         genreComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -212,7 +244,6 @@ public class FHMDbController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     /**

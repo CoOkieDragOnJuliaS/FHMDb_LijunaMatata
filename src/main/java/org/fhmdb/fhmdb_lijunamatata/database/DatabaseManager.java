@@ -23,13 +23,27 @@ public class DatabaseManager {
      * starts web-based H2 Console on specified port
      * @throws SQLException
      */
-    protected static void startH2Console() throws SQLException {
-        try {
-            Server.createWebServer("-web", "-webAllowOthers", "-webPort", "8082").start();
-            System.out.println("H2 Console: http://localhost:8082");
-        } catch (SQLException e) {
-            // Wrap H2 startup issues in a higher-level custom exception
-            throw new DatabaseException("Failed to start H2 console", e);
+    protected static void startH2Console() {
+        System.out.println("Starting H2 Console...");
+        
+        // Try ports in range 8082-8092
+        for (int port = 8082; port <= 8092; port++) {
+            try {
+                Server server = Server.createWebServer(
+                    "-web",
+                    "-webAllowOthers",
+                    "-webPort", String.valueOf(port)
+                );
+                server.start();
+                System.out.println("H2 Console started at: " + server.getURL());
+                return;
+            } catch (SQLException e) {
+                if (port < 8092) {
+                    System.out.println("Port " + port + " is in use, trying next port...");
+                } else {
+                    System.err.println("Could not start H2 console on any port. Continuing without web console.");
+                }
+            }
         }
     }
 
@@ -39,14 +53,43 @@ public class DatabaseManager {
      */
     private DatabaseManager() {
         try {
+            // Initialize in proper order
             createConnectionSource();
-            startH2Console();
+            if (connectionSource == null) {
+                throw new DatabaseException("Connection source is null after initialization");
+            }
+            
+            // Try to start H2 console, but continue if it fails
+            try {
+                startH2Console();
+            } catch (Exception e) {
+                System.err.println("H2 console could not be started. Continuing without web console.");
+            }
+            
+            // Create DAOs
             movieDao = DaoManager.createDao(connectionSource, MovieEntity.class);
+            if (movieDao == null) {
+                throw new DatabaseException("MovieDao is null after initialization");
+            }
+            
             watchlistDao = DaoManager.createDao(connectionSource, WatchlistMovieEntity.class);
+            if (watchlistDao == null) {
+                throw new DatabaseException("WatchlistDao is null after initialization");
+            }
+            
+            // Create tables last
             createTables();
+            
+            System.out.println("DatabaseManager initialized successfully");
+            
         } catch (SQLException e) {
-            // Wrap low-level SQLException into a custom unchecked DatabaseException
-            throw new DatabaseException("Failed to initialize DatabaseManager", e);
+            String msg = "Failed to initialize DatabaseManager: " + e.getMessage();
+            System.err.println(msg);
+            throw new DatabaseException(msg, e);
+        } catch (Exception e) {
+            String msg = "Unexpected error initializing DatabaseManager: " + e.getMessage();
+            System.err.println(msg);
+            throw new DatabaseException(msg, e);
         }
     }
 
@@ -54,9 +97,14 @@ public class DatabaseManager {
      * Initializes the DatabaseManager singleton instance.
      * @return DatabaseManager instance
      */
-    public static DatabaseManager getDatabaseManager() {
+    public static synchronized DatabaseManager getDatabaseManager() {
         if (instance == null) {
-            instance = new DatabaseManager();
+            try {
+                instance = new DatabaseManager();
+            } catch (Exception e) {
+                System.err.println("Failed to create DatabaseManager instance: " + e.getMessage());
+                throw e; // Re-throw to ensure caller knows about the failure
+            }
         }
         return instance;
     }
@@ -67,6 +115,8 @@ public class DatabaseManager {
      */
     protected static void createTables() throws SQLException{
         try {
+            TableUtils.dropTable(connectionSource, MovieEntity.class, true);
+            TableUtils.dropTable(connectionSource, WatchlistMovieEntity.class, true);
             TableUtils.createTableIfNotExists(connectionSource, MovieEntity.class);
             TableUtils.createTableIfNotExists(connectionSource, WatchlistMovieEntity.class);
         } catch (SQLException e) {
