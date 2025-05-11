@@ -3,12 +3,10 @@ package org.fhmdb.fhmdb_lijunamatata.ui;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.utils.ClickEventHandler;
@@ -26,10 +24,11 @@ public class MovieCell extends ListCell<Movie> {
     private final Label genre = new Label();
     private final Label releaseYear = new Label();
     private final Label rating = new Label();
-    private final VBox layout = new VBox(title, description, genre, releaseYear, rating);
+    private final VBox movieLayout = new VBox(title, description, genre);
     private final HBox releaseRatingLayout = new HBox(releaseYear, new Label(" | "), rating);
     private final Button watchlistButton = new Button("To Watchlist");
-    private final HBox buttonLayout = new HBox(watchlistButton);
+    private final VBox buttonLayout = new VBox(watchlistButton);
+    private final HBox cellLayout = new HBox(movieLayout, buttonLayout);
 
 
     //Functional interfaces to handle the buttonClicks
@@ -79,29 +78,35 @@ public class MovieCell extends ListCell<Movie> {
             genre.getStyleClass().setAll(List.of("text-white", "genre"));
             releaseYear.getStyleClass().setAll(List.of("text-white", "releaseYear"));
             rating.getStyleClass().setAll(List.of("text-yellow", "rating"));
-            layout.setBackground(new Background(new BackgroundFill(Color.web("#454545"), null, null)));
+            cellLayout.setBackground(new Background(new BackgroundFill(Color.web("#454545"), null, null)));
+            cellLayout.setMaxWidth(1143);
 
             // layout by a template
             double maxWidth = (getScene() != null) ? getScene().getWidth() - 30 : 300; // Fallback width
             description.setMaxWidth(maxWidth);
             description.setWrapText(true);
 
-            layout.setPadding(new Insets(10));
-            layout.spacingProperty().set(10);
-            layout.alignmentProperty().set(javafx.geometry.Pos.CENTER_LEFT);
+            movieLayout.setPadding(new Insets(10));
+            movieLayout.spacingProperty().set(10);
+            movieLayout.alignmentProperty().set(javafx.geometry.Pos.CENTER_LEFT);
+            HBox.setHgrow(movieLayout, Priority.ALWAYS); // Allow movieLayout to take available space
 
             // Clear previous children from the layout before adding new ones
-            layout.getChildren().removeIf(node -> node instanceof HBox); // Remove any existing HBox
+            movieLayout.getChildren().removeIf(node -> node instanceof HBox);
 
             // Add the releaseRatingLayout to the main layout
             releaseRatingLayout.setPadding(new Insets(0, 0, 0, 0)); // Optional: adjust padding as needed
             releaseRatingLayout.setSpacing(5); // Optional: adjust spacing as needed
 
-            buttonLayout.setAlignment(Pos.CENTER_RIGHT);
+            //style Add to Watchlist Button
+            buttonLayout.setMinWidth(Control.USE_PREF_SIZE);
+            buttonLayout.setPadding(new Insets(10));
+            watchlistButton.getStyleClass().add("watchlist-buttons");
 
             // Add the releaseRatingLayout to the main layout
-            layout.getChildren().addAll(releaseRatingLayout, buttonLayout);
-            setGraphic(layout);
+            movieLayout.getChildren().add(releaseRatingLayout);
+
+            setGraphic(cellLayout);
         }
     }
 }

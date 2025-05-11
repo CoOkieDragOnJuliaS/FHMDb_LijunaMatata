@@ -41,13 +41,17 @@ public class FHMDbApplication extends Application {
             //Toolbar/Navbar
             Label navigationLabel = new Label();
             navigationLabel.setText("Navigation-Menu");
+            navigationLabel.getStyleClass().add("nav-label");
             Separator separator = new Separator();
             Button buttonMovieView = new Button("Home");
             Button buttonWatchlistView = new Button("Watchlist");
 
             ToolBar toolBar = new ToolBar(navigationLabel, separator, buttonMovieView, buttonWatchlistView);
+            toolBar.getStyleClass().add("nav-bar");
             buttonMovieView.maxWidthProperty().bind(root.widthProperty());
+            buttonMovieView.getStyleClass().add("nav-button");
             buttonWatchlistView.maxWidthProperty().bind(root.widthProperty());
+            buttonWatchlistView.getStyleClass().add("nav-button");
             toolBar.setOrientation(Orientation.VERTICAL);
 
             root.setLeft(toolBar);

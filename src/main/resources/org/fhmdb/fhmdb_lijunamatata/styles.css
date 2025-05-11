@@ -62,3 +62,23 @@
     -fx-border-width: 0 0 1 0; /* No width on top, left, and right; 1px on bottom */
     -fx-border-color: black; /* Change 'black' to your desired color */
 }
+
+.nav-button {
+    -fx-background-color: #454545;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.nav-label {
+    -fx-text-fill: #f5c518;
+    -fx-font-weight: bold;
+    -fx-padding: 2;
+}
+
+.nav-bar {
+    -fx-background-color: black;
+}
+
+.watchlist-buttons {
+     -fx-background-color: #f5c518;
+}
