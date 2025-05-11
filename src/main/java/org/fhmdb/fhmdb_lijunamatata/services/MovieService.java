@@ -30,6 +30,7 @@ public class MovieService {
     public MovieService(MovieAPI movieAPI) {
         this.movieAPI = movieAPI;
     }
+
     /**
      * Sorts the given list of movies either in ascending or descending order by title
      *
@@ -68,7 +69,76 @@ public class MovieService {
         }
     }
 
+    /**
+     * Filters a list of movies based on the provided search text and selected genre.
+     * The method checks if the movie's title contains the search text (ignoring case)
+     * and if the movie's genre matches the selected genre.
+     *
+     * @param movies     The list of movies to be filtered.
+     * @param searchText The text to search for in movie titles.
+     * @param genre      The genre to filter movies by. If {@code null}, no genre filtering is applied.
+     * @return A list of movies that match both the search text and selected genre.
+     */
+    public List<Movie> filterMovies(List<Movie> movies, String searchText, Genre genre, Integer releaseYear,
+                                    Double rating) {
+        List<Movie> filteredMovies = new ArrayList<>();
+        for (Movie movie : movies) {
+            boolean matchesSearchText = isMatchesSearchText(searchText, movie);
+            boolean matchesGenre = isMatchesGenre(genre, movie);
+            boolean matchesReleaseYear = isMatchesReleaseYear(releaseYear, movie);
+            boolean matchesRating = isMatchesRating(rating, movie);
+            if (matchesSearchText && matchesGenre && matchesReleaseYear && matchesRating) {
+                filteredMovies.add(movie);
+            }
+        }
+        return filteredMovies;
+    }
 
+    /**
+     * Checks if the movie's release year equals the selected relesae year
+     *
+     * @param releaseYear to compare with
+     * @param movie      The movie whose release year is to be checked.
+     * @return {@code true} if the movie's release year equal the selected rating; {@code false} otherwise.
+     */
+    private static boolean isMatchesReleaseYear(Integer releaseYear, Movie movie) {
+        return (releaseYear == null || releaseYear.equals(movie.getReleaseYear()));
+    }
+
+    /**
+     * Checks if the movie's rating is equal or higher than selected rating
+     *
+     * @param rating The minimum rating
+     * @param movie      The movie whose rating is to be checked.
+     * @return {@code true} if the movie's rating is equal or higher than selected rating; {@code false} otherwise.
+     */
+    private static boolean isMatchesRating(Double rating, Movie movie) {
+        return (rating == null || rating.compareTo(movie.getRating()) <= 0);
+    }
+
+    /**
+     * Checks if the movie's genres contain the selected genre.
+     * Returns {@code true} if the movie matches the selected genre or if no genre is selected.
+     *
+     * @param genre The genre to check against.
+     * @param movie The movie to check.
+     * @return {@code true} if the movie matches the selected genre or if no genre is selected; {@code false} otherwise.
+     */
+    private static boolean isMatchesGenre(Genre genre, Movie movie) {
+        return (genre == null || movie.getGenres().contains(genre));
+    }
+
+    /**
+     * Checks if the movie's title and description contains the search text, ignoring case.
+     *
+     * @param searchText The text to search for in the movie's title.
+     * @param movie      The movie whose title is to be checked.
+     * @return {@code true} if the movie's title and the movie's description contains the search text; {@code false} otherwise.
+     */
+    private static boolean isMatchesSearchText(String searchText, Movie movie) {
+        return movie.getTitle().toLowerCase().contains(searchText.toLowerCase()) ||
+                movie.getDescription().toLowerCase().contains(searchText.toLowerCase());
+    }
 
     /**
      * Streams through a list of movies to get the actor who appears most frequently in the main cast

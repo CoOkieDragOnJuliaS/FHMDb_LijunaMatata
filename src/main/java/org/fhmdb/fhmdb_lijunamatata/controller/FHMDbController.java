@@ -379,11 +379,10 @@ public class FHMDbController {
      * Calls the filterMovies method inside the movieService class and updates the movieListView
      */
     void filterMovies() {
-
+        // Filter movies
+        this.filteredMovies = FXCollections.observableArrayList();
+        this.filteredMovies.addAll(this.movies);
         try {
-            // Filter movies
-            this.filteredMovies = FXCollections.observableArrayList();
-            this.filteredMovies.addAll(this.movies);
             // Get the filtered results from the movieService
             // and add the filtered results to the filteredMovies list
             this.filteredMovies = FXCollections.observableList(this.movieService.fetchFilteredMovies(this.searchText, this.genre, this.releaseYear, this.rating));
@@ -391,8 +390,13 @@ public class FHMDbController {
             updateMovieListView(this.searchText, this.genre != null ? this.genre.name() : "", this.releaseYear != null ? this.releaseYear : 0, this.rating != null ? this.rating : 0);
 
         } catch (MovieApiException e) {
-            updateStatusLabel("API-error: " + e.getMessage(), true);
+            updateStatusLabel("API-error: " + e.getMessage() + "-> Getting cached movies instead!", true);
             logger.severe(e.getMessage());
+            this.filteredMovies =
+                    FXCollections.observableList(this.movieService.filterMovies(this.movies, this.searchText,
+                            this.genre,
+                    this.releaseYear, this.rating));
+            updateMovieListView(this.searchText, this.genre != null ? this.genre.name() : "", this.releaseYear != null ? this.releaseYear : 0, this.rating != null ? this.rating : 0);
         } catch (DatabaseException e) {
             updateStatusLabel("Database error:: " + e.getMessage(), true);
             logger.severe(e.getMessage());
