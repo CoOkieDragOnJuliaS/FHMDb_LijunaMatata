@@ -1,112 +1,32 @@
 package org.fhmdb.fhmdb_lijunamatata.ui;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.Control;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.utils.ClickEventHandler;
 
-import java.util.List;
-
 /**
- * @author Julia Sass
- * @date 13.02.2025
+ * @author Julia, Lilie
+ * @date 11.05.2025
  * This class is the design cell for the Movie object inside the UI
  */
-public class MovieCell extends ListCell<Movie> {
-    private final Label title = new Label();
-    private final Label description = new Label();
-    private final Label genre = new Label();
-    private final Label releaseYear = new Label();
-    private final Label rating = new Label();
-    private final VBox movieLayout = new VBox(title, description, genre);
-    private final HBox releaseRatingLayout = new HBox(releaseYear, new Label(" | "), rating);
-    private final Button watchlistButton = new Button("To Watchlist");
-    private final VBox buttonLayout = new VBox(watchlistButton);
-    private final HBox cellLayout = new HBox(movieLayout, buttonLayout);
-
-
-    //Functional interfaces to handle the buttonClicks
+public class MovieCell extends AbstractMovieCell {
     private final ClickEventHandler<Movie> addToWatchlistClicked;
 
-    //Constructor to accept the ClickEventHandler
     public MovieCell(ClickEventHandler<Movie> addToWatchlistClicked) {
+        super();
         this.addToWatchlistClicked = addToWatchlistClicked;
 
-        //AddToWatchlistClickHandler
+        // Create and configure watchlist button
+        Button watchlistButton = new Button("Add to Watchlist");
         watchlistButton.setOnMouseClicked(mouseEvent -> {
             if (this.addToWatchlistClicked != null) {
                 this.addToWatchlistClicked.onClick(getItem());
             }
         });
+        watchlistButton.getStyleClass().add("watchlist-buttons");
 
+        // Add the button to the layout
+        setActionButton(watchlistButton);
     }
 
-    @Override
-    protected void updateItem(Movie movie, boolean empty) {
-        super.updateItem(movie, empty);
-
-        // Clear previous styles and graphic
-        this.getStyleClass().removeAll("movie-cell");
-        setGraphic(null); // Clear the graphic when empty to avoid double entries on MovieCell
-
-        if (empty || movie == null) {
-            setText(null);  //sets the text of all labels inside the item null
-        } else {
-            //Adds the movie-cell element, setting the title, description and genre
-            this.getStyleClass().add("movie-cell");
-            title.setText(movie.getTitle());
-            description.setText(
-                    movie.getDescription() != null
-                            ? movie.getDescription()
-                            : "No description available"
-            );
-            genre.setText(String.join(", ", movie.getGenres().stream()
-                    .map(Enum::name)
-                    .toArray(String[]::new)));
-            releaseYear.setText("Release year: " + movie.getReleaseYear());
-            rating.setText("Movie Rating: " + movie.getRating());
-
-            // color scheme
-            title.getStyleClass().setAll(List.of("text-yellow", "title"));
-            description.getStyleClass().setAll(List.of("text-white", "description"));
-            genre.getStyleClass().setAll(List.of("text-white", "genre"));
-            releaseYear.getStyleClass().setAll(List.of("text-white", "releaseYear"));
-            rating.getStyleClass().setAll(List.of("text-yellow", "rating"));
-            cellLayout.setBackground(new Background(new BackgroundFill(Color.web("#454545"), null, null)));
-            cellLayout.setMaxWidth(1143);
-
-            // layout by a template
-            double maxWidth = (getScene() != null) ? getScene().getWidth() - 30 : 300; // Fallback width
-            description.setMaxWidth(maxWidth);
-            description.setWrapText(true);
-
-            movieLayout.setPadding(new Insets(10));
-            movieLayout.spacingProperty().set(10);
-            movieLayout.alignmentProperty().set(javafx.geometry.Pos.CENTER_LEFT);
-            HBox.setHgrow(movieLayout, Priority.ALWAYS); // Allow movieLayout to take available space
-
-            // Clear previous children from the layout before adding new ones
-            movieLayout.getChildren().removeIf(node -> node instanceof HBox);
-
-            // Add the releaseRatingLayout to the main layout
-            releaseRatingLayout.setPadding(new Insets(0, 0, 0, 0)); // Optional: adjust padding as needed
-            releaseRatingLayout.setSpacing(5); // Optional: adjust spacing as needed
-
-            //style Add to Watchlist Button
-            buttonLayout.setMinWidth(Control.USE_PREF_SIZE);
-            buttonLayout.setPadding(new Insets(10));
-            watchlistButton.getStyleClass().add("watchlist-buttons");
-
-            // Add the releaseRatingLayout to the main layout
-            movieLayout.getChildren().add(releaseRatingLayout);
-
-            setGraphic(cellLayout);
-        }
-    }
 }

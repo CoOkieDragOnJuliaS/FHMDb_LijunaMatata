@@ -72,6 +72,8 @@ public class Movie {
         return directors;
     }
 
+    public List<String> getWriters() { return writers; }
+
     public List<String> getMainCast() {
         return mainCast;
     }

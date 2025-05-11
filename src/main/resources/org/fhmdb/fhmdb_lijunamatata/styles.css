@@ -1,84 +1,155 @@
 
 .background-yellow {
     -fx-background-color: #f5c518;
+    background-color: #f5c518;
 }
 
 .background-black {
     -fx-background-color: #000000;
+    background-color: #000000;
 }
 
 .title {
     -fx-font-size: 16px;
+    font-size: 16px;
     -fx-font-weight: bold;
+    font-weight: bold;
 }
 
 .description {
     -fx-font-size: 12px;
+    font-size: 12px;
 }
 
 .genre, .releaseYear, .rating{
     -fx-font-weight: bold;
+    font-weight: bold;
 }
 
 .statusLabel {
     -fx-font-size: 16px;
+    font-size: 16px;
     -fx-font-weight: bold;
+    font-weight: bold;
     -fx-text-fill: #f5c518;
+    color: #f5c518;
 }
 
 .text-yellow {
     -fx-text-fill: #f5c518;
+    color: #f5c518;
 }
 
 .text-white {
     -fx-text-fill: #ffffff;
+    color: #ffffff;
 }
 
 .list-view .list-cell:even {
     -fx-background-color: black;
+    background-color: black;
     -fx-text-fill: white;
+    color: white;
 }
 
 .list-view .list-cell:odd {
     -fx-background-color: black;
+    background-color: black;
     -fx-text-fill: white;
+    color: white;
 }
 
 .movie-cell {
     -fx-background-color: black;
+    background-color: black;
     -fx-padding: 2;
+    padding: 2px;
 }
 
 .filter-combo-box {
     -fx-background-color: white;
+    background-color: white;
     -fx-text-fill: #000000;
+    color: #000000;
 }
 
 .filter-combo-box .list-view .list-cell {
     -fx-background-color: white;
+    background-color: white;
     -fx-text-fill: #000000;
+    color: #000000;
     -fx-font-weight: bold;
-    -fx-border-style: none none solid none; /* No border on top, left, and right; solid on bottom */
-    -fx-border-width: 0 0 1 0; /* No width on top, left, and right; 1px on bottom */
-    -fx-border-color: black; /* Change 'black' to your desired color */
+    font-weight: bold;
+    -fx-border-style: none none solid none;
+    border-style: none none solid none;
+    -fx-border-width: 0 0 1 0;
+    border-width: 0 0 1 0;
+    -fx-border-color: black;
+    border-color: black;
 }
 
 .nav-button {
     -fx-background-color: #454545;
+    background-color: #454545;
     -fx-text-fill: white;
+    color: white;
     -fx-font-weight: bold;
+    font-weight: bold;
 }
 
 .nav-label {
     -fx-text-fill: #f5c518;
+    color: #f5c518;
     -fx-font-weight: bold;
+    font-weight: bold;
     -fx-padding: 2;
+    padding: 2px;
 }
 
 .nav-bar {
     -fx-background-color: black;
+    background-color: black;
 }
 
 .watchlist-buttons {
-     -fx-background-color: #f5c518;
+    -fx-background-color: #f5c518;
+    background-color: #f5c518;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.details-box {
+    -fx-padding: 10;
+    padding: 10px;
+    -fx-spacing: 8;
+    -fx-background-color: #353535;
+    background-color: #353535;
+    -fx-background-radius: 5;
+    border-radius: 5px;
+    -fx-border-color: #f5c518;
+    border-color: #f5c518;
+    -fx-border-radius: 5;
+    border-radius: 5px;
+    -fx-border-width: 1;
+    border-width: 1px;
+    -fx-margin-top: 10;
+    margin-top: 10px;
+    -fx-text-fill: #ffffff;
+    color: #ffffff;
+}
+
+.bold-label{
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.details-button {
+    -fx-background-color: #f5c518;
+    background-color: #f5c518;
+    -fx-text-fill: black;
+    color: black;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-background-radius: 5;
+    border-radius: 5px;
 }
