@@ -52,6 +52,7 @@ public class MovieEntity {
     public MovieEntity(Movie movie) {
         this.apiId = movie.getId();
         this.title = movie.getTitle();
+        this.description = movie.getDescription();
         this.genres = genresToString(movie.getGenres());
         this.releaseYear = movie.getReleaseYear();
         this.imgUrl = movie.getImgUrl();
