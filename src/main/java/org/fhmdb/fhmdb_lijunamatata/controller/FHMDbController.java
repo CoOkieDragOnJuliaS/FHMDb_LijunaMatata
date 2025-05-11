@@ -10,6 +10,7 @@ import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 import org.fhmdb.fhmdb_lijunamatata.exceptions.MovieApiException;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
+import org.fhmdb.fhmdb_lijunamatata.repositories.MovieRepository;
 import org.fhmdb.fhmdb_lijunamatata.repositories.WatchlistRepository;
 import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
 import org.fhmdb.fhmdb_lijunamatata.ui.MovieCell;
@@ -233,6 +234,9 @@ public class FHMDbController {
         try {
             updateStatusLabel("Loading movies...", false);
             this.movies = FXCollections.observableArrayList(Movie.initializeMovies());
+
+            initializeMovieRepository();
+
             this.filteredMovies = FXCollections.observableArrayList(this.movies);
             updateStatusLabel("", false);
         } catch (MovieApiException e) {
@@ -243,6 +247,13 @@ public class FHMDbController {
             logger.severe(e.getMessage());
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void initializeMovieRepository() {
+        MovieRepository movieRepository = new MovieRepository();
+        if(movieRepository.getAllMovies().isEmpty()) {
+            movieRepository.addAllMovies(MovieEntity.fromMovies(movies));
         }
     }
 

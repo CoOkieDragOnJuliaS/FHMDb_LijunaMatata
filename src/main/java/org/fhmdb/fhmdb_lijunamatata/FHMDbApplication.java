@@ -12,6 +12,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import org.fhmdb.fhmdb_lijunamatata.controller.FHMDbController;
+import org.fhmdb.fhmdb_lijunamatata.controller.WatchlistController;
 import org.fhmdb.fhmdb_lijunamatata.database.DatabaseManager;
 import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 
@@ -20,6 +21,7 @@ import java.util.Objects;
 
 public class FHMDbApplication extends Application {
     private FHMDbController fhmdbController;
+    private WatchlistController watchlistController;
     private BorderPane root;
 
     @Override
@@ -31,7 +33,8 @@ public class FHMDbApplication extends Application {
             // Load FXML views
             FXMLLoader fxmlLoaderMoviesView = new FXMLLoader(FHMDbApplication.class.getResource("fhmdb-view.fxml"));
             Parent moviesRoot = fxmlLoaderMoviesView.load();
-            Parent watchlistRoot = new FXMLLoader(FHMDbApplication.class.getResource("watchlist-view.fxml")).load();
+            FXMLLoader fxmlLoaderWatchlistView = new FXMLLoader(FHMDbApplication.class.getResource("watchlist-view.fxml"));
+            Parent watchlistRoot = fxmlLoaderWatchlistView.load();
 
             root = new BorderPane();
 
@@ -54,10 +57,11 @@ public class FHMDbApplication extends Application {
 
             // Get the controller instance from the FXMLLoader
             this.fhmdbController = fxmlLoaderMoviesView.getController();
+            this.watchlistController = fxmlLoaderWatchlistView.getController();
 
             //Button to View --> ClickAction
-            buttonMovieView.setOnAction(e -> {root.setCenter(moviesRoot); });
-            buttonWatchlistView.setOnAction(e -> {root.setCenter(watchlistRoot); });
+            buttonMovieView.setOnAction(e -> {root.setCenter(moviesRoot); fhmdbController.initialize();});
+            buttonWatchlistView.setOnAction(e -> {root.setCenter(watchlistRoot); watchlistController.initialize();});
 
             //Sets the scene by loading the .fxml element, setting the size and adding
             //elements like stylesheet (for css) and "setting the stage" for the scene

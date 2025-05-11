@@ -49,7 +49,7 @@ public class WatchlistController {
     public void initialize() {
         initializeClickHandlers();
         initializeStatusLabel();
-        initializeWatchlistView();
+        refreshWatchlist();
     }
 
     protected void initializeClickHandlers() {
@@ -68,6 +68,7 @@ public class WatchlistController {
     }
 
     private void refreshWatchlist() {
+        initializeWatchlistMovies();
         initializeWatchlistView();
     }
 
@@ -80,6 +81,7 @@ public class WatchlistController {
     }
 
     private void initializeWatchlistView() {
+        watchlistView.getItems().clear();
         watchlistView.setItems(this.watchlistMovies);
         watchlistView.setCellFactory(watchlistView -> new WatchlistCell(onRemoveFromWatchlistClicked));
     }
