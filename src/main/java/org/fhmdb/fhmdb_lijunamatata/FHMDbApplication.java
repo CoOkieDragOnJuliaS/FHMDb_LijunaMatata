@@ -19,6 +19,7 @@ public class FHMDbApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(FHMDbApplication.class.getResource("fhmdb-view.fxml"));
+
         // Load the FXML and get the root node
         Parent root = fxmlLoader.load();
 

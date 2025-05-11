@@ -23,27 +23,11 @@
             <Label styleClass="text-white" text="Welcome to FHMDb!"/>
         </children>
     </HBox>
-    <HBox spacing="5.0" styleClass="background-black">
-        <children>
-            <Button fx:id="sortBtn" onAction="#onSortButtonClick" styleClass="background-yellow" text="Sort (asc)"/>
-            <TextField fx:id="searchField" prefHeight="25.0" prefWidth="170.0" promptText="Search FHMDb"/>
-            <ComboBox fx:id="genreComboBox" promptText="Filter by Genre" styleClass="filter-combo-box"/>
-            <ComboBox fx:id="releaseYearComboBox" promptText="Filter by Release Year" styleClass="filter-combo-box"/>
-            <ComboBox fx:id="ratingComboBox" promptText="Filter by Rating" styleClass="filter-combo-box"/>
-            <Button fx:id="filterBtn" onAction="#onFilterButtonClick" styleClass="background-yellow" text="Filter"/>
-        </children>
-        <VBox.margin>
-            <Insets/>
-        </VBox.margin>
-        <padding>
-            <Insets bottom="20.0" left="10.0" top="20.0"/>
-        </padding>
-    </HBox>
     <HBox styleClass="background-black">
         <Label fx:id="statusLabel" styleClass="statusLabel" text=" " />
         <padding>
             <Insets left="10.0"/>
         </padding>
     </HBox>
-    <ListView fx:id="movieListView" styleClass="background-black" VBox.vgrow="ALWAYS"/>
+    <ListView fx:id="watchlistView" styleClass="background-black" VBox.vgrow="ALWAYS"/>
 </VBox>

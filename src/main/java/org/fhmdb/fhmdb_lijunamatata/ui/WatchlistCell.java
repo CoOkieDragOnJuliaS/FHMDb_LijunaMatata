@@ -1,7 +1,6 @@
 package org.fhmdb.fhmdb_lijunamatata.ui;
 
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -16,11 +15,11 @@ import org.fhmdb.fhmdb_lijunamatata.utils.ClickEventHandler;
 import java.util.List;
 
 /**
- * @author Julia Sass
- * @date 13.02.2025
- * This class is the design cell for the Movie object inside the UI
+ * @author Julia Sass, Lilie Lin
+ * @date 11.05.2025
+ * This class is the design cell for the Watchlits object inside the UI
  */
-public class MovieCell extends ListCell<Movie> {
+public class WatchlistCell extends ListCell<Movie> {
     private final Label title = new Label();
     private final Label description = new Label();
     private final Label genre = new Label();
@@ -28,24 +27,25 @@ public class MovieCell extends ListCell<Movie> {
     private final Label rating = new Label();
     private final VBox layout = new VBox(title, description, genre, releaseYear, rating);
     private final HBox releaseRatingLayout = new HBox(releaseYear, new Label(" | "), rating);
-    private final Button watchlistButton = new Button("To Watchlist");
-    private final HBox buttonLayout = new HBox(watchlistButton);
 
+    private final Button removeButton = new Button("Remove from Watchlist");
 
     //Functional interfaces to handle the buttonClicks
-    private final ClickEventHandler<Movie> addToWatchlistClicked;
+    private final ClickEventHandler<Movie> removeFromWatchlistClicked;
 
     //Constructor to accept the ClickEventHandler
-    public MovieCell(ClickEventHandler<Movie> addToWatchlistClicked) {
-        this.addToWatchlistClicked = addToWatchlistClicked;
+    public WatchlistCell(ClickEventHandler<Movie> removeFromWatchlistClicked) {
+        this.removeFromWatchlistClicked = removeFromWatchlistClicked;
 
-        //AddToWatchlistClickHandler
-        watchlistButton.setOnMouseClicked(mouseEvent -> {
-            if (this.addToWatchlistClicked != null) {
-                this.addToWatchlistClicked.onClick(getItem());
+
+        //RemoveFromwatchlistClickHandler
+        removeButton.setOnMouseClicked(mouseEvent ->
+
+        {
+            if (this.removeFromWatchlistClicked != null) {
+                this.removeFromWatchlistClicked.onClick(getItem());
             }
         });
-
     }
 
     @Override
@@ -97,14 +97,11 @@ public class MovieCell extends ListCell<Movie> {
             releaseRatingLayout.setPadding(new Insets(0, 0, 0, 0)); // Optional: adjust padding as needed
             releaseRatingLayout.setSpacing(5); // Optional: adjust spacing as needed
 
-            //buttonLayout.getChildren().add(watchlistButton);
-            buttonLayout.setAlignment(Pos.BOTTOM_RIGHT);
-
             // Add the releaseRatingLayout to the main layout
-            layout.getChildren().addAll(releaseRatingLayout, buttonLayout);
-            //layout.getChildren().add(releaseRatingLayout);
-            //layout.getChildren().add(watchlistButton);
+            layout.getChildren().add(releaseRatingLayout);
+            layout.getChildren().add(removeButton);
             setGraphic(layout);
+
         }
     }
 }

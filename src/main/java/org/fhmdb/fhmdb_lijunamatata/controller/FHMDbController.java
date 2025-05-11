@@ -61,7 +61,6 @@ public class FHMDbController {
     private Label statusLabel;
 
     private ClickEventHandler<Movie> onAddToWatchlistClicked;
-    private ClickEventHandler<Movie> onRemoveFromWatchlistClicked;
 
     //Scheduler for delaying filtering with API after keypress
     private ScheduledExecutorService scheduler;
@@ -82,7 +81,7 @@ public class FHMDbController {
         try {
             this.movieService = new MovieService();
             this.watchlistRepository = new WatchlistRepository();
-        }catch(DatabaseException sqlException) {
+        } catch (DatabaseException sqlException) {
             logger.severe(sqlException.getMessage());
             updateStatusLabel("Access to Database was not successful!", true);
         }
@@ -124,31 +123,18 @@ public class FHMDbController {
      * of the MovieCell/or new scene below in the initialization method!
      */
     protected void initializeClickHandlers() {
-        onAddToWatchlistClicked =
-                (clickedMovie) -> {
-                    try {
-                        MovieEntity movieEntity = new MovieEntity(clickedMovie);
-                        watchlistRepository.addToWatchlist(movieEntity);
-                        logger.info("Adding movie to watchlist: " + clickedMovie.getTitle());
-                        updateStatusLabel("Added " + clickedMovie.getTitle() + " to Watchlist!", false);
-                    }catch(DatabaseException dbException) {
-                        logger.severe(dbException.getMessage());
-                        updateStatusLabel("Movie " + clickedMovie.getTitle() + " could not be added to the watchlist!", true);
-                    }
-                };
+        onAddToWatchlistClicked = (clickedMovie) -> {
+            try {
+                MovieEntity movieEntity = new MovieEntity(clickedMovie);
+                watchlistRepository.addToWatchlist(movieEntity);
+                logger.info("Adding movie to watchlist: " + clickedMovie.getTitle());
+                updateStatusLabel("Added " + clickedMovie.getTitle() + " to Watchlist!", false);
+            } catch (DatabaseException dbException) {
+                logger.severe(dbException.getMessage());
+                updateStatusLabel("Movie " + clickedMovie.getTitle() + " could not be added to the watchlist!", true);
+            }
+        };
 
-        onRemoveFromWatchlistClicked =
-                (clickedMovie) -> {
-                    try {
-                        MovieEntity movieEntity = new MovieEntity(clickedMovie);
-                        watchlistRepository.removeFromWatchlist(movieEntity.getApiId());
-                        logger.info("Removing movie from watchlist: " + clickedMovie.getTitle());
-                        updateStatusLabel("Removed " + clickedMovie.getTitle() + " from Watchlist!", false);
-                    }catch(DatabaseException dbException) {
-                        logger.severe(dbException.getMessage());
-                        updateStatusLabel("Movie " + clickedMovie.getTitle() + " could not be added to the watchlist!", true);
-                    }
-                };
     }
 
     /**
@@ -205,8 +191,7 @@ public class FHMDbController {
      */
     private void initializeMovieListView() {
         movieListView.setItems(this.filteredMovies);
-        movieListView.setCellFactory(movieListView ->
-                new MovieCell(onAddToWatchlistClicked, onRemoveFromWatchlistClicked));
+        movieListView.setCellFactory(movieListView -> new MovieCell(onAddToWatchlistClicked));
     }
 
     /**
@@ -224,8 +209,7 @@ public class FHMDbController {
         } catch (DatabaseException e) {
             updateStatusLabel("Datenbankfehler: " + e.getMessage(), true);
             logger.severe(e.getMessage());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -326,9 +310,7 @@ public class FHMDbController {
         updateSortButtonText();
 
         this.isAscending = !this.isAscending;
-        updateMovieListView(this.searchText, this.genre != null ? this.genre.name() : "",
-                this.releaseYear != null ? this.releaseYear : 0,
-                this.rating != null ? this.rating : 0);
+        updateMovieListView(this.searchText, this.genre != null ? this.genre.name() : "", this.releaseYear != null ? this.releaseYear : 0, this.rating != null ? this.rating : 0);
     }
 
     /**
@@ -362,12 +344,9 @@ public class FHMDbController {
             this.filteredMovies.addAll(this.movies);
             // Get the filtered results from the movieService
             // and add the filtered results to the filteredMovies list
-            this.filteredMovies = FXCollections.observableList(this.movieService.fetchFilteredMovies(
-                    this.searchText, this.genre, this.releaseYear, this.rating));
+            this.filteredMovies = FXCollections.observableList(this.movieService.fetchFilteredMovies(this.searchText, this.genre, this.releaseYear, this.rating));
             //New updateMovieListView call with null check
-            updateMovieListView(this.searchText, this.genre!=null ? this.genre.name() : "",
-                    this.releaseYear!= null ? this.releaseYear : 0,
-                    this.rating!=null ? this.rating : 0);
+            updateMovieListView(this.searchText, this.genre != null ? this.genre.name() : "", this.releaseYear != null ? this.releaseYear : 0, this.rating != null ? this.rating : 0);
 
         } catch (MovieApiException e) {
             updateStatusLabel("API-error: " + e.getMessage(), true);
@@ -392,8 +371,7 @@ public class FHMDbController {
             updateStatusLabel("No movies found!", false);
         } else {
             logger.info("movies found, calling updateStatusLabel");
-            updateStatusLabel(String.format("Movies found with Query = %s / Genre = %s / ReleaseYear = %d and Rating from %.1f",
-                    searchText, genre, releaseYear, rating), false);
+            updateStatusLabel(String.format("Movies found with Query = %s / Genre = %s / ReleaseYear = %d and Rating from %.1f", searchText, genre, releaseYear, rating), false);
         }
     }
 

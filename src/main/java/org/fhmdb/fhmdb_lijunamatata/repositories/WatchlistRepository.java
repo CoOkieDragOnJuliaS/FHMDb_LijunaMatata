@@ -6,9 +6,11 @@ import org.fhmdb.fhmdb_lijunamatata.database.DatabaseManager;
 import org.fhmdb.fhmdb_lijunamatata.database.MovieEntity;
 import org.fhmdb.fhmdb_lijunamatata.database.WatchlistMovieEntity;
 import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
+import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Repository class for accessing WatchlistMovieEntity data in the database.
@@ -91,6 +93,23 @@ public class WatchlistRepository {
             return watchlistDao.countOf(queryBuilder.prepare()) > 0;
         } catch (SQLException e) {
             throw new DatabaseException("Failed to check if movie exists in watchlist", e);
+        }
+    }
+
+    public List<MovieEntity> getWatchlistMovies() {
+        List<WatchlistMovieEntity> watchlist = getWatchlist();
+
+        try {
+            MovieRepository movieRepository = new MovieRepository();
+            List<MovieEntity> allMovies = movieRepository.getAllMovies();
+
+            return allMovies.stream()
+                    .filter(movieEntity -> watchlist.stream()
+                            .anyMatch(watchlistMovieEntity  ->
+                                    watchlistMovieEntity.getApiId().equals(movieEntity.getApiId())))
+                    .toList();
+        } catch (SQLException e) {
+            throw new DatabaseException("Failed to get movies from watchlist", e);
         }
     }
 }
