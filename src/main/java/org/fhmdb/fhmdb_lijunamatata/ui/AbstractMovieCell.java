@@ -13,6 +13,8 @@ import javafx.scene.text.TextFlow;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * @author Julia, Lilie
@@ -105,11 +107,23 @@ public abstract class AbstractMovieCell extends ListCell<Movie> {
         TextFlow releaseYear = createStyledText("Release Year: ", String.valueOf(getItem().getReleaseYear()));
         TextFlow length = createStyledText("Length: ", getItem().getLengthInMinutes() + " minutes");
         TextFlow rating = createStyledText("Rating: ", getItem().getRating() + "/10");
-        TextFlow directors = createStyledText("Directors: ", String.join(", ", getItem().getDirectors()));
-        TextFlow writers = createStyledText("Writers: ", String.join(", ", getItem().getWriters()));
-        TextFlow mainCast = createStyledText("Main Cast: ", String.join(", ", getItem().getMainCast()));
 
-        details.getChildren().addAll(releaseYear, rating, length, directors, writers, mainCast);
+        List<String> directorsList = getItem().getDirectors();
+        TextFlow directors = directorsList.isEmpty() ? null : createStyledText("Directors: ", String.join(", ", directorsList));
+
+        List<String> writersList = getItem().getWriters();
+        TextFlow writers = writersList.isEmpty() ? null : createStyledText("Writers: ", String.join(", ", writersList));
+
+        List<String> mainCastList = getItem().getMainCast();
+        TextFlow mainCast = mainCastList.isEmpty() ? null : createStyledText("Main Cast: ", String.join(", ", mainCastList));
+
+        // Add the non-null TextFlows
+        // Add all non-null elements
+        details.getChildren().addAll(releaseYear, rating, length);
+        Stream.of(directors, writers, mainCast)
+                .filter(Objects::nonNull)
+                .forEach(details.getChildren()::add);
+
         return details;
     }
 
@@ -168,6 +182,7 @@ public abstract class AbstractMovieCell extends ListCell<Movie> {
                             ? movie.getDescription()
                             : "No description available"
             );
+
             genre.setText(String.join(", ", movie.getGenres().stream()
                     .map(Enum::name)
                     .toArray(String[]::new)));
