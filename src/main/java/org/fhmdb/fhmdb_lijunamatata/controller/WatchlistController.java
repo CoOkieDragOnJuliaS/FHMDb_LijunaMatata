@@ -52,11 +52,15 @@ public class WatchlistController {
         refreshWatchlist();
     }
 
+    /**
+     * Initializing clickhandler for the "Remove from Watchlist"-Button
+     */
     protected void initializeClickHandlers() {
         onRemoveFromWatchlistClicked = (clickedMovie) -> {
             try {
                 MovieEntity movieEntity = new MovieEntity(clickedMovie);
                 watchlistRepository.removeFromWatchlist(movieEntity.getApiId());
+                //Refreshing the watchlist repository as well as the listview for actual view of movies
                 refreshWatchlist();
                 logger.info("Removing movie from watchlist: " + clickedMovie.getTitle());
                 updateStatusLabel("Removed " + clickedMovie.getTitle() + " from Watchlist!", false);
@@ -83,12 +87,20 @@ public class WatchlistController {
         updateStatusLabel("", false);
     }
 
+    /**
+     * Initialize Watchlistview (is called by refreshWatchlist()), by clearing the last items,
+     * setting the new items and setting the cellFactory to the new WatchlistCell
+     */
     private void initializeWatchlistView() {
         watchlistView.getItems().clear();
         watchlistView.setItems(this.watchlistMovies);
         watchlistView.setCellFactory(watchlistView -> new WatchlistCell(onRemoveFromWatchlistClicked));
     }
 
+    /**
+     * Method to initialize watchlist movies by loading them from repository if existent
+     * If not then the statusLabel will show the current sítuation or count of movies existent
+     */
     private void initializeWatchlistMovies() {
         updateStatusLabel("Loading watchlist...", false);
         List<MovieEntity> watchlistMovieEntities = watchlistRepository.getWatchlistMovies();

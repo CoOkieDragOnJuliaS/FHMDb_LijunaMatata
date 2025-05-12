@@ -44,6 +44,10 @@ public abstract class AbstractMovieCell extends ListCell<Movie> {
         buttonLayout.getChildren().add(0, actionButton);
     }
 
+    /**
+     * Method to style the main layout, the buttons
+     * as well as the details box where additional information is stored!
+     */
     protected void styleLayout() {
         // Add CSS classes
         detailButton.getStyleClass().add("details-button");
@@ -83,6 +87,10 @@ public abstract class AbstractMovieCell extends ListCell<Movie> {
         VBox.setVgrow(rightLayout, Priority.ALWAYS);
     }
 
+    /**
+     * Method to initialize the mouseClickEvent to
+     * show and hide details for the detailsbox
+     */
     protected void initButtonEvent() {
         detailButton.setOnMouseClicked(mouseEvent -> {
             if (!detailsVisible) {
@@ -100,6 +108,12 @@ public abstract class AbstractMovieCell extends ListCell<Movie> {
         });
     }
 
+    /**
+     * Method to structure the detailed information inside the details box.
+     * Additional non-null check if the information (like in WatchlistCell) is empty, so the information
+     * is not shown in the detail-box!
+     * @return VBox with all the detailed information of the movie
+     */
     protected VBox getDetails() {
         VBox details = new VBox(5); // 5px spacing between elements
 
@@ -127,6 +141,12 @@ public abstract class AbstractMovieCell extends ListCell<Movie> {
         return details;
     }
 
+    /**
+     * Method that formats the parts of the detail box to make it more readable
+     * @param labelText
+     * @param valueText
+     * @return a combined TextFlow element with formatted label(bold) and text for the detailbox
+     */
     protected TextFlow createStyledText(String labelText, String valueText) {
         Text labelPart = new Text(labelText);
         Text valuePart = new Text(valueText);
@@ -141,10 +161,14 @@ public abstract class AbstractMovieCell extends ListCell<Movie> {
         return textFlow;
     }
 
+    /**
+     * Method to setup responsive layout for the movieLayout-box, title, description and genre to be
+     * bound with the widthProperty, respondent to width, padding and listView element
+     */
     protected void setupResponsiveLayout() {
         // Set up responsive layout if ListView is available
         if (getListView() != null) {
-            // Bind main layout width (80% of list view width)
+            // Bind main layout width (80% of list view width / the parent)
             movieLayout.prefWidthProperty().bind(getListView().widthProperty().multiply(0.8));
             title.prefWidthProperty().bind(movieLayout.prefWidthProperty());
             description.prefWidthProperty().bind(movieLayout.prefWidthProperty());
@@ -153,7 +177,7 @@ public abstract class AbstractMovieCell extends ListCell<Movie> {
             // Bind cell layout width (full width minus padding)
             cellLayout.prefWidthProperty().bind(getListView().widthProperty().subtract(20));
 
-            // Bind right layout width (20% of list view width)
+            // Bind right layout width (20% of list view width) --> for the buttons
             rightLayout.prefWidthProperty().bind(getListView().widthProperty().multiply(0.2));
         } else {
             // Fallback fixed widths if ListView isn't available
@@ -193,11 +217,13 @@ public abstract class AbstractMovieCell extends ListCell<Movie> {
             setupResponsiveLayout();
 
             // Style buttons
+            //Control.USE_PREF_SIZE is a constant in JavaFX that tells the layout to use the control's preferred size for the minimum width.
             buttonLayout.setMinWidth(Control.USE_PREF_SIZE);
 
             // Ensure only basic info is shown initially
             movieLayout.getChildren().setAll(title, description, genre);
 
+            //Set everything in place
             setGraphic(cellLayout);
         }
     }

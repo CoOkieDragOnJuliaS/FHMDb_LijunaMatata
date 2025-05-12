@@ -42,15 +42,21 @@ public class WatchlistControllerTest {
         watchlistController = spy(new WatchlistController(watchlistRepository));
         watchlistController.setWatchlistMovies(initialWatchlistMovies);
 
+        //Give a specific answer when calling the updateStatusLabel from the spied Controller
         doNothing().when(watchlistController).updateStatusLabel(anyString(), anyBoolean());
 
         initializeOnRemoveFromWatchlistField();
         watchlistController.initializeClickHandlers();
 
+        //Give specific answers when calling method refreshWatchList() as well as removeFromWatchlist()
         doNothing().when(watchlistController).refreshWatchlist();
         doNothing().when(watchlistRepository).removeFromWatchlist(anyString());
     }
 
+    /**
+     * Stub of Field from removeFromWatchlist-ClickEventHandler
+     * Through this initialization we can verify the call to the controller and the method in place
+     */
     private void initializeOnRemoveFromWatchlistField() {
         try {
             Field field = WatchlistController.class.getDeclaredField("onRemoveFromWatchlistClicked");
