@@ -1,6 +1,7 @@
 package org.fhmdb.fhmdb_lijunamatata.controller;
 
 import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
+import org.fhmdb.fhmdb_lijunamatata.exceptions.MovieApiException;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.repositories.WatchlistRepository;
@@ -98,14 +99,14 @@ public class FHMDbControllerTest {
 
     @Test
     @DisplayName("filterMovies should call movieService.fetchFilteredMovies")
-    public void filterMovies_calls_movieServiceFilterMovies() {
+    public void filterMovies_calls_movieServiceFilterMovies() throws MovieApiException {
         movieController.filterMovies();
         verify(movieService).fetchFilteredMovies(any(), any(), any(), any());
     }
 
     @Test
     @DisplayName("filterMovies calls fetchFilteredMovies with correct parameter types")
-    public void filterMovies_calls_movieServiceFilterMovies_withCorrectParameterTypes() {
+    public void filterMovies_calls_movieServiceFilterMovies_withCorrectParameterTypes() throws MovieApiException {
         movieController.setFilterElements("", Genre.DRAMA, 1990, 2.5);
         movieController.filterMovies();
         verify(movieService).fetchFilteredMovies(anyString(), any(Genre.class), anyInt(), anyDouble());
@@ -113,7 +114,7 @@ public class FHMDbControllerTest {
 
     @Test
     @DisplayName("onAddToWatchlistClicked triggers repository and status label")
-    public void onAddToWatchlistClicked_methodCall() {
+    public void onAddToWatchlistClicked_methodCall() throws DatabaseException {
         Movie dummyMovie = new Movie("test-id", "test-name", List.of(Genre.ACTION, Genre.DRAMA), 2023, "Description",
                 "fake_url", 120, List.of("Director"), List.of("Writer"), List.of("Actor"), 1.0);
 
@@ -129,4 +130,15 @@ public class FHMDbControllerTest {
         verify(movieController).updateStatusLabel("Added " + dummyMovie.getTitle() + " to Watchlist!", false);
         verify(watchlistRepository).addToWatchlist(argThat(entity -> entity.getApiId().equals(dummyMovie.getId())));
     }
+
+    @Test
+    @DisplayName("onWatchlistChanged updates status label correctly")
+    void onWatchlistChanged_updatesStatusLabel() {
+        List<Movie> updatedWatchlist = List.of(
+                new Movie("id1", "Movie 1", List.of(), 2020, "", "", 0, List.of(), List.of(), List.of(), 0.0)
+        );
+        movieController.onWatchlistChanged(updatedWatchlist);
+        verify(movieController).updateStatusLabel("Watchlist updated: 1 movies", false);
+    }
+
 }

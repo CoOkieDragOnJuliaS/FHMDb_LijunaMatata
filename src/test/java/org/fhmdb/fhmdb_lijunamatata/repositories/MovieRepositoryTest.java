@@ -1,6 +1,7 @@
 package org.fhmdb.fhmdb_lijunamatata.repositories;
 
 import org.fhmdb.fhmdb_lijunamatata.database.MovieEntity;
+import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 import org.junit.jupiter.api.*;
 
 import java.sql.SQLException;
@@ -14,24 +15,24 @@ class MovieRepositoryTest {
     private MovieRepository movieRepository;
 
     @BeforeEach
-    void setUp() throws SQLException {
+    void setUp() throws SQLException, DatabaseException {
         movieRepository = new MovieRepository();
         clearMovies();
     }
 
     @AfterEach
-    void tearDown() throws SQLException {
+    void tearDown() throws SQLException, DatabaseException {
         clearMovies();
     }
 
-    private void clearMovies() throws SQLException {
+    private void clearMovies() throws SQLException, DatabaseException {
         movieRepository.removeAll();
     }
 
     @Test
     @Order(1)
     @DisplayName("Add multiple movies and retrieve all movies")
-    void shouldAddAndRetrieveAllMovies() throws SQLException {
+    void shouldAddAndRetrieveAllMovies() throws SQLException, DatabaseException {
         MovieEntity movie1 = new MovieEntity();
         movie1.setApiId("api1");
         movie1.setTitle("Movie 1");
@@ -50,7 +51,7 @@ class MovieRepositoryTest {
     @Test
     @Order(2)
     @DisplayName("Remove all movies from the database")
-    void shouldRemoveAllMovies() throws SQLException {
+    void shouldRemoveAllMovies() throws SQLException, DatabaseException {
         MovieEntity movie = new MovieEntity();
         movie.setApiId("api3");
         movie.setTitle("Movie 3");
@@ -65,7 +66,7 @@ class MovieRepositoryTest {
     @Test
     @Order(3)
     @DisplayName("Retrieve a movie by its ID")
-    void shouldRetrieveMovieById() throws SQLException {
+    void shouldRetrieveMovieById() throws SQLException, DatabaseException {
         MovieEntity movie = new MovieEntity();
         movie.setApiId("api4");
         movie.setTitle("Movie 4");

@@ -161,42 +161,42 @@ public class MovieEntityTest {
     class UtilsTests {
         @Test
         @DisplayName("Test stringToGenre: all lowercase returns expected genre")
-        public void testStringToGenre_all_lowercase_returns_expected() {
+        public void testStringToGenre_all_lowercase_returns_expected() throws DatabaseException {
             String testString = "action";
             assertEquals(MovieEntity.stringToGenre(testString), Genre.valueOf("ACTION"));
         }
 
         @Test
         @DisplayName("Test stringToGenre: first letter lowercase returns expected genre")
-        public void testStringToGenre_firstLowercase_returns_expected() {
+        public void testStringToGenre_firstLowercase_returns_expected() throws DatabaseException {
             String testString = "bIOGRAPHY";
             assertEquals(MovieEntity.stringToGenre(testString), Genre.valueOf("BIOGRAPHY"));
         }
 
         @Test
         @DisplayName("Test stringToGenre: all uppercase returns expected genre")
-        public void testStringToGenre_allUppercase_returns_expected() {
+        public void testStringToGenre_allUppercase_returns_expected() throws DatabaseException {
             String testString = "FAMILY";
             assertEquals(MovieEntity.stringToGenre(testString), Genre.valueOf("FAMILY"));
         }
 
         @Test
         @DisplayName("Test stringToGenre: first uppercase returns expected genre")
-        public void testStringToGenre_firstUppercase_returns_expected() {
+        public void testStringToGenre_firstUppercase_returns_expected() throws DatabaseException {
             String testString = "Musical";
             assertEquals(MovieEntity.stringToGenre(testString), Genre.valueOf("MUSICAL"));
         }
 
         @Test
         @DisplayName("Test stringToGenre: space in the middle returns expected genre")
-        public void testStringToGenre_spaceInMiddle_returns_expected() {
+        public void testStringToGenre_spaceInMiddle_returns_expected() throws DatabaseException {
             String testString = "science fiction";
             assertEquals(MovieEntity.stringToGenre(testString), Genre.valueOf("SCIENCE_FICTION"));
         }
 
         @Test
         @DisplayName("Test stringToGenre: whitespace returns expected genre")
-        public void testStringToGenre_whitespace_returns_expected() {
+        public void testStringToGenre_whitespace_returns_expected() throws DatabaseException {
             String testString = "   THRILLER   ";
             assertEquals(MovieEntity.stringToGenre(testString), Genre.valueOf("THRILLER"));
         }

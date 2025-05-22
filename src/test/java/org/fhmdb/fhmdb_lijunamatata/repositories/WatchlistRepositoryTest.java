@@ -2,6 +2,7 @@ package org.fhmdb.fhmdb_lijunamatata.repositories;
 
 import org.fhmdb.fhmdb_lijunamatata.database.MovieEntity;
 import org.fhmdb.fhmdb_lijunamatata.database.WatchlistMovieEntity;
+import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 import org.junit.jupiter.api.*;
 
 import java.sql.SQLException;
@@ -15,17 +16,17 @@ class WatchlistRepositoryTest {
     private WatchlistRepository watchlistRepository;
 
     @BeforeEach
-    void setUp() throws SQLException {
+    void setUp() throws SQLException, DatabaseException {
         watchlistRepository = new WatchlistRepository();
         clearWatchlist();
     }
 
     @AfterEach
-    void tearDown() throws SQLException {
+    void tearDown() throws SQLException, DatabaseException {
         clearWatchlist();
     }
 
-    private void clearWatchlist() throws SQLException {
+    private void clearWatchlist() throws SQLException, DatabaseException {
         for (WatchlistMovieEntity movie : watchlistRepository.getWatchlist()) {
             watchlistRepository.removeFromWatchlist(movie.getApiId());
         }
@@ -34,7 +35,7 @@ class WatchlistRepositoryTest {
     @Test
     @Order(1)
     @DisplayName("Add a movie to the watchlist successfully")
-    void shouldAddMovieToWatchlist() throws SQLException {
+    void shouldAddMovieToWatchlist() throws SQLException, DatabaseException {
         MovieEntity movie = new MovieEntity();
         movie.setApiId("api1");
 
@@ -48,7 +49,7 @@ class WatchlistRepositoryTest {
     @Test
     @Order(2)
     @DisplayName("Prevent adding the same movie twice")
-    void shouldNotAddDuplicateMovieToWatchlist() throws SQLException {
+    void shouldNotAddDuplicateMovieToWatchlist() throws SQLException, DatabaseException {
         MovieEntity movie = new MovieEntity();
         movie.setApiId("api2");
 
@@ -63,7 +64,7 @@ class WatchlistRepositoryTest {
     @Test
     @Order(3)
     @DisplayName("Remove a movie from the watchlist by API ID")
-    void shouldRemoveMovieFromWatchlistByApiId() throws SQLException {
+    void shouldRemoveMovieFromWatchlistByApiId() throws SQLException, DatabaseException {
         MovieEntity movie = new MovieEntity();
         movie.setApiId("api3");
 

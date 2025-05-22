@@ -1,6 +1,8 @@
 package org.fhmdb.fhmdb_lijunamatata.models;
 
 import org.fhmdb.fhmdb_lijunamatata.api.MovieAPI;
+import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
+import org.fhmdb.fhmdb_lijunamatata.exceptions.MovieApiException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -131,11 +133,11 @@ public class Movie {
      * send request to API,
      * and returns the list
      */
-    public static List<Movie> initializeMovies() throws IOException {
+    public static List<Movie> initializeMovies() throws IOException, MovieApiException, DatabaseException {
         MovieAPI movieAPI = new MovieAPI();
-        List<Movie> movies = movieAPI.fetchAllMovies();
-        return movies;
+        return movieAPI.fetchAllMovies();
     }
+
 
     /**
      * creates a mutable ArrayList of movies,

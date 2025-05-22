@@ -6,6 +6,7 @@ import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -93,6 +94,8 @@ public class MovieEntity {
                     movieEntity.getRating());
         } catch (IllegalArgumentException e) {
             throw e;
+        } catch (DatabaseException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -126,7 +129,7 @@ public class MovieEntity {
                 .collect(Collectors.joining(", ")); //join genres by comma
     }
 
-    protected static Genre stringToGenre(String genreString) {
+    protected static Genre stringToGenre(String genreString) throws DatabaseException {
         try {
             return Genre.valueOf(genreString.trim().toUpperCase().replace(" ", "_"));
         } catch (IllegalArgumentException e) {
@@ -134,20 +137,26 @@ public class MovieEntity {
         }
     }
 
-    protected static List<Genre> stringToGenres(String genresString) throws IllegalArgumentException {
+    protected static List<Genre> stringToGenres(String genresString) throws IllegalArgumentException, DatabaseException {
         if (genresString == null || genresString.trim().isEmpty()) {
             return Collections.emptyList();
         }
-        try {
-            return Arrays.stream(genresString.split(",")) //split by comma
-                    .map(String::trim)//trim whitespaces
-                    .filter(genreString -> !genreString.isEmpty())//ignore empty entries
-                    .map(MovieEntity::stringToGenre) //convert each string to GENRE enum
-                    .collect(Collectors.toList());
-        } catch (IllegalArgumentException e) {
-            throw new DatabaseException("Failed to parse genre list: '" + genresString + "'", e);
+        List<Genre> genres = new ArrayList<>();
+        String[] parts = genresString.split(",");
+        for (String genreString : parts) {
+            genreString = genreString.trim();
+            if (!genreString.isEmpty()) {
+                try {
+                    genres.add(stringToGenre(genreString));
+                } catch (IllegalArgumentException e) {
+                    // Оборачиваем в DatabaseException, чтобы сохранить контракт метода
+                    throw new DatabaseException("Failed to parse genre list: '" + genresString + "'", e);
+                }
+            }
         }
+        return genres;
     }
+
 
 
     public long getId() {

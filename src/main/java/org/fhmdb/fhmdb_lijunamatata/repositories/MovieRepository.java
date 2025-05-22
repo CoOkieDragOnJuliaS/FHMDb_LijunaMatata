@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * Repository class for accessing MovieEntity data in the database.
+ * All checked SQLExceptions are caught and rethrown as DatabaseException to enforce explicit handling.
  */
 public class MovieRepository {
 
@@ -17,26 +18,28 @@ public class MovieRepository {
 
     /**
      * Constructor that initializes the MovieRepository by obtaining the DAO instance.
-     * @throws SQLException if database access fails
+     * Throws DatabaseException if the database manager or DAO is not initialized.
+     *
+     * @throws DatabaseException if DatabaseManager or movieDao is not properly initialized
      */
-    public MovieRepository() {
+    public MovieRepository() throws DatabaseException {
         DatabaseManager dbManager = DatabaseManager.getDatabaseManager();
-        if (dbManager != null) {
-            this.movieDao = dbManager.getMovieDao();
-            if (this.movieDao == null) {
-                throw new DatabaseException("MovieDao is null after initialization");
-            }
-        } else {
+        if (dbManager == null) {
             throw new DatabaseException("DatabaseManager is not initialized");
+        }
+        this.movieDao = dbManager.getMovieDao();
+        if (this.movieDao == null) {
+            throw new DatabaseException("MovieDao is null after initialization");
         }
     }
 
     /**
      * Retrieves all movies from the database.
-     * @return a list of MovieEntity objects
-     * @throws DatabaseException if the query fails
+     *
+     * @return List of MovieEntity objects representing all movies in the database
+     * @throws DatabaseException if an SQL exception occurs during query
      */
-    public List<MovieEntity> getAllMovies() {
+    public List<MovieEntity> getAllMovies() throws DatabaseException {
         try {
             return movieDao.queryForAll();
         } catch (SQLException e) {
@@ -44,12 +47,12 @@ public class MovieRepository {
         }
     }
 
-
     /**
      * Deletes all movies from the database.
-     * @throws DatabaseException if database delete operation fails
+     *
+     * @throws DatabaseException if an SQL exception occurs during delete operation
      */
-    public void removeAll() {
+    public void removeAll() throws DatabaseException {
         try {
             movieDao.deleteBuilder().delete();
         } catch (SQLException e) {
@@ -57,14 +60,14 @@ public class MovieRepository {
         }
     }
 
-
     /**
      * Retrieves a movie by its ID from the database.
-     * @param id the ID of the movie
-     * @return the MovieEntity object, or null if not found
-     * @throws DatabaseException database query fails
+     *
+     * @param id The ID of the movie
+     * @return The MovieEntity object if found, or null if no movie matches the ID
+     * @throws DatabaseException if an SQL exception occurs during query
      */
-    public MovieEntity getMovie(long id) {
+    public MovieEntity getMovie(long id) throws DatabaseException {
         try {
             return movieDao.queryForId(id);
         } catch (SQLException e) {
@@ -73,11 +76,13 @@ public class MovieRepository {
     }
 
     /**
-     * Adds a list of movies to the database. If a movie already exists, it is updated.
-     * @param movies a list of MovieEntity objects to be added
-     * @throws DatabaseException if database insert/update operation fails
+     * Adds or updates a list of movies in the database.
+     * Each movie is either created or updated based on whether it already exists.
+     *
+     * @param movies List of MovieEntity objects to be added or updated
+     * @throws DatabaseException if an SQL exception occurs during create or update operations
      */
-    public void addAllMovies(List<MovieEntity> movies) {
+    public void addAllMovies(List<MovieEntity> movies) throws DatabaseException {
         try {
             for (MovieEntity movie : movies) {
                 movieDao.createOrUpdate(movie);
@@ -87,3 +92,4 @@ public class MovieRepository {
         }
     }
 }
+

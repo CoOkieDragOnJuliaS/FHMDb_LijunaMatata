@@ -1,11 +1,14 @@
 package org.fhmdb.fhmdb_lijunamatata.controller;
 
+import javafx.application.Platform;
+import javafx.scene.control.ListView;
 import org.fhmdb.fhmdb_lijunamatata.database.MovieEntity;
 import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.repositories.WatchlistRepository;
 import org.fhmdb.fhmdb_lijunamatata.utils.ClickEventHandler;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,8 +30,14 @@ public class WatchlistControllerTest {
     List<Movie> initialWatchlistMovies;
     Logger logger = Logger.getLogger(WatchlistControllerTest.class.getName());
 
+    @BeforeAll
+    public static void initToolkit() {
+        // Initialize JavaFX Toolkit once for all tests (needed to create JavaFX controls)
+        Platform.startup(() -> {});
+    }
+
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws DatabaseException, NoSuchFieldException, IllegalAccessException {
         MockitoAnnotations.openMocks(this);
         initialWatchlistMovies = Movie.initializeMoviesTestbase();
 
@@ -40,22 +49,29 @@ public class WatchlistControllerTest {
 
         watchlistRepository = spy(watchlistRepository);
         watchlistController = spy(new WatchlistController(watchlistRepository));
+
+        // Use reflection to set the private 'watchlistView' field with a new ListView<Movie>
+        Field watchlistViewField = WatchlistController.class.getDeclaredField("watchlistView");
+        watchlistViewField.setAccessible(true);
+        watchlistViewField.set(watchlistController, new ListView<Movie>());
+
+        // Set initial movies in the controller
         watchlistController.setWatchlistMovies(initialWatchlistMovies);
 
-        //Give a specific answer when calling the updateStatusLabel from the spied Controller
+        // Stub out updateStatusLabel to avoid actual UI updates during tests
         doNothing().when(watchlistController).updateStatusLabel(anyString(), anyBoolean());
 
         initializeOnRemoveFromWatchlistField();
         watchlistController.initializeClickHandlers();
 
-        //Give specific answers when calling method refreshWatchList() as well as removeFromWatchlist()
+        // Stub methods that interact with DB or UI to do nothing
         doNothing().when(watchlistController).refreshWatchlist();
         doNothing().when(watchlistRepository).removeFromWatchlist(anyString());
     }
 
     /**
-     * Stub of Field from removeFromWatchlist-ClickEventHandler
-     * Through this initialization we can verify the call to the controller and the method in place
+     * Sets up the onRemoveFromWatchlistClicked field with a stub handler
+     * so we can verify interactions in tests.
      */
     private void initializeOnRemoveFromWatchlistField() {
         try {
@@ -76,7 +92,7 @@ public class WatchlistControllerTest {
 
     @Test
     @DisplayName("onRemoveFromWatchlistClicked triggers repository and status label")
-    public void onRemoveFromWatchlistClicked_methodCall() {
+    public void onRemoveFromWatchlistClicked_methodCall() throws DatabaseException {
         Movie dummyMovie = new Movie("test-id", "test-name", List.of(Genre.ACTION, Genre.DRAMA), 2023, "Description",
                 "fake_url", 120, List.of("Director"), List.of("Writer"), List.of("Actor"), 1.0);
 
@@ -92,5 +108,15 @@ public class WatchlistControllerTest {
 
         verify(watchlistController).updateStatusLabel("Removed " + dummyMovie.getTitle() + " from Watchlist!", false);
         verify(watchlistRepository).removeFromWatchlist(dummyEntity.getApiId());
+    }
+
+    @Test
+    @DisplayName("onWatchlistChanged updates status label correctly")
+    public void onWatchlistChanged_updatesStatusLabel() {
+        List<Movie> updatedWatchlist = List.of(
+                new Movie("id1", "Movie 1", List.of(), 2020, "", "", 0, List.of(), List.of(), List.of(), 0.0)
+        );
+        watchlistController.onWatchlistChanged(updatedWatchlist);
+        verify(watchlistController).updateStatusLabel("Watchlist updated: 1 movies", false);
     }
 }

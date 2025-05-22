@@ -45,7 +45,7 @@ public class MovieAPITest {
 
     @Test
     @DisplayName("Test fetching all movies - valid response")
-    void fetchAllMovies_returnsMovieList() throws IOException {
+    void fetchAllMovies_returnsMovieList() throws IOException, MovieApiException {
         // Provide a mock JSON movie response
         String jsonResponse =
                 """
@@ -115,7 +115,7 @@ public class MovieAPITest {
 
     @Test
     @DisplayName("Test fetchMovies with filters - valid response")
-    void fetchMovies_withFilters_returnsFilteredMovie() throws IOException {
+    void fetchMovies_withFilters_returnsFilteredMovie() throws IOException, MovieApiException {
         // Provide a mock response with a filtered movie
         String jsonResponse =
                 """

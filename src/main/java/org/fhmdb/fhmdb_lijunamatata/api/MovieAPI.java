@@ -55,9 +55,9 @@ public class MovieAPI {
      * @param releaseYear The year of release for filtering. Can be null.
      * @param ratingFrom  The minimum rating for filtering. Can be null.
      * @return A list of movies matching the filters, or an empty list if none are found.
-     * @throws IOException If the API request fails.
+     * @throws MovieApiException If the API request fails.
      */
-    public List<Movie> fetchMovies(String query, Genre genre, Integer releaseYear, Double ratingFrom) throws IOException {
+    public List<Movie> fetchMovies(String query, Genre genre, Integer releaseYear, Double ratingFrom) throws MovieApiException {
         String finalUrl = buildUrl(query, genre, releaseYear, ratingFrom);
         Request request = new Request.Builder()
                 .url(finalUrl)
@@ -80,7 +80,7 @@ public class MovieAPI {
      * @param ratingFrom
      * @return the final URL as String
      */
-    private String buildUrl(String query, Genre genre, Integer releaseYear, Double ratingFrom) {
+    private String buildUrl(String query, Genre genre, Integer releaseYear, Double ratingFrom) throws MovieApiException {
         HttpUrl base = HttpUrl.parse(getBaseUrl());
         if (base == null) {
             throw new MovieApiException("Invalid base URL: " + getBaseUrl());
@@ -106,7 +106,7 @@ public class MovieAPI {
      * @return a list of movies as List<Movie>
      * @throws IOException
      */
-    private List<Movie> parseResponse(Response response) throws IOException {
+    private List<Movie> parseResponse(Response response) throws IOException, MovieApiException {
         if (!response.isSuccessful() || response.body() == null) {
             throw new MovieApiException("Error fetching movies: HTTP " + response.code());
             // HttpExceptionHandler.handle(response);
@@ -132,7 +132,7 @@ public class MovieAPI {
      * @return A list of all movies from the API.
      * @throws IOException If the API request fails.
      */
-    public List<Movie> fetchAllMovies() throws IOException {
+    public List<Movie> fetchAllMovies() throws IOException, MovieApiException {
         return fetchMovies(null, null, null, null);
     }
 

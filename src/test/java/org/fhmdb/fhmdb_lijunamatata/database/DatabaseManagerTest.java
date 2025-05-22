@@ -23,7 +23,7 @@ public class DatabaseManagerTest {
 
         @Test
         @DisplayName("getConnectionSource should return a non-null object after initialization")
-        void test_getConnectionSource_returns_notNull_afterCreate() throws SQLException {
+        void test_getConnectionSource_returns_notNull_afterCreate() throws SQLException, DatabaseException {
             DatabaseManager.createConnectionSource();
             ConnectionSource source = DatabaseManager.getConnectionSource();
             assertNotNull(source, "ConnectionSource should not be null after initialization");
@@ -35,7 +35,7 @@ public class DatabaseManagerTest {
 
         @Test
         @DisplayName("createTables should not throw exception after valid connection")
-        void test_createTables_doesNotThrow() throws SQLException {
+        void test_createTables_doesNotThrow() throws SQLException, DatabaseException {
             DatabaseManager.createConnectionSource();
             assertDoesNotThrow(() -> DatabaseManager.createTables());
         }
@@ -81,14 +81,14 @@ public class DatabaseManagerTest {
 
         @Test
         @DisplayName("getDatabaseManager should return a non-null singleton instance")
-        void test_getDatabaseManager_returnsInstance() {
+        void test_getDatabaseManager_returnsInstance() throws DatabaseException {
             DatabaseManager instance = DatabaseManager.getDatabaseManager();
             assertNotNull(instance, "DatabaseManager instance should not be null");
         }
 
         @Test
         @DisplayName("getWatchlistDao and getMovieDao should return DAOs")
-        void test_getDaos_areNotNull() {
+        void test_getDaos_areNotNull() throws DatabaseException {
             DatabaseManager instance = DatabaseManager.getDatabaseManager();
             assertNotNull(instance.getMovieDao(), "MovieDao should not be null");
             assertNotNull(instance.getWatchlistDao(), "WatchlistDao should not be null");

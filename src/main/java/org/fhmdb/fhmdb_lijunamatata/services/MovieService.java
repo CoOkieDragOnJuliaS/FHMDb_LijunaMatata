@@ -5,9 +5,7 @@ import org.fhmdb.fhmdb_lijunamatata.exceptions.MovieApiException;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 
-import java.io.IOException;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -19,8 +17,6 @@ import java.util.stream.Collectors;
  */
 public class MovieService {
     MovieAPI movieAPI;
-
-    Logger logger = Logger.getLogger(MovieService.class.getName());
 
     public MovieService() {
         this.movieAPI = new MovieAPI();
@@ -61,7 +57,7 @@ public class MovieService {
      * @return A list of movies that matches all criteria.
      */
     public List<Movie> fetchFilteredMovies(String searchText, Genre genre, Integer releaseYear,
-                                           Double rating) {
+                                           Double rating) throws MovieApiException {
         try {
             return this.movieAPI.fetchMovies(searchText, genre, releaseYear, rating);
         } catch (Exception e) {
@@ -95,7 +91,7 @@ public class MovieService {
     }
 
     /**
-     * Checks if the movie's release year equals the selected relesae year
+     * Checks if the movie's release year equals the selected release year
      *
      * @param releaseYear to compare with
      * @param movie      The movie whose release year is to be checked.
@@ -143,7 +139,6 @@ public class MovieService {
     /**
      * Streams through a list of movies to get the actor who appears most frequently in the main cast
      *
-     * @param movies
      * @return the most popular actor as String
      */
     public String getMostPopularActor(List<Movie> movies) {
@@ -173,8 +168,7 @@ public class MovieService {
 
     /**
      * Streams through a list of movies and counts the length of the longest title of the movies
-     *
-     * @param movies
+
      * @return the count of the characters used in the longest title
      */
     public int getLongestMovieTitle(List<Movie> movies) {
@@ -191,8 +185,6 @@ public class MovieService {
     /**
      * Streams through a list of movies and the String value director to get the movies from the specific director
      *
-     * @param movies
-     * @param director
      * @return the count of the movies from the director which is set as a parameter
      */
     public long countMoviesFromDirector(List<Movie> movies, String director) {
@@ -205,9 +197,6 @@ public class MovieService {
     /**
      * Streams through a list of movies and uses the startYear and endYear parameters to get the movies which are between 2 years
      *
-     * @param movies
-     * @param startYear
-     * @param endYear
      * @return a list of movies between the specific years of the parameters
      */
     public List<Movie> getMoviesBetweenYears(List<Movie> movies, int startYear, int endYear) {

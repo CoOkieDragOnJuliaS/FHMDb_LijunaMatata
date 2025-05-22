@@ -10,6 +10,7 @@ import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 import org.fhmdb.fhmdb_lijunamatata.exceptions.MovieApiException;
 import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
+import org.fhmdb.fhmdb_lijunamatata.observer.WatchlistObserver;
 import org.fhmdb.fhmdb_lijunamatata.repositories.MovieRepository;
 import org.fhmdb.fhmdb_lijunamatata.repositories.WatchlistRepository;
 import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
@@ -24,9 +25,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-
-public class FHMDbController {
-
+/**
+ * This controller manages the main movie view, including searching, filtering, and sorting movies.
+ * It also handles adding movies to the watchlist.
+ * This class implements the WatchlistObserver interface,
+ * so it gets notified when the watchlist changes. (in constructors)
+ * It can then update the UI or display a status message.
+ */
+public class FHMDbController implements WatchlistObserver {
 
     private Genre genre;
     private Integer releaseYear;
@@ -37,55 +43,32 @@ public class FHMDbController {
     private MovieService movieService; //do not make final or can't mock
     private String searchText = "";
 
-    @FXML
-    public Button filterBtn;
-
-    @FXML
-    public ComboBox<Genre> genreComboBox;
-
-    @FXML
-    public ComboBox<Integer> releaseYearComboBox;
-
-    @FXML
-    public ComboBox<String> ratingComboBox;
-
-    @FXML
-    private ListView<Movie> movieListView;
-
-    @FXML
-    private Button sortBtn;
-
-    @FXML
-    public TextField searchField;
-
-    @FXML
-    private Label statusLabel;
+    @FXML public Button filterBtn;
+    @FXML public ComboBox<Genre> genreComboBox;
+    @FXML public ComboBox<Integer> releaseYearComboBox;
+    @FXML public ComboBox<String> ratingComboBox;
+    @FXML private ListView<Movie> movieListView;
+    @FXML private Button sortBtn;
+    @FXML public TextField searchField;
+    @FXML private Label statusLabel;
 
     private ClickEventHandler<Movie> onAddToWatchlistClicked;
 
-    //Scheduler for delaying filtering with API after keypress
     private ScheduledExecutorService scheduler;
-    //Filtering mechanism for filtering delayed
     private Runnable filterTask;
 
-    //WatchlistRepository
     private WatchlistRepository watchlistRepository;
 
     Logger logger = Logger.getLogger(FHMDbController.class.getName());
 
-
-    /**
-     * sets up the logic by initializing movieService
-     */
+    // Default constructor
     public FHMDbController() {
         try {
-            // Initialize services first
             this.movieService = new MovieService();
             this.watchlistRepository = new WatchlistRepository();
+            this.watchlistRepository.addObserver(this);
         } catch (DatabaseException e) {
             logger.severe("Database initialization failed: " + e.getMessage());
-            // Don't call updateStatusLabel here as JavaFX components aren't initialized yet
-            // Instead, store the error to show later
             Platform.runLater(() -> updateStatusLabel("Database initialization failed: " + e.getMessage(), true));
         } catch (Exception e) {
             logger.severe("Initialization failed: " + e.getMessage());
@@ -93,52 +76,45 @@ public class FHMDbController {
         }
     }
 
-    //Constructor with Constructor Injection for testing
+    // Constructor with DI for testing
     public FHMDbController(WatchlistRepository watchlistRepository, MovieService movieService) {
         this.movieService = movieService;
         this.watchlistRepository = watchlistRepository;
+        this.watchlistRepository.addObserver(this);
     }
 
-    /**
-     * initializes the Controller by calling methods for initializing the elements of the class.
-     * <p>
-     * - The `searchText` is automatically updated whenever the user types in the `searchField`.
-     * - The `genre` is automatically updated whenever a new genre is selected from the `genreComboBox`.
-     */
     @FXML
     public void initialize() {
         try {
-            // First initialize UI components and handlers
             initializeClickHandlers();
             initializeStatusLabel();
             initializeSchedulers();
-            
-            // Then initialize data and UI components that depend on data
+
             initializeMovies();
             initializeGenreComboBox();
             initializeReleaseYearComboBox();
             initializeRatingComboBox();
-            
-            // Initialize ListView
+
             initializeMovieListView();
-            
-            // Initialize listeners last to avoid premature filtering
             initializeListeners();
-            
-            // Initial filter
+
             filterMovies();
-            
+
+        } catch (DatabaseException e) {
+            logger.severe("Database error during initialization: " + e.getMessage());
+            updateStatusLabel("Database error during initialization: " + e.getMessage(), true);
+        } catch (MovieApiException e) {
+            logger.severe("API error during initialization: " + e.getMessage());
+            updateStatusLabel("API error during initialization: " + e.getMessage(), true);
+        } catch (IOException e) {
+            logger.severe("IO error during initialization: " + e.getMessage());
+            updateStatusLabel("IO error during initialization: " + e.getMessage(), true);
         } catch (Exception e) {
             logger.severe("Failed to initialize: " + e.getMessage());
             updateStatusLabel("Failed to initialize application: " + e.getMessage(), true);
         }
     }
 
-    /**
-     * Implementation of the ClickEventHandler to work as a intermediate layer between
-     * Data-Layer and UI-Layer --> the clickEventHandler is then used in the constructor
-     * of the MovieCell/or new scene below in the initialization method!
-     */
     protected void initializeClickHandlers() {
         onAddToWatchlistClicked = (clickedMovie) -> {
             if (watchlistRepository == null) {
@@ -146,7 +122,6 @@ public class FHMDbController {
                 updateStatusLabel("Cannot add to watchlist: Database not initialized", true);
                 return;
             }
-            
             try {
                 MovieEntity movieEntity = new MovieEntity(clickedMovie);
                 watchlistRepository.addToWatchlist(movieEntity);
@@ -160,39 +135,23 @@ public class FHMDbController {
                 updateStatusLabel("Unexpected error adding movie to watchlist: " + e.getMessage(), true);
             }
         };
-
     }
 
-    /**
-     * Adding a new instance to statusLabel and set it to not visible by updating it
-     */
     private void initializeStatusLabel() {
         updateStatusLabel("", false);
     }
 
-    /**
-     * Adding the scheduler to help with delaying input and query search
-     */
     private void initializeSchedulers() {
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
-    /**
-     * Adding listeners to the search field (searchText) and
-     * changing the genre in the genreComboBox. Old value is compared with new one.
-     */
     private void initializeListeners() {
-        // Search field listener with debouncing
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             searchText = newValue;
-            
-            // Cancel any pending filter task
             if (filterTask != null) {
                 scheduler.shutdownNow();
                 initializeSchedulers();
             }
-            
-            // Create new filter task with debouncing
             filterTask = () -> Platform.runLater(() -> {
                 try {
                     filterMovies();
@@ -201,97 +160,58 @@ public class FHMDbController {
                     updateStatusLabel("Error filtering movies: " + e.getMessage(), true);
                 }
             });
-            
-            // Schedule with 500ms delay for better performance
             scheduler.schedule(filterTask, 500, TimeUnit.MILLISECONDS);
         });
 
-        genreComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            genre = newValue;
-        });
-
-        releaseYearComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            releaseYear = newValue;
-        });
-
-        ratingComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            updateRatingFilter(newValue);
-        });
+        genreComboBox.valueProperty().addListener((observable, oldValue, newValue) -> genre = newValue);
+        releaseYearComboBox.valueProperty().addListener((observable, oldValue, newValue) -> releaseYear = newValue);
+        ratingComboBox.valueProperty().addListener((observable, oldValue, newValue) -> updateRatingFilter(newValue));
     }
 
-    /**
-     * Initializes movieListView element and setting the MovieCell onto the view
-     */
     private void initializeMovieListView() {
         movieListView.setItems(this.filteredMovies);
         movieListView.setCellFactory(movieListView -> new MovieCell(onAddToWatchlistClicked));
     }
 
-    /**
-     * Initializes the ObservableArrayList() of movies and filteredMovies
-     */
-    private void initializeMovies() {
-        try {
-            updateStatusLabel("Loading movies...", false);
-            this.movies = FXCollections.observableArrayList(Movie.initializeMovies());
+    private void initializeMovies() throws MovieApiException, DatabaseException, IOException {
+        updateStatusLabel("Loading movies...", false);
+        this.movies = FXCollections.observableArrayList(Movie.initializeMovies());
 
-            initializeMovieRepository();
+        initializeMovieRepository();
 
-            this.filteredMovies = FXCollections.observableArrayList(this.movies);
-            updateStatusLabel("", false);
-        } catch (MovieApiException e) {
-            updateStatusLabel("API-Fehler: " + e.getMessage(), true);
-            logger.severe(e.getMessage());
-        } catch (DatabaseException e) {
-            updateStatusLabel("Datenbankfehler: " + e.getMessage(), true);
-            logger.severe(e.getMessage());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        this.filteredMovies = FXCollections.observableArrayList(this.movies);
+        updateStatusLabel("", false);
     }
 
-    private void initializeMovieRepository() {
+    private void initializeMovieRepository() throws DatabaseException {
         MovieRepository movieRepository = new MovieRepository();
-        if(movieRepository.getAllMovies().isEmpty()) {
+        if (movieRepository.getAllMovies().isEmpty()) {
             movieRepository.addAllMovies(MovieEntity.fromMovies(movies));
         }
     }
 
-    /**
-     * Initializes the ComboBox with a "no genre" option followed by all genres from the {@link Genre} enum.
-     * The first item, representing "no genre", is selected by default.
-     */
     private void initializeGenreComboBox() {
-        // Create an ObservableList to store genre options, including a "no genre" option.
         ObservableList<Genre> genreOptions = FXCollections.observableArrayList();
         genreOptions.add(null);
         genreOptions.addAll(Genre.values());
         this.genreComboBox.setItems(genreOptions);
     }
 
-    /**
-     * Initializes the ComboBox with a "no year" option followed by all distinct years from filtered Movies.
-     * The first item, representing "no year", is selected by default.
-     */
     private void initializeReleaseYearComboBox() {
         ObservableList<Integer> releaseYearOptions = FXCollections.observableArrayList();
         releaseYearOptions.add(null);
         if (filteredMovies != null && !filteredMovies.isEmpty()) {
-            List<Integer> years = filteredMovies.stream() //convert to stream for processing
-                    .filter(Objects::nonNull) //safety check to remove any null objects
-                    .map(Movie::getReleaseYear) //get only release year of each movie
-                    .distinct() //keep only unique years
-                    .sorted() //ascending
-                    .toList(); //convert back to list
+            List<Integer> years = filteredMovies.stream()
+                    .filter(Objects::nonNull)
+                    .map(Movie::getReleaseYear)
+                    .distinct()
+                    .sorted()
+                    .toList();
             releaseYearOptions.addAll(years);
         }
         this.releaseYearComboBox.setItems(releaseYearOptions);
     }
 
-    /**
-     * Initializes the ComboBox with a "no rating" option followed by all distinct ratings from filtered Movies.
-     * The first item, representing "no rating", is selected by default.
-     */
     private void initializeRatingComboBox() {
         ObservableList<String> ratingOptions = FXCollections.observableArrayList();
         ratingOptions.add("All Ratings");
@@ -304,49 +224,33 @@ public class FHMDbController {
         ratingOptions.add("> 7");
         ratingOptions.add("> 8");
         ratingOptions.add("> 9");
-
         this.ratingComboBox.setItems(ratingOptions);
     }
 
-    /**
-     * @param selectedRatingString This method updates the rating variable which is used for filtering movies
-     *                             according to the value picked in the ratingComboBox (e.g. > 2)
-     */
     private void updateRatingFilter(String selectedRatingString) {
         if (selectedRatingString == null || selectedRatingString.equals("All Ratings")) {
-            this.rating = null; // Pass null to the service to indicate no rating filter
+            this.rating = null;
         } else if (selectedRatingString.startsWith("> ")) {
             try {
-                // Extract the number and set the 'rating' variable to this value
                 this.rating = Double.parseDouble(selectedRatingString.substring(2));
             } catch (NumberFormatException e) {
                 System.err.println("Error parsing rating threshold: " + selectedRatingString);
-                this.rating = null; // Reset rating if parsing fails
+                this.rating = null;
             }
         } else {
-            // Handle any other unexpected strings, perhaps set rating to null
             this.rating = null;
         }
     }
 
-    /**
-     * Handles the sorting button click event.
-     * Calls the sortMovies() method to toggle the sorting order.
-     */
     @FXML
     public void onSortButtonClick() {
         sortMovies();
     }
 
-    /**
-     * Sorts the list of movies based on the current sorting order.
-     * Updates the button text and refreshes the movie list view.
-     */
     void sortMovies() {
         if (this.filteredMovies == null || this.filteredMovies.isEmpty()) {
             return;
         }
-
         List<Movie> sortedMovies = this.movieService.sortMovies(this.filteredMovies, this.isAscending);
         this.filteredMovies = FXCollections.observableList(sortedMovies);
         updateSortButtonText();
@@ -355,63 +259,35 @@ public class FHMDbController {
         updateMovieListView(this.searchText, this.genre != null ? this.genre.name() : "", this.releaseYear != null ? this.releaseYear : 0, this.rating != null ? this.rating : 0);
     }
 
-    /**
-     * Updates the sort button text based on the current sorting order.
-     * This method ensures that the UI element is updated only when available.
-     */
     void updateSortButtonText() {
         if (this.sortBtn != null) {
             this.sortBtn.setText(this.isAscending ? "Sort (desc)" : "Sort (asc)");
         }
     }
 
-    /**
-     * Handles the filter button click event.
-     * Calls the filterMovies() method to trigger filtering
-     */
     @FXML
     public void onFilterButtonClick() {
-        //Calling the filterMovies() method to separate FXMl of logic
         filterMovies();
     }
 
-    /**
-     * Calls the filterMovies method inside the movieService class and updates the movieListView
-     */
     void filterMovies() {
-        // Filter movies
         this.filteredMovies = FXCollections.observableArrayList();
         this.filteredMovies.addAll(this.movies);
         try {
-            // Get the filtered results from the movieService
-            // and add the filtered results to the filteredMovies list
             this.filteredMovies = FXCollections.observableList(this.movieService.fetchFilteredMovies(this.searchText, this.genre, this.releaseYear, this.rating));
-            //New updateMovieListView call with null check
             updateMovieListView(this.searchText, this.genre != null ? this.genre.name() : "", this.releaseYear != null ? this.releaseYear : 0, this.rating != null ? this.rating : 0);
-
         } catch (MovieApiException e) {
             updateStatusLabel("API-error: " + e.getMessage() + "-> Getting cached movies instead!", true);
             logger.severe(e.getMessage());
-            this.filteredMovies =
-                    FXCollections.observableList(this.movieService.filterMovies(this.movies, this.searchText,
-                            this.genre,
-                    this.releaseYear, this.rating));
+            this.filteredMovies = FXCollections.observableList(this.movieService.filterMovies(this.movies, this.searchText, this.genre, this.releaseYear, this.rating));
             updateMovieListView(this.searchText, this.genre != null ? this.genre.name() : "", this.releaseYear != null ? this.releaseYear : 0, this.rating != null ? this.rating : 0);
-        } catch (DatabaseException e) {
-            updateStatusLabel("Database error:: " + e.getMessage(), true);
-            logger.severe(e.getMessage());
         }
     }
 
-    /**
-     * Updates the movie list view by clearing and repopulating it with sorted movie titles.
-     * Ensures the UI list correctly reflects the current order of movies.
-     */
     public void updateMovieListView(String searchText, String genre, int releaseYear, double rating) {
         if (this.movieListView == null) return;
         this.movieListView.getItems().clear();
         this.movieListView.getItems().addAll(this.filteredMovies);
-        //if there is no result, because the filtering does not return movies, set the label
         if (this.filteredMovies.isEmpty()) {
             logger.info("No movies found!");
             updateStatusLabel("No movies found!", false);
@@ -421,13 +297,6 @@ public class FHMDbController {
         }
     }
 
-    /**
-     * Updates the status label with a given message.
-     * Ensures the update runs on the JavaFX UI thread.
-     *
-     * @param message The message to display.
-     * @param isError If true, the label is made visible; otherwise, it's hidden when empty message and not an error.
-     */
     public void updateStatusLabel(String message, boolean isError) {
         if (statusLabel != null) {
             logger.info("Updating status label...");
@@ -436,17 +305,12 @@ public class FHMDbController {
         }
     }
 
-    /**
-     * Shuts down the scheduler which is setup in the Controller.
-     * Without this option the scheduler would still run after the Application is closed
-     */
     public void shutdownScheduler() {
         if (scheduler != null && !scheduler.isShutdown()) {
             scheduler.shutdown();
         }
     }
 
-    //Getter, Setter
     public void setMovies(List<Movie> movies) {
         this.movies = FXCollections.observableList(movies);
     }
@@ -462,5 +326,11 @@ public class FHMDbController {
         this.genre = genre;
         this.releaseYear = releaseYear;
         this.rating = rating;
+    }
+
+    @Override
+    public void onWatchlistChanged(List<Movie> updatedWatchlist) {
+        logger.info("Watchlist updated: " + updatedWatchlist.size() + " movies");
+        updateStatusLabel("Watchlist updated: " + updatedWatchlist.size() + " movies", false);
     }
 }

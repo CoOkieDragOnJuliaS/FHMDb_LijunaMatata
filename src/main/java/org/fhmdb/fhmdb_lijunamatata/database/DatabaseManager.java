@@ -24,7 +24,7 @@ public class DatabaseManager {
      * starts web-based H2 Console on specified port
      * @throws SQLException
      */
-    protected static synchronized void startH2Console() {
+    protected static synchronized void startH2Console() throws DatabaseException {
         // If console is already started, don't try again
         if (h2ConsoleStarted) {
             throw new DatabaseException("H2 Console is already running");
@@ -58,7 +58,7 @@ public class DatabaseManager {
      * initializes connectionSource, H2console, DAOs and tables
      * @throws SQLException
      */
-    private DatabaseManager() {
+    private DatabaseManager() throws DatabaseException {
         try {
             // Initialize in proper order
             createConnectionSource();
@@ -104,7 +104,7 @@ public class DatabaseManager {
      * Initializes the DatabaseManager singleton instance.
      * @return DatabaseManager instance
      */
-    public static synchronized DatabaseManager getDatabaseManager() {
+    public static synchronized DatabaseManager getDatabaseManager() throws DatabaseException {
         if (instance == null) {
             try {
                 instance = new DatabaseManager();
@@ -120,7 +120,7 @@ public class DatabaseManager {
      * creates the SQL tables for MovieEntity and WatchlistMovieEntity classes
      * @throws SQLException
      */
-    protected static void createTables() throws SQLException{
+    protected static void createTables() throws SQLException, DatabaseException {
         try {
             TableUtils.dropTable(connectionSource, MovieEntity.class, true);
             TableUtils.dropTable(connectionSource, WatchlistMovieEntity.class, true);
@@ -136,7 +136,7 @@ public class DatabaseManager {
      * initializes the connection to the database
      * @throws SQLException
      */
-    protected static void createConnectionSource() throws SQLException{
+    protected static void createConnectionSource() throws SQLException, DatabaseException {
         try {
             connectionSource = new JdbcConnectionSource(DB_URL, username, password);
         } catch (SQLException e) {
