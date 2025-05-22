@@ -16,14 +16,15 @@ import org.fhmdb.fhmdb_lijunamatata.controller.WatchlistController;
 import org.fhmdb.fhmdb_lijunamatata.database.DatabaseManager;
 import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 import org.fhmdb.fhmdb_lijunamatata.factory.ControllerFactory;
+import org.fhmdb.fhmdb_lijunamatata.ui.SceneRoot;
 
 import java.io.IOException;
 import java.util.Objects;
 
 public class FHMDbApplication extends Application {
-    private FHMDbController fhmdbController;
-    private WatchlistController watchlistController;
+
     private BorderPane root;
+    private FHMDbController fhmdbController;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -33,44 +34,17 @@ public class FHMDbApplication extends Application {
             //Initialize factory
             ControllerFactory controllerFactory = new ControllerFactory();
 
-            // Load FXML views
+            // Load FXML views and assign factory
             FXMLLoader fxmlLoaderMoviesView = new FXMLLoader(FHMDbApplication.class.getResource("fhmdb-view.fxml"));
             fxmlLoaderMoviesView.setControllerFactory(controllerFactory);
-            Parent moviesRoot = fxmlLoaderMoviesView.load();
-            FXMLLoader fxmlLoaderWatchlistView = new FXMLLoader(FHMDbApplication.class.getResource("watchlist-view.fxml"));
-            fxmlLoaderWatchlistView.setControllerFactory(controllerFactory);
-            Parent watchlistRoot = fxmlLoaderWatchlistView.load();
-
-            root = new BorderPane();
-
-            //Toolbar/Navbar
-            Label navigationLabel = new Label();
-            navigationLabel.setText("Navigation-Menu");
-            navigationLabel.getStyleClass().add("nav-label");
-            Separator separator = new Separator();
-            Button buttonMovieView = new Button("Home");
-            Button buttonWatchlistView = new Button("Watchlist");
-
-            ToolBar toolBar = new ToolBar(navigationLabel, separator, buttonMovieView, buttonWatchlistView);
-            toolBar.getStyleClass().add("nav-bar");
-            buttonMovieView.maxWidthProperty().bind(root.widthProperty());
-            buttonMovieView.getStyleClass().add("nav-button");
-            buttonWatchlistView.maxWidthProperty().bind(root.widthProperty());
-            buttonWatchlistView.getStyleClass().add("nav-button");
-            toolBar.setOrientation(Orientation.VERTICAL);
-
-            root.setLeft(toolBar);
-
-            //MovieView als default
-            root.setCenter(moviesRoot);
-
             // Get the controller instance from the FXMLLoader
             this.fhmdbController = fxmlLoaderMoviesView.getController();
-            this.watchlistController = fxmlLoaderWatchlistView.getController();
 
-            //Button to View --> ClickAction
-            buttonMovieView.setOnAction(e -> {root.setCenter(moviesRoot); fhmdbController.initialize();});
-            buttonWatchlistView.setOnAction(e -> {root.setCenter(watchlistRoot); watchlistController.initialize();});
+            FXMLLoader fxmlLoaderWatchlistView = new FXMLLoader(FHMDbApplication.class.getResource("watchlist-view.fxml"));
+            fxmlLoaderWatchlistView.setControllerFactory(controllerFactory);
+
+            //create and style singleton instance of scene root
+            root = SceneRoot.getInstance(fxmlLoaderMoviesView, fxmlLoaderWatchlistView);
 
             //Sets the scene by loading the .fxml element, setting the size and adding
             //elements like stylesheet (for css) and "setting the stage" for the scene
@@ -97,6 +71,7 @@ public class FHMDbApplication extends Application {
     public void stop() {
         //Shutting down the scheduler of the controller when application is closing
         //so that the scheduler is not running in the background while the application is not open
+
         if(this.fhmdbController != null) {
             this.fhmdbController.shutdownScheduler();
         }
