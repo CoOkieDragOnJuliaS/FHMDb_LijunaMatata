@@ -15,6 +15,7 @@ import org.fhmdb.fhmdb_lijunamatata.controller.FHMDbController;
 import org.fhmdb.fhmdb_lijunamatata.controller.WatchlistController;
 import org.fhmdb.fhmdb_lijunamatata.database.DatabaseManager;
 import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
+import org.fhmdb.fhmdb_lijunamatata.factory.ControllerFactory;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -29,11 +30,15 @@ public class FHMDbApplication extends Application {
         try {
             // Initialize database first
             DatabaseManager.getDatabaseManager();
+            //Initialize factory
+            ControllerFactory controllerFactory = new ControllerFactory();
 
             // Load FXML views
             FXMLLoader fxmlLoaderMoviesView = new FXMLLoader(FHMDbApplication.class.getResource("fhmdb-view.fxml"));
+            fxmlLoaderMoviesView.setControllerFactory(controllerFactory);
             Parent moviesRoot = fxmlLoaderMoviesView.load();
             FXMLLoader fxmlLoaderWatchlistView = new FXMLLoader(FHMDbApplication.class.getResource("watchlist-view.fxml"));
+            fxmlLoaderWatchlistView.setControllerFactory(controllerFactory);
             Parent watchlistRoot = fxmlLoaderWatchlistView.load();
 
             root = new BorderPane();
