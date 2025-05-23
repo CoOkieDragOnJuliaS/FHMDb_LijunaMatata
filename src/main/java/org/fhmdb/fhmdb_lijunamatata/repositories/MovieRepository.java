@@ -8,21 +8,18 @@ import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
 import java.sql.SQLException;
 import java.util.List;
 
-/**
- * Repository class for accessing MovieEntity data in the database.
- * All checked SQLExceptions are caught and rethrown as DatabaseException to enforce explicit handling.
- */
-public class MovieRepository {
-
+    /**
+     * Repository class for accessing MovieEntity data in the database.
+     * Implemented as a Singleton.
+     */
+    public class MovieRepository {
+    private static MovieRepository instance; // Singleton instance
     private final Dao<MovieEntity, Long> movieDao; // DAO object for accessing MovieEntity table
 
     /**
-     * Constructor that initializes the MovieRepository by obtaining the DAO instance.
-     * Throws DatabaseException if the database manager or DAO is not initialized.
-     *
-     * @throws DatabaseException if DatabaseManager or movieDao is not properly initialized
+     * Private constructor to enforce Singleton pattern.
      */
-    public MovieRepository() throws DatabaseException {
+    private MovieRepository() throws DatabaseException {
         DatabaseManager dbManager = DatabaseManager.getDatabaseManager();
         if (dbManager == null) {
             throw new DatabaseException("DatabaseManager is not initialized");
@@ -31,6 +28,16 @@ public class MovieRepository {
         if (this.movieDao == null) {
             throw new DatabaseException("MovieDao is null after initialization");
         }
+    }
+
+    /**
+     * Returns the single instance of MovieRepository.
+     */
+    public static MovieRepository getInstance() throws DatabaseException {
+        if (instance == null) {
+            instance = new MovieRepository();
+        }
+        return instance;
     }
 
     /**

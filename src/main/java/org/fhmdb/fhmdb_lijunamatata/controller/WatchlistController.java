@@ -34,10 +34,11 @@ public class WatchlistController implements WatchlistObserver {
 
     public WatchlistController() {
         try {
-            this.watchlistRepository = new WatchlistRepository();
+            this.watchlistRepository = WatchlistRepository.getInstance();
         } catch (DatabaseException e) {
             logger.severe("Database initialization failed: " + e.getMessage());
-            updateStatusLabel("Access to Database was not successful!", true);
+            // Note: Do not call updateStatusLabel directly from the constructor,
+            // as the FXML components (e.g., statusLabel) may not be initialized yet.
         }
     }
 

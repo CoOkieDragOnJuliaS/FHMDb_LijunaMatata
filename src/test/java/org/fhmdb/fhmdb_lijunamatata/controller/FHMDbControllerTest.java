@@ -38,7 +38,7 @@ public class FHMDbControllerTest {
 
         initialMovies = Movie.initializeMoviesTestbase();
         try {
-            watchlistRepository = new WatchlistRepository();
+            watchlistRepository = WatchlistRepository.getInstance();
         } catch (DatabaseException e) {
             logger.severe(e.getMessage());
         }
@@ -50,7 +50,9 @@ public class FHMDbControllerTest {
 
         initializeOnAddToWatchlistField();
         movieController.initializeClickHandlers();
+
     }
+
 
     private void initializeOnAddToWatchlistField() {
         try {

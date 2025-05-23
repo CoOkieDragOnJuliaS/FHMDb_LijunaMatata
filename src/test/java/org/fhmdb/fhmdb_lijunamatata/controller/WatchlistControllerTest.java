@@ -37,34 +37,23 @@ public class WatchlistControllerTest {
     }
 
     @BeforeEach
-    public void setUp() throws DatabaseException, NoSuchFieldException, IllegalAccessException {
-        MockitoAnnotations.openMocks(this);
+    public void setUp() throws Exception {
         initialWatchlistMovies = Movie.initializeMoviesTestbase();
-
-        try {
-            watchlistRepository = new WatchlistRepository();
-        } catch (DatabaseException e) {
-            logger.severe(e.getMessage());
-        }
-
-        watchlistRepository = spy(watchlistRepository);
+        watchlistRepository = spy(WatchlistRepository.getInstance());
         watchlistController = spy(new WatchlistController(watchlistRepository));
 
-        // Use reflection to set the private 'watchlistView' field with a new ListView<Movie>
+        // Inject ListView<Movie> into private field
         Field watchlistViewField = WatchlistController.class.getDeclaredField("watchlistView");
         watchlistViewField.setAccessible(true);
-        watchlistViewField.set(watchlistController, new ListView<Movie>());
+        watchlistViewField.set(watchlistController, new ListView<>());
 
-        // Set initial movies in the controller
         watchlistController.setWatchlistMovies(initialWatchlistMovies);
-
-        // Stub out updateStatusLabel to avoid actual UI updates during tests
         doNothing().when(watchlistController).updateStatusLabel(anyString(), anyBoolean());
 
         initializeOnRemoveFromWatchlistField();
         watchlistController.initializeClickHandlers();
 
-        // Stub methods that interact with DB or UI to do nothing
+        // Stub DB calls
         doNothing().when(watchlistController).refreshWatchlist();
         doNothing().when(watchlistRepository).removeFromWatchlist(anyString());
     }

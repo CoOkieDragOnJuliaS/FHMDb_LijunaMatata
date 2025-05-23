@@ -17,7 +17,7 @@ class WatchlistRepositoryTest {
 
     @BeforeEach
     void setUp() throws SQLException, DatabaseException {
-        watchlistRepository = new WatchlistRepository();
+        watchlistRepository = WatchlistRepository.getInstance();
         clearWatchlist();
     }
 

@@ -65,7 +65,7 @@ public class FHMDbController implements WatchlistObserver {
     public FHMDbController() {
         try {
             this.movieService = new MovieService();
-            this.watchlistRepository = new WatchlistRepository();
+            this.watchlistRepository = WatchlistRepository.getInstance();
             this.watchlistRepository.addObserver(this);
         } catch (DatabaseException e) {
             logger.severe("Database initialization failed: " + e.getMessage());
@@ -184,7 +184,7 @@ public class FHMDbController implements WatchlistObserver {
     }
 
     private void initializeMovieRepository() throws DatabaseException {
-        MovieRepository movieRepository = new MovieRepository();
+        MovieRepository movieRepository = MovieRepository.getInstance();
         if (movieRepository.getAllMovies().isEmpty()) {
             movieRepository.addAllMovies(MovieEntity.fromMovies(movies));
         }

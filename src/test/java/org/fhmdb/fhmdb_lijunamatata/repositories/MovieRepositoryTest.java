@@ -16,7 +16,7 @@ class MovieRepositoryTest {
 
     @BeforeEach
     void setUp() throws SQLException, DatabaseException {
-        movieRepository = new MovieRepository();
+        movieRepository = MovieRepository.getInstance();
         clearMovies();
     }
 

@@ -13,15 +13,29 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Repository class for accessing WatchlistMovieEntity data in the database.
- * Implements Observable pattern for notifying watchers on data changes.
- */
-public class WatchlistRepository {
+    /**
+    * Repository class for accessing WatchlistMovieEntity data in the database.
+    * Implements Observable pattern for notifying watchers on data changes.
+    */
+    public class WatchlistRepository {
 
+    private static WatchlistRepository instance;
     private final Dao<WatchlistMovieEntity, Long> watchlistDao;
     private final List<WatchlistObserver> observers = new ArrayList<>();
 
+    /**
+     * Returns the singleton instance of WatchlistRepository.
+     * Initializes the instance if it has not been created yet.
+     *
+     * @return the single instance of WatchlistRepository
+     * @throws DatabaseException if the repository fails to initialize
+     */
+    public static WatchlistRepository getInstance() throws DatabaseException {
+        if (instance == null) {
+            instance = new WatchlistRepository();
+        }
+        return instance;
+    }
     /**
      * Registers an observer to be notified when the watchlist changes.
      * @param observer the observer to add
@@ -53,7 +67,7 @@ public class WatchlistRepository {
      * Constructs the repository, initializing the DAO.
      * @throws DatabaseException if DatabaseManager or DAO are not properly initialized
      */
-    public WatchlistRepository() throws DatabaseException {
+    private WatchlistRepository() throws DatabaseException {
         DatabaseManager dbManager = DatabaseManager.getDatabaseManager();
         if (dbManager == null) {
             throw new DatabaseException("DatabaseManager is not initialized");
@@ -141,7 +155,7 @@ public class WatchlistRepository {
     public List<MovieEntity> getWatchlistMovies() throws DatabaseException {
         List<WatchlistMovieEntity> watchlist = getWatchlist();
         try {
-            MovieRepository movieRepository = new MovieRepository();
+            MovieRepository movieRepository = MovieRepository.getInstance();
             List<MovieEntity> allMovies = movieRepository.getAllMovies();
 
             return allMovies.stream()
