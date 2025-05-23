@@ -2,7 +2,6 @@ package org.fhmdb.fhmdb_lijunamatata.api;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -72,31 +71,29 @@ public class MovieAPI {
     }
 
     /**
-     * Builds the url by concatenating the parameters in the correct format to pass to the HTTP request in fetchMovies
+     * Builds the final API URL using the Builder Pattern.
+     * This method utilizes the MovieAPIRequestBuilder to dynamically add query parameters
+     * such as search query, genre, release year, and rating threshold.
      *
-     * @param query
-     * @param genre
-     * @param releaseYear
-     * @param ratingFrom
-     * @return the final URL as String
+     * @param query        The search query (e.g., title or keyword). Can be null.
+     * @param genre        The genre filter. Can be null.
+     * @param releaseYear  The release year filter. Can be null.
+     * @param ratingFrom   The minimum rating filter. Can be null.
+     * @return A fully constructed URL as a String.
+     * @throws MovieApiException If the base URL is invalid or building the URL fails.
      */
     private String buildUrl(String query, Genre genre, Integer releaseYear, Double ratingFrom) throws MovieApiException {
-        HttpUrl base = HttpUrl.parse(getBaseUrl());
-        if (base == null) {
-            throw new MovieApiException("Invalid base URL: " + getBaseUrl());
+        try {
+            return new MovieAPIRequestBuilder(getBaseUrl())
+                    .query(query)
+                    .genre(genre != null ? genre.name() : null)
+                    .releaseYear(releaseYear != null ? String.valueOf(releaseYear) : null)
+                    .ratingFrom(ratingFrom != null ? String.valueOf(ratingFrom) : null)
+                    .build();
+
+        } catch (IllegalArgumentException e) {
+            throw new MovieApiException("Failed to build API URL", e);
         }
-        HttpUrl.Builder urlBuilder = base.newBuilder();
-
-        // based on exercise task: 2. Wenn User*innen einen Wert im Freitextfeld und beim Genre selektieren, sollen
-        //dementsprechende Parameter in der URL gesetzt werden.
-
-        if (query != null) urlBuilder.addQueryParameter("query", query);
-        if (genre != null) urlBuilder.addQueryParameter("genre", String.valueOf(genre));
-        if (releaseYear != null) urlBuilder.addQueryParameter("releaseYear", String.valueOf(releaseYear));
-        if (ratingFrom != null) urlBuilder.addQueryParameter("ratingFrom", String.valueOf(ratingFrom));
-
-        return urlBuilder.build().toString();
-
     }
 
     /**
