@@ -14,10 +14,12 @@ import org.fhmdb.fhmdb_lijunamatata.observer.WatchlistObserver;
 import org.fhmdb.fhmdb_lijunamatata.repositories.MovieRepository;
 import org.fhmdb.fhmdb_lijunamatata.repositories.WatchlistRepository;
 import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
+import org.fhmdb.fhmdb_lijunamatata.state.SortContext;
 import org.fhmdb.fhmdb_lijunamatata.ui.MovieCell;
 import org.fhmdb.fhmdb_lijunamatata.utils.ClickEventHandler;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
@@ -37,7 +39,7 @@ public class FHMDbController implements WatchlistObserver {
     private Genre genre;
     private Integer releaseYear;
     private Double rating;
-    private boolean isAscending = true;
+    private final SortContext sortContext = new SortContext();
     private ObservableList<Movie> movies;
     private ObservableList<Movie> filteredMovies;
     private MovieService movieService; //do not make final or can't mock
@@ -251,17 +253,22 @@ public class FHMDbController implements WatchlistObserver {
         if (this.filteredMovies == null || this.filteredMovies.isEmpty()) {
             return;
         }
-        List<Movie> sortedMovies = this.movieService.sortMovies(this.filteredMovies, this.isAscending);
-        this.filteredMovies = FXCollections.observableList(sortedMovies);
-        updateSortButtonText();
 
-        this.isAscending = !this.isAscending;
-        updateMovieListView(this.searchText, this.genre != null ? this.genre.name() : "", this.releaseYear != null ? this.releaseYear : 0, this.rating != null ? this.rating : 0);
+        sortContext.nextState();
+
+        List<Movie> sortedMovies = sortContext.sort(new ArrayList<>(this.filteredMovies));
+        this.filteredMovies = FXCollections.observableList(sortedMovies);
+
+        updateSortButtonText();
+        updateMovieListView(this.searchText, 
+                          this.genre != null ? this.genre.name() : "", 
+                          this.releaseYear != null ? this.releaseYear : 0, 
+                          this.rating != null ? this.rating : 0.0);
     }
 
     void updateSortButtonText() {
         if (this.sortBtn != null) {
-            this.sortBtn.setText(this.isAscending ? "Sort (desc)" : "Sort (asc)");
+            this.sortBtn.setText(sortContext.getButtonText());
         }
     }
 
@@ -271,29 +278,72 @@ public class FHMDbController implements WatchlistObserver {
     }
 
     void filterMovies() {
-        this.filteredMovies = FXCollections.observableArrayList();
-        this.filteredMovies.addAll(this.movies);
+        if (this.movies == null) {
+            return;
+        }
+        
         try {
-            this.filteredMovies = FXCollections.observableList(this.movieService.fetchFilteredMovies(this.searchText, this.genre, this.releaseYear, this.rating));
-            updateMovieListView(this.searchText, this.genre != null ? this.genre.name() : "", this.releaseYear != null ? this.releaseYear : 0, this.rating != null ? this.rating : 0);
-        } catch (MovieApiException e) {
-            updateStatusLabel("API-error: " + e.getMessage() + "-> Getting cached movies instead!", true);
-            logger.severe(e.getMessage());
-            this.filteredMovies = FXCollections.observableList(this.movieService.filterMovies(this.movies, this.searchText, this.genre, this.releaseYear, this.rating));
-            updateMovieListView(this.searchText, this.genre != null ? this.genre.name() : "", this.releaseYear != null ? this.releaseYear : 0, this.rating != null ? this.rating : 0);
+            List<Movie> filtered;
+            
+            // Try to fetch filtered movies from API first
+            try {
+                filtered = this.movieService.fetchFilteredMovies(
+                    this.searchText.isEmpty() ? null : this.searchText, this.genre,
+                    this.releaseYear, this.rating
+                );
+                // Update the local movies list with the fresh data from API
+                if (filtered != null && !filtered.isEmpty()) {
+                    this.movies = FXCollections.observableArrayList(filtered);
+                }
+            } catch (Exception e) {
+                // If API call fails, fall back to local filtering
+                logger.warning("API call failed, using local filtering: " + e.getMessage());
+                filtered = this.movieService.filterMovies(
+                    this.movies, this.searchText, this.genre, this.releaseYear, this.rating
+                );
+            }
+            
+            // Apply the current sort state if not in unsorted state
+            if (!sortContext.isUnsorted() && filtered != null) {
+                filtered = sortContext.sort(filtered);
+            }
+            
+            this.filteredMovies = filtered != null ? 
+                FXCollections.observableArrayList(filtered) : 
+                FXCollections.observableArrayList();
+            
+            // Update the UI
+            updateMovieListView(
+                this.searchText, this.genre != null ? this.genre.name() : "",
+                this.releaseYear != null ? this.releaseYear : 0, this.rating != null ? this.rating : 0.0
+            );
+            
+        } catch (Exception e) {
+            logger.severe("Error filtering movies: " + e.getMessage());
+            updateStatusLabel("Error filtering movies: " + e.getMessage(), true);
         }
     }
-
-    public void updateMovieListView(String searchText, String genre, int releaseYear, double rating) {
-        if (this.movieListView == null) return;
+    
+    void updateMovieListView(String searchText, String genre, int releaseYear, double rating) {
+        if (this.movieListView == null) {
+            return;
+        }
+        
         this.movieListView.getItems().clear();
-        this.movieListView.getItems().addAll(this.filteredMovies);
-        if (this.filteredMovies.isEmpty()) {
-            logger.info("No movies found!");
-            updateStatusLabel("No movies found!", false);
-        } else {
-            logger.info("movies found, calling updateStatusLabel");
-            updateStatusLabel(String.format("Movies found with Query = %s / Genre = %s / ReleaseYear = %d and Rating from %.1f", searchText, genre, releaseYear, rating), false);
+        
+        if (this.filteredMovies != null) {
+            this.movieListView.getItems().addAll(this.filteredMovies);
+            
+            if (this.filteredMovies.isEmpty()) {
+                logger.info("No movies found!");
+                updateStatusLabel("No movies found!", false);
+            } else {
+                logger.info("Movies found, updating status label");
+                updateStatusLabel(String.format(
+                    "Movies found with Query = %s / Genre = %s / ReleaseYear = %d and Rating from %.1f", searchText,
+                    genre != null && !genre.isEmpty() ? genre : "Any", releaseYear, rating
+                ), false);
+            }
         }
     }
 
@@ -321,16 +371,17 @@ public class FHMDbController implements WatchlistObserver {
         }
     }
 
-    public void setFilterElements(String searchText, Genre genre, int releaseYear, double rating) {
-        this.searchText = searchText;
-        this.genre = genre;
-        this.releaseYear = releaseYear;
-        this.rating = rating;
-    }
-
     @Override
     public void onWatchlistChanged(List<Movie> updatedWatchlist) {
         logger.info("Watchlist updated: " + updatedWatchlist.size() + " movies");
         updateStatusLabel("Watchlist updated: " + updatedWatchlist.size() + " movies", false);
+    }
+
+    public SortContext getSortContext() {
+        return sortContext;
+    }
+
+    public ObservableList<Movie> getFilteredMovies() {
+        return filteredMovies;
     }
 }

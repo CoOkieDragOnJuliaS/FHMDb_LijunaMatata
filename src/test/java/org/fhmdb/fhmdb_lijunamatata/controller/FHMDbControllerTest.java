@@ -6,7 +6,9 @@ import org.fhmdb.fhmdb_lijunamatata.models.Genre;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 import org.fhmdb.fhmdb_lijunamatata.repositories.WatchlistRepository;
 import org.fhmdb.fhmdb_lijunamatata.services.MovieService;
+import org.fhmdb.fhmdb_lijunamatata.state.SortContext;
 import org.fhmdb.fhmdb_lijunamatata.utils.ClickEventHandler;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -84,34 +86,99 @@ public class FHMDbControllerTest {
     }
 
     @Test
-    @DisplayName("sortMovies with filteredMovies should call movieService.sortMovies")
-    public void sortMovies_with_filteredMovies_calls_moviesServiceSortMovies() {
-        movieController.setFilteredMovies(initialMovies);
+    @DisplayName("sortMovies should cycle through sort states and update UI")
+    public void sortMovies_cycles_through_sort_states() {
+        // Given
+        Movie movieA = new Movie("1", "A Movie", List.of(Genre.ACTION), 2023, "", "", 120, List.of(), List.of(), List.of(), 8.0);
+        Movie movieB = new Movie("2", "B Movie", List.of(Genre.DRAMA), 2023, "", "", 120, List.of(), List.of(), List.of(), 9.0);
+        List<Movie> testMovies = List.of(movieB, movieA); // Initial order: B, A
+        
+        movieController.setFilteredMovies(testMovies);
+        SortContext sortContext = movieController.getSortContext();
+        
+        // Initial state should be unsorted
+        Assertions.assertTrue(sortContext.isUnsorted());
+        
+        // When - First click (should sort ascending - A, B)
         movieController.sortMovies();
-        verify(movieService).sortMovies(anyList(), anyBoolean());
+        
+        // Then - Verify movies are sorted in ascending order
+        List<Movie> sortedMovies = movieController.getFilteredMovies();
+        Assertions.assertEquals("A Movie", sortedMovies.get(0).getTitle());
+        Assertions.assertEquals("B Movie", sortedMovies.get(1).getTitle());
+        
+        // Verify UI was updated
+        verify(movieController).updateMovieListView(eq(""), eq(""), eq(0), eq(0.0));
+        verify(movieController).updateSortButtonText();
+        
+        // When - Second click (should sort descending - B, A)
+        movieController.sortMovies();
+        
+        // Then - Verify movies are sorted in descending order
+        sortedMovies = movieController.getFilteredMovies();
+        Assertions.assertEquals("B Movie", sortedMovies.get(0).getTitle());
+        Assertions.assertEquals("A Movie", sortedMovies.get(1).getTitle());
+        
+        // Verify button text was updated
+        verify(movieController, times(2)).updateSortButtonText();
+        
+        // When - Third click (should go back to unsorted - B, A)
+        movieController.sortMovies();
+        
+        // Then - Should be back to unsorted state with original order
+        Assertions.assertTrue(sortContext.isUnsorted());
+        sortedMovies = movieController.getFilteredMovies();
+        Assertions.assertEquals("B Movie", sortedMovies.get(0).getTitle());
+        Assertions.assertEquals("A Movie", sortedMovies.get(1).getTitle());
     }
-
+    
     @Test
-    @DisplayName("sortMovies with null filteredMovies should not call movieService.sortMovies")
-    public void sortMovies_with_null_filteredMovies_doesnt_call_moviesServiceSortMethod() {
+    @DisplayName("sortMovies with null filteredMovies should not change state")
+    public void sortMovies_with_null_filteredMovies_does_nothing() {
+        // Given
         movieController.setFilteredMovies(null);
+        
+        // When
         movieController.sortMovies();
-        verify(movieService, never()).sortMovies(anyList(), anyBoolean());
+        
+        // Then - No state change should occur
+        Assertions.assertTrue(movieController.getSortContext().isUnsorted());
+        verify(movieController, never()).updateMovieListView(any(), any(), anyInt(), anyDouble());
     }
 
     @Test
-    @DisplayName("filterMovies should call movieService.fetchFilteredMovies")
+    @DisplayName("filterMovies should call movieService.fetchFilteredMovies and handle API response")
     public void filterMovies_calls_movieServiceFilterMovies() throws MovieApiException {
+        // Given
+        List<Movie> mockMovies = List.of(
+            new Movie("1", "Test Movie", List.of(Genre.ACTION), 2023, "", "", 120, List.of(), List.of(), List.of(), 8.0)
+        );
+        when(movieService.fetchFilteredMovies(any(), any(), any(), any()))
+            .thenReturn(mockMovies);
+        
+        // When
         movieController.filterMovies();
+        
+        // Then
         verify(movieService).fetchFilteredMovies(any(), any(), any(), any());
+        verify(movieController).updateMovieListView(eq(""), eq(""), eq(0), eq(0.0));
     }
 
     @Test
-    @DisplayName("filterMovies calls fetchFilteredMovies with correct parameter types")
-    public void filterMovies_calls_movieServiceFilterMovies_withCorrectParameterTypes() throws MovieApiException {
-        movieController.setFilterElements("", Genre.DRAMA, 1990, 2.5);
+    @DisplayName("filterMovies falls back to local filtering when API call fails")
+    public void filterMovies_fallsBackToLocalFiltering() throws MovieApiException {
+        // Given
+        when(movieService.fetchFilteredMovies(any(), any(), any(), any()))
+            .thenThrow(new MovieApiException("API Error"));
+        when(movieService.filterMovies(any(), any(), any(), any(), any()))
+            .thenReturn(initialMovies);
+        
+        // When
         movieController.filterMovies();
-        verify(movieService).fetchFilteredMovies(anyString(), any(Genre.class), anyInt(), anyDouble());
+        
+        // Then
+        verify(movieService).fetchFilteredMovies(any(), any(), any(), any());
+        verify(movieService).filterMovies(any(), any(), any(), any(), any());
     }
 
     @Test
