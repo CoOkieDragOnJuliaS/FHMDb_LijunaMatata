@@ -56,7 +56,9 @@ public class FHMDbController implements WatchlistObserver {
 
     private ClickEventHandler<Movie> onAddToWatchlistClicked;
 
+    //Scheduler for delaying filtering with API after keypress
     private ScheduledExecutorService scheduler;
+    //Filtering mechanism for filtering delayed
     private Runnable filterTask;
 
     private WatchlistRepository watchlistRepository;
@@ -85,18 +87,26 @@ public class FHMDbController implements WatchlistObserver {
         this.watchlistRepository.addObserver(this);
     }
 
+    /**
+     * initializes the Controller by calling methods for initializing the elements of the class.
+     * <p>
+     * - The `searchText` is automatically updated whenever the user types in the `searchField`.
+     */
     @FXML
     public void initialize() {
         try {
+            //Initializing UI components and handlers
             initializeClickHandlers();
             initializeStatusLabel();
             initializeSchedulers();
 
+            //Initializing data and UI components
             initializeMovies();
             initializeGenreComboBox();
             initializeReleaseYearComboBox();
             initializeRatingComboBox();
 
+            //initializing ListView and Listeners
             initializeMovieListView();
             initializeListeners();
 
@@ -117,6 +127,11 @@ public class FHMDbController implements WatchlistObserver {
         }
     }
 
+    /**
+     * Implementation of the ClickEventHandler to work as a intermediate layer between
+     * Data-Layer and UI-Layer --> the clickEventHandler is then used in the constructor
+     * of the MovieCell/or new scene below in the initialization method!
+     */
     protected void initializeClickHandlers() {
         onAddToWatchlistClicked = (clickedMovie) -> {
             if (watchlistRepository == null) {
@@ -139,14 +154,24 @@ public class FHMDbController implements WatchlistObserver {
         };
     }
 
+    /**
+     * Adding a new instance to statusLabel and set it to not visible by updating it
+     */
     private void initializeStatusLabel() {
         updateStatusLabel("", false);
     }
 
+    /**
+     * Adding the scheduler to help with delaying input and query search
+     */
     private void initializeSchedulers() {
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
+    /**
+     * Adding listeners to the search field (searchText) and
+     * changing the genre in the genreComboBox. Old value is compared with new one.
+     */
     private void initializeListeners() {
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             searchText = newValue;
@@ -170,11 +195,17 @@ public class FHMDbController implements WatchlistObserver {
         ratingComboBox.valueProperty().addListener((observable, oldValue, newValue) -> updateRatingFilter(newValue));
     }
 
+    /**
+     * Initializes movieListView element and setting the MovieCell onto the view
+     */
     private void initializeMovieListView() {
         movieListView.setItems(this.filteredMovies);
         movieListView.setCellFactory(movieListView -> new MovieCell(onAddToWatchlistClicked));
     }
 
+    /**
+     * Initializes the ObservableArrayList() of movies and filteredMovies
+     */
     private void initializeMovies() throws MovieApiException, DatabaseException, IOException {
         updateStatusLabel("Loading movies...", false);
         this.movies = FXCollections.observableArrayList(Movie.initializeMovies());
@@ -185,6 +216,9 @@ public class FHMDbController implements WatchlistObserver {
         updateStatusLabel("", false);
     }
 
+    /**
+     * initializes the repository with the movies from the database
+     */
     private void initializeMovieRepository() throws DatabaseException {
         MovieRepository movieRepository = MovieRepository.getInstance();
         if (movieRepository.getAllMovies().isEmpty()) {
@@ -192,6 +226,10 @@ public class FHMDbController implements WatchlistObserver {
         }
     }
 
+    /**
+     * Initializes the genre ComboBox with a "no genre" option followed by all genres from the {@link Genre} enum.
+     * The first item, representing "no genre", is selected by default.
+     */
     private void initializeGenreComboBox() {
         ObservableList<Genre> genreOptions = FXCollections.observableArrayList();
         genreOptions.add(null);
@@ -199,6 +237,10 @@ public class FHMDbController implements WatchlistObserver {
         this.genreComboBox.setItems(genreOptions);
     }
 
+    /**
+     * Initializes a releaseYear ComboBox with a "no year" option followed by all distinct years from filtered Movies.
+     * The first item, representing "no year", is selected by default.
+     */
     private void initializeReleaseYearComboBox() {
         ObservableList<Integer> releaseYearOptions = FXCollections.observableArrayList();
         releaseYearOptions.add(null);
@@ -214,6 +256,10 @@ public class FHMDbController implements WatchlistObserver {
         this.releaseYearComboBox.setItems(releaseYearOptions);
     }
 
+    /**
+     * Initializes the rating ComboBox with a "no rating" option followed by all distinct ratings from filtered Movies.
+     * The first item, representing "no rating", is selected by default.
+     */
     private void initializeRatingComboBox() {
         ObservableList<String> ratingOptions = FXCollections.observableArrayList();
         ratingOptions.add("All Ratings");
@@ -229,6 +275,10 @@ public class FHMDbController implements WatchlistObserver {
         this.ratingComboBox.setItems(ratingOptions);
     }
 
+    /**
+     * @param selectedRatingString This method updates the rating variable which is used for filtering movies
+     *                             according to the value picked in the ratingComboBox (e.g. > 2)
+     */
     private void updateRatingFilter(String selectedRatingString) {
         if (selectedRatingString == null || selectedRatingString.equals("All Ratings")) {
             this.rating = null;
@@ -237,23 +287,33 @@ public class FHMDbController implements WatchlistObserver {
                 this.rating = Double.parseDouble(selectedRatingString.substring(2));
             } catch (NumberFormatException e) {
                 System.err.println("Error parsing rating threshold: " + selectedRatingString);
-                this.rating = null;
+                this.rating = null; // Reset rating if parsing fails
             }
         } else {
             this.rating = null;
         }
     }
 
+    /**
+     * Handles the sorting button click event.
+     * Calls the sortMovies() method to toggle the sorting order.
+     */
     @FXML
     public void onSortButtonClick() {
         sortMovies();
     }
 
+    /**
+     * Sorts the list of movies based on the current sorting order.
+     * Update: The sorting order and sorting mechanism is now done by the State Pattern SortContext()
+     * Updates the button text and refreshes the movie list view.
+     */
     void sortMovies() {
         if (this.filteredMovies == null || this.filteredMovies.isEmpty()) {
             return;
         }
 
+        //Iterating to the next state, e.g. unsorted, asc or desc
         sortContext.nextState();
 
         List<Movie> sortedMovies = sortContext.sort(new ArrayList<>(this.filteredMovies));
@@ -266,17 +326,30 @@ public class FHMDbController implements WatchlistObserver {
                           this.rating != null ? this.rating : 0.0);
     }
 
+    /**
+     * Updates the sort button text based on the current sorting order.
+     * This method ensures that the UI element is updated only when available.
+     */
     void updateSortButtonText() {
         if (this.sortBtn != null) {
             this.sortBtn.setText(sortContext.getButtonText());
         }
     }
 
+    /**
+     * Handles the filter button click event.
+     * Calls the filterMovies() method to trigger filtering
+     */
     @FXML
     public void onFilterButtonClick() {
         filterMovies();
     }
 
+    /**
+     * Calls the fetchFilteredMovies() method from movieService if API is accessible,
+     * otherwise referring to local filtering mechanism in movieService
+     * Updating the movieListView and the sortingState during the process
+     */
     void filterMovies() {
         if (this.movies == null) {
             return;
@@ -285,7 +358,7 @@ public class FHMDbController implements WatchlistObserver {
         try {
             List<Movie> filtered;
             
-            // Try to fetch filtered movies from API first
+            // Trying to fetch filtered movies from API first
             try {
                 filtered = this.movieService.fetchFilteredMovies(
                     this.searchText.isEmpty() ? null : this.searchText, this.genre,
@@ -323,7 +396,11 @@ public class FHMDbController implements WatchlistObserver {
             updateStatusLabel("Error filtering movies: " + e.getMessage(), true);
         }
     }
-    
+
+    /**
+     * Updates the movie list view by clearing and repopulating it with sorted movie titles.
+     * Ensures the UI list correctly reflects the current order of movies.
+     */
     void updateMovieListView(String searchText, String genre, int releaseYear, double rating) {
         if (this.movieListView == null) {
             return;
@@ -347,6 +424,13 @@ public class FHMDbController implements WatchlistObserver {
         }
     }
 
+    /**
+     * Updates the status label with a given message.
+     * Ensures the update runs on the JavaFX UI thread.
+     *
+     * @param message The message to display.
+     * @param isError If true, the label is made visible; otherwise, it's hidden when empty message and not an error.
+     */
     public void updateStatusLabel(String message, boolean isError) {
         if (statusLabel != null) {
             logger.info("Updating status label...");
@@ -355,12 +439,27 @@ public class FHMDbController implements WatchlistObserver {
         }
     }
 
+    /**
+     * Shuts down the scheduler which is setup in the Controller.
+     * Without this option the scheduler would still run after the Application is closed
+     */
     public void shutdownScheduler() {
         if (scheduler != null && !scheduler.isShutdown()) {
             scheduler.shutdown();
         }
     }
 
+    /**
+     * overridden method to call the updateStatusLabel to set the new information
+     * @param updatedWatchlist the current state of the watchlist
+     */
+    @Override
+    public void onWatchlistChanged(List<Movie> updatedWatchlist) {
+        logger.info("Watchlist updated: " + updatedWatchlist.size() + " movies");
+        updateStatusLabel("Watchlist updated: " + updatedWatchlist.size() + " movies", false);
+    }
+
+    //Getter, Setter
     public void setMovies(List<Movie> movies) {
         this.movies = FXCollections.observableList(movies);
     }
@@ -369,12 +468,6 @@ public class FHMDbController implements WatchlistObserver {
         if (movies != null) {
             this.filteredMovies = FXCollections.observableList(movies);
         }
-    }
-
-    @Override
-    public void onWatchlistChanged(List<Movie> updatedWatchlist) {
-        logger.info("Watchlist updated: " + updatedWatchlist.size() + " movies");
-        updateStatusLabel("Watchlist updated: " + updatedWatchlist.size() + " movies", false);
     }
 
     public SortContext getSortContext() {

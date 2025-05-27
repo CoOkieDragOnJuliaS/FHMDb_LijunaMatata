@@ -59,6 +59,9 @@ public class WatchlistController implements WatchlistObserver {
         }
     }
 
+    /**
+     * Initializing clickhandler for the "Remove from Watchlist"-Button
+     */
     protected void initializeClickHandlers() {
         onRemoveFromWatchlistClicked = (clickedMovie) -> {
             try {
@@ -74,6 +77,10 @@ public class WatchlistController implements WatchlistObserver {
         };
     }
 
+    /**
+     * Method to initialize watchlist movies and the view itself when called
+     * "Refresher" method
+     */
     protected void refreshWatchlist() {
         try {
             initializeWatchlistMovies();
@@ -84,10 +91,17 @@ public class WatchlistController implements WatchlistObserver {
         initializeWatchlistView();
     }
 
+    /**
+     * Adding a new instance to statusLabel and set it to not visible by updating it
+     */
     private void initializeStatusLabel() {
         updateStatusLabel("", false);
     }
 
+    /**
+     * Initialize Watchlistview (is called by refreshWatchlist()), by clearing the last items,
+     * setting the new items and setting the cellFactory to the new WatchlistCell
+     */
     private void initializeWatchlistView() {
         if (watchlistMovies == null) {
             watchlistMovies = FXCollections.observableArrayList();
@@ -97,6 +111,10 @@ public class WatchlistController implements WatchlistObserver {
         watchlistView.setCellFactory(view -> new WatchlistCell(onRemoveFromWatchlistClicked));
     }
 
+    /**
+     * initialize watchlist movies by loading them from repository if existent
+     * If not then the statusLabel will show the current sítuation or count of movies existent
+     */
     private void initializeWatchlistMovies() throws DatabaseException {
         updateStatusLabel("Loading watchlist...", false);
         List<MovieEntity> watchlistMovieEntities = watchlistRepository.getWatchlistMovies();
@@ -109,6 +127,13 @@ public class WatchlistController implements WatchlistObserver {
         }
     }
 
+    /**
+     * Updates the status label with a given message.
+     * Ensures the update runs on the JavaFX UI thread.
+     *
+     * @param message The message to display.
+     * @param isError If true, the label is made visible; otherwise, it's hidden when empty message and not an error.
+     */
     public void updateStatusLabel(String message, boolean isError) {
         if (statusLabel != null) {
             logger.info("Updating status label: " + message);
@@ -117,15 +142,21 @@ public class WatchlistController implements WatchlistObserver {
         }
     }
 
-    public void setWatchlistMovies(List<Movie> watchlistMovies) {
-        this.watchlistMovies = FXCollections.observableList(watchlistMovies);
-    }
-
+    /**
+     * Overridden method to set the updatedWatchlistMovies if changed
+     * as well as update the listView and the statusLabel
+     * @param updatedWatchlist the current state of the watchlist
+     */
     @Override
     public void onWatchlistChanged(List<Movie> updatedWatchlist) {
         logger.info("Watchlist updated. Number of movies: " + updatedWatchlist.size());
         setWatchlistMovies(updatedWatchlist);
         initializeWatchlistView();
         updateStatusLabel("Watchlist updated: " + updatedWatchlist.size() + " movies", false);
+    }
+
+    //Getter, Setter
+    public void setWatchlistMovies(List<Movie> watchlistMovies) {
+        this.watchlistMovies = FXCollections.observableList(watchlistMovies);
     }
 }
