@@ -128,31 +128,37 @@ public class FHMDbController implements WatchlistObserver {
     }
 
     /**
-     * Implementation of the ClickEventHandler to work as a intermediate layer between
-     * Data-Layer and UI-Layer --> the clickEventHandler is then used in the constructor
-     * of the MovieCell/or new scene below in the initialization method!
+     * Initializes the click handler for adding movies to the watchlist.
+     * Prevents duplicate entries and shows feedback using popup alerts.
      */
     protected void initializeClickHandlers() {
         onAddToWatchlistClicked = (clickedMovie) -> {
             if (watchlistRepository == null) {
                 logger.severe("WatchlistRepository is not initialized");
-                updateStatusLabel("Cannot add to watchlist: Database not initialized", true);
+                showPopup("Error", "Database not initialized.");
                 return;
             }
+
             try {
+                // Convert Movie to MovieEntity to access the API ID
                 MovieEntity movieEntity = new MovieEntity(clickedMovie);
+                String apiId = movieEntity.getApiId();
+
+                // Add the movie to the watchlist
                 watchlistRepository.addToWatchlist(movieEntity);
-                logger.info("Adding movie to watchlist: " + clickedMovie.getTitle());
-                updateStatusLabel("Added " + clickedMovie.getTitle() + " to Watchlist!", false);
+                logger.info("Added to watchlist: " + clickedMovie.getTitle());
+                showPopup("Watchlist", "✅ " + clickedMovie.getTitle() + " added to watchlist!");
+
             } catch (DatabaseException dbException) {
                 logger.severe("Database error: " + dbException.getMessage());
-                updateStatusLabel("Movie " + clickedMovie.getTitle() + " could not be added to the watchlist: " + dbException.getMessage(), true);
+                showPopup("Database Error", "Could not add movie: " + dbException.getMessage());
             } catch (Exception e) {
                 logger.severe("Unexpected error: " + e.getMessage());
-                updateStatusLabel("Unexpected error adding movie to watchlist: " + e.getMessage(), true);
+                showPopup("Error", "Unexpected error: " + e.getMessage());
             }
         };
     }
+
 
     /**
      * Adding a new instance to statusLabel and set it to not visible by updating it
@@ -477,4 +483,18 @@ public class FHMDbController implements WatchlistObserver {
     public ObservableList<Movie> getFilteredMovies() {
         return filteredMovies;
     }
+
+    void showPopup(String title, String content) {
+        javafx.application.Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(content);
+            alert.getButtonTypes().setAll(ButtonType.OK);
+            alert.showAndWait();
+        });
+    }
+
+
+
 }

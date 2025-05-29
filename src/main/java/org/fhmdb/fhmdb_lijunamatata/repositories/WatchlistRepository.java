@@ -6,6 +6,7 @@ import org.fhmdb.fhmdb_lijunamatata.database.DatabaseManager;
 import org.fhmdb.fhmdb_lijunamatata.database.MovieEntity;
 import org.fhmdb.fhmdb_lijunamatata.database.WatchlistMovieEntity;
 import org.fhmdb.fhmdb_lijunamatata.exceptions.DatabaseException;
+import org.fhmdb.fhmdb_lijunamatata.observer.Observable;
 import org.fhmdb.fhmdb_lijunamatata.observer.WatchlistObserver;
 import org.fhmdb.fhmdb_lijunamatata.models.Movie;
 
@@ -17,7 +18,7 @@ import java.util.List;
     * Repository class for accessing WatchlistMovieEntity data in the database.
     * Implements Observable pattern for notifying watchers on data changes.
     */
-    public class WatchlistRepository {
+    public class WatchlistRepository implements Observable {
 
     private static WatchlistRepository instance;
     private final Dao<WatchlistMovieEntity, Long> watchlistDao;
@@ -56,7 +57,7 @@ import java.util.List;
      * Notifies all registered observers with the current watchlist movies.
      * @throws DatabaseException if fetching watchlist movies fails
      */
-    private void notifyObservers() throws DatabaseException {
+    public void notifyObservers() throws DatabaseException {
         List<Movie> updatedWatchlist = MovieEntity.toMovies(getWatchlistMovies());
         for (WatchlistObserver observer : observers) {
             observer.onWatchlistChanged(updatedWatchlist);
@@ -136,7 +137,7 @@ import java.util.List;
      * @return true if movie exists, false otherwise
      * @throws DatabaseException if DB query fails
      */
-    private boolean existsInWatchlist(String apiId) throws DatabaseException {
+    public boolean existsInWatchlist(String apiId) throws DatabaseException {
         try {
             QueryBuilder<WatchlistMovieEntity, Long> queryBuilder = watchlistDao.queryBuilder();
             queryBuilder.setCountOf(true);

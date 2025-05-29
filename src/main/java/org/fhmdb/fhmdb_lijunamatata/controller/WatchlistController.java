@@ -12,11 +12,16 @@ import org.fhmdb.fhmdb_lijunamatata.observer.WatchlistObserver;
 import org.fhmdb.fhmdb_lijunamatata.repositories.WatchlistRepository;
 import org.fhmdb.fhmdb_lijunamatata.ui.WatchlistCell;
 import org.fhmdb.fhmdb_lijunamatata.utils.ClickEventHandler;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import org.fhmdb.fhmdb_lijunamatata.utils.StatusUpdatable;
+
 
 import java.util.List;
 import java.util.logging.Logger;
 
-public class WatchlistController implements WatchlistObserver {
+public class WatchlistController implements WatchlistObserver, StatusUpdatable {
 
     private ObservableList<Movie> watchlistMovies;
 
@@ -60,22 +65,37 @@ public class WatchlistController implements WatchlistObserver {
     }
 
     /**
-     * Initializing clickhandler for the "Remove from Watchlist"-Button
+     * Initializes the click handler for adding movies to the watchlist.
+     * Prevents duplicate entries and shows feedback using popup alerts.
+     */
+    /**
+     * Initializes the click handler for removing movies from the watchlist.
+     * Provides popup feedback and handles database errors gracefully.
      */
     protected void initializeClickHandlers() {
         onRemoveFromWatchlistClicked = (clickedMovie) -> {
             try {
+                // Show info in console and popup before deletion
+                logger.info("Removing movie from watchlist: " + clickedMovie.getTitle());
+                showPopup("Watchlist", "🗑️ " + clickedMovie.getTitle() + " removed from watchlist.");
+
+                // Convert to MovieEntity for database deletion
                 MovieEntity movieEntity = new MovieEntity(clickedMovie);
                 watchlistRepository.removeFromWatchlist(movieEntity.getApiId());
-                logger.info("Removing movie from watchlist: " + clickedMovie.getTitle());
-                updateStatusLabel("Removed " + clickedMovie.getTitle() + " from Watchlist!", false);
+
+                // Refresh list
                 refreshWatchlist();
+
             } catch (DatabaseException e) {
                 logger.severe("Error removing movie from watchlist: " + e.getMessage());
-                updateStatusLabel("Failed to remove movie from watchlist: " + e.getMessage(), true);
+                showPopup("Database Error", "Failed to remove movie: " + e.getMessage());
+                updateStatus("Failed to remove movie from watchlist: " + e.getMessage(), true);
+
             }
         };
     }
+
+
 
     /**
      * Method to initialize watchlist movies and the view itself when called
@@ -159,4 +179,28 @@ public class WatchlistController implements WatchlistObserver {
     public void setWatchlistMovies(List<Movie> watchlistMovies) {
         this.watchlistMovies = FXCollections.observableList(watchlistMovies);
     }
+
+    /**
+     * Displays a simple popup dialog with OK button.
+     *
+     * @param title   The window title
+     * @param content The message to show
+     */
+    protected void showPopup(String title, String content) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(content);
+            alert.getButtonTypes().setAll(ButtonType.OK);
+            alert.showAndWait();
+        });
+    }
+
+    @Override
+    public void updateStatus(String message, boolean isError) {
+        updateStatusLabel(message, isError);
+    }
+
+
 }
