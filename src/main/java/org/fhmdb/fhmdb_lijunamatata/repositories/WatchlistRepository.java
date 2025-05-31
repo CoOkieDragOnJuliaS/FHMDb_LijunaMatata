@@ -26,17 +26,18 @@ import java.util.List;
 
     /**
      * Returns the singleton instance of WatchlistRepository.
-     * Initializes the instance if it has not been created yet.
+     * Synchronized to prevent multiple instances in a multithreaded environment.
      *
      * @return the single instance of WatchlistRepository
      * @throws DatabaseException if the repository fails to initialize
      */
-    public static WatchlistRepository getInstance() throws DatabaseException {
-        if (instance == null) {
-            instance = new WatchlistRepository();
+        public static synchronized WatchlistRepository getInstance() throws DatabaseException {
+            if (instance == null) {
+                instance = new WatchlistRepository();
+            }
+            return instance;
         }
-        return instance;
-    }
+
     /**
      * Registers an observer to be notified when the watchlist changes.
      * @param observer the observer to add

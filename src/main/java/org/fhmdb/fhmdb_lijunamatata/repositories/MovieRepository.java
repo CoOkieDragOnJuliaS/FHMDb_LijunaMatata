@@ -32,15 +32,17 @@ import java.util.List;
 
     /**
      * Returns the single instance of MovieRepository.
+     * Synchronized to ensure thread safety when accessed from multiple threads.
      */
-    public static MovieRepository getInstance() throws DatabaseException {
-        if (instance == null) {
-            instance = new MovieRepository();
-        }
-        return instance;
+    public static synchronized MovieRepository getInstance() throws DatabaseException {
+            if (instance == null) {
+                instance = new MovieRepository();
+            }
+            return instance;
     }
 
-    /**
+
+        /**
      * Retrieves all movies from the database.
      *
      * @return List of MovieEntity objects representing all movies in the database
