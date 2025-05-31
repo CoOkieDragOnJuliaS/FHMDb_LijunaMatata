@@ -77,7 +77,7 @@ public class WatchlistController implements WatchlistObserver, StatusUpdatable {
             try {
                 // Show info in console and popup before deletion
                 logger.info("Removing movie from watchlist: " + clickedMovie.getTitle());
-                showPopup("Watchlist", "🗑️ " + clickedMovie.getTitle() + " removed from watchlist.");
+                showPopup("Watchlist", "🗑 " + clickedMovie.getTitle() + " removed from watchlist.");
 
                 // Convert to MovieEntity for database deletion
                 MovieEntity movieEntity = new MovieEntity(clickedMovie);

@@ -42,6 +42,7 @@ import java.util.List;
      * Registers an observer to be notified when the watchlist changes.
      * @param observer the observer to add
      */
+    @Override
     public void addObserver(WatchlistObserver observer) {
         observers.add(observer);
     }
@@ -50,6 +51,7 @@ import java.util.List;
      * Removes an observer from notifications.
      * @param observer the observer to remove
      */
+    @Override
     public void removeObserver(WatchlistObserver observer) {
         observers.remove(observer);
     }
@@ -58,6 +60,7 @@ import java.util.List;
      * Notifies all registered observers with the current watchlist movies.
      * @throws DatabaseException if fetching watchlist movies fails
      */
+    @Override
     public void notifyObservers() throws DatabaseException {
         List<Movie> updatedWatchlist = MovieEntity.toMovies(getWatchlistMovies());
         for (WatchlistObserver observer : observers) {
