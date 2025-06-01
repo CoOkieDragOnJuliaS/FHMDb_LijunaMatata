@@ -31,11 +31,11 @@ The aim of this exercise is to:
                   .ratingFrom("8.3")
                   .build();
   ```
-## Singleton Pattern
+### Singleton Pattern
 
 - Implement all repository classes (e.g., `MovieRepository`, `WatchlistRepository`) using the Singleton Pattern to ensure a single shared instance.
 
-## Observer Pattern
+### Observer Pattern
 
 - Notify the UI when a movie is successfully added to the Watchlist or if it already exists.
 - `WatchlistRepository` should be the Observable.
