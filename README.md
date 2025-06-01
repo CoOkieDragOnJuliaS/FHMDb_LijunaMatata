@@ -1,65 +1,54 @@
-## Mirrored Template for Exercise 3
-The goal of this exercise is to extend the FHMDb application by introducing a multi-layered architecture (UI Layer, Business/Logic Layer, Data Layer), adding persistence with an H2 database using ORMLite, and implementing robust exception handling.
-## K.O. Criteria are the following:
-- The project must include a GUI (no console applications allowed).
-- The project must be based on Maven.
-- The project must be available on GitHub with public access.
-- If any K.O. criterion is not met, the submission will be evaluated as failed.
-## Tasks
+## Mirrored Template for Exercise 4
+This exercise extends the FHMDb application by integrating **Software Design Patterns** into the application structure and refactoring existing functionality accordingly. It also focuses on applying **SOLID principles** to improve software architecture and maintainability.
+## Goal
 
-### Presentation Layer
+The aim of this exercise is to:
+- Understand and apply common design patterns in a JavaFX application.
+- Apply and identify SOLID principles in code.
+- Refactor the codebase for better maintainability and modularity.
 
-- Implement navigation between the **MovieScreen** (all movies) and the **WatchlistScreen** (saved movies).
-- In the **MovieScreen**, allow users to **add movies to the Watchlist** (e.g., via a button).
-- In the **WatchlistScreen**, allow users to **remove movies from the Watchlist**.
+## K.O. Criteria (Must be fulfilled)
 
-### Data Layer
+- The project **must include a GUI** (no console applications).
+- The project **must use Maven**.
+- The project **must be available on GitHub** and **public**.
 
-- Implement the following classes:
-  - `MovieEntity`: Represents movie data to be stored in the database.  
-    (Lists like directors, writers, and mainCast are excluded; genres are stored as comma-separated strings.)
-  - `WatchlistMovieEntity`: Represents entries in the Watchlist (stores only the API ID of the movie).
-  - `DatabaseManager`: Manages the database connection and DAO instances.
-  - `MovieRepository` and `WatchlistRepository`: Provide functions for:
-    - Retrieving all entries from the respective database tables.
-    - Deleting all or specific entries.
-    - Adding a movie to the Watchlist (only if it does not already exist).
+### State Pattern
 
-### Business/Logic Layer
+- Implement sorting logic (unsorted, ascending, descending) using the **State Pattern**.
+- Sorting should persist even after filtering.
+- The logic for state transitions must be encapsulated in **dedicated state classes**, not in the controller.
 
-- Extend the **Controller** to interact between the UI and the Data Layer.
-- When a user clicks **"Add to Watchlist"** or **"Remove from Watchlist"**, handle the action using a **Lambda Expression**.
-- Create a `ClickEventHandler` functional interface with the method:
+### Builder Pattern
+
+- Refactor URL construction for `MovieAPI` requests using the **Builder Pattern**.
+- Support flexible filter chaining:
+  ```java
+  String url = new MovieAPIRequestBuilder(base)
+                  .query("word")
+                  .genre("ACTION")
+                  .releaseYear("2012")
+                  .ratingFrom("8.3")
+                  .build();
+  ```
+### Singleton Pattern
+
+- Implement all repository classes (e.g., `MovieRepository`, `WatchlistRepository`) using the Singleton Pattern to ensure a single shared instance.
+
+### Observer Pattern
+
+- Notify the UI when a movie is successfully added to the Watchlist or if it already exists.
+- `WatchlistRepository` should be the Observable.
+- Controller classes act as Observers.
+- Create Observable and Observer interfaces and implement them properly.
+  
+### Factory Pattern
+- JavaFX controllers should be instantiated via a Controller Factory to ensure a Singleton instance.
+- Implement a custom MyFactory that returns the same controller instance:
 ```java
-void onClick(T t);
-```
-Example usage:
-
-## In MovieCell class:
-```java
-watchlistBtn.setOnMouseClicked(mouseEvent -> {
-    addToWatchlistClicked.onClick(getItem());
-});
-```
-## In the Controller:
-```java
-private final ClickEventHandler onAddToWatchlistClicked = (clickedItem) -> {
-    // code to add movie to watchlist
-};
-```
-### Exception Handling
-- Implement two custom exception classes:
-  - `DatabaseException`
-  - `MovieApiException`
-- Properly propagate exceptions:
-  - Data Layer exceptions → `DatabaseException`
-  - API Layer exceptions → `MovieApiException`
-- Handle exceptions in the **Controller**.
-
-- Display user-friendly error messages in the GUI.
-- If the MovieAPI is unavailable, fallback to cached movies from the database.
-- The application must never crash and should always provide meaningful feedback to users.
-
+FXMLLoader loader = new FXMLLoader(...);
+loader.setControllerFactory(new MyFactory());
+  ```
 ## Coding Conventions:
   .) Naming Conventions are in English, camelCase is mandatory</br>
   .) Beware of method/function names and variables - state that it is clear what the variable does or the function/method</br>
